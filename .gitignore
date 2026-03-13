@@ -9,3 +9,6 @@ yarn-error.log*
 node_modules/
 .vscode/
 .idea/
+docs/
+.well-known/
+volume.vivan.site.conf
