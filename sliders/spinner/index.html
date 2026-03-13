@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roulette Wheel | Volume</title>
+    <meta
+      name="description"
+      content="Set the volume with a roulette wheel and accept whatever number the pointer lands on."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Roulette Wheel | Volume" />
+    <meta
+      property="og:description"
+      content="Set the volume with a roulette wheel and accept whatever number the pointer lands on."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/spinner/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Roulette Wheel | Volume" />
+    <meta
+      name="twitter:description"
+      content="Set the volume with a roulette wheel and accept whatever number the pointer lands on."
+    />
+    <link rel="canonical" href="https://volume.vivan.site/sliders/spinner/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --text: #111111;
+        --muted: #9a9a9a;
+        --line: #d9d9d9;
+        --panel: #ffffff;
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(76vh, 880px);
+        width: 100%;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+        width: min(92vw, 560px);
+      }
+
+      .label {
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #a8a8a3;
+      }
+
+      .volume-display {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        min-height: 82px;
+      }
+
+      .volume-number {
+        font-size: clamp(3.6rem, 10vw, 5.4rem);
+        font-weight: 300;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        min-width: 6.5rem;
+        text-align: right;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease;
+      }
+
+      .volume-number.landing {
+        transform: scale(1.05);
+      }
+
+      .volume-unit {
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: var(--muted);
+      }
+
+      .wheel-wrap {
+        position: relative;
+        width: min(88vw, 520px);
+        height: min(88vw, 520px);
+      }
+
+      .pointer {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 11px solid transparent;
+        border-right: 11px solid transparent;
+        border-top: 18px solid #111;
+        z-index: 10;
+      }
+
+      canvas#wheel {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 50%;
+        background: var(--panel);
+        box-shadow:
+          0 0 0 1px var(--line),
+          0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .centre-cap {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #111;
+        z-index: 5;
+      }
+
+      .spin-btn {
+        appearance: none;
+        border: none;
+        background: #111;
+        color: #fff;
+        font: inherit;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        padding: 0.9rem 2.5rem;
+        border-radius: 999px;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          opacity 0.2s ease,
+          background 0.2s ease;
+        touch-action: manipulation;
+      }
+
+      .spin-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .spin-btn:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+
+      .spin-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page">
+    <div class="page-shell">
+      <header class="page-bar">
+        <div class="page-links">
+          <a class="page-link" href="../../">Homepage</a>
+          <a class="page-link page-link-secondary" href="../">All sliders</a>
+        </div>
+        <div class="page-bar-copy">
+          <h1>Roulette Wheel</h1>
+          <p>Spin once and live with whatever percentage shows up.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="app">
+          <div class="label">Current Volume</div>
+
+          <div class="volume-display">
+            <span class="volume-number" id="volNum">-</span>
+            <span class="volume-unit">%</span>
+          </div>
+
+          <div class="wheel-wrap">
+            <div class="pointer"></div>
+            <canvas
+              id="wheel"
+              width="520"
+              height="520"
+              role="img"
+              aria-label="Roulette wheel with volume values from zero to one hundred"
+            ></canvas>
+            <div class="centre-cap"></div>
+          </div>
+
+          <button class="spin-btn" id="spinBtn" type="button">Spin</button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const TAU = Math.PI * 2;
+
+      function shuffle(items) {
+        const copy = [...items];
+
+        for (let index = copy.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+        }
+
+        return copy;
+      }
+
+      const values = Array.from({ length: 101 }, (_, index) => index);
+      const segments = shuffle(values);
+      const SEGMENTS = segments.length;
+      const ARC = TAU / SEGMENTS;
+
+      const wheelWrap = document.querySelector(".wheel-wrap");
+      const canvas = document.getElementById("wheel");
+      const ctx = canvas.getContext("2d");
+      const spinBtn = document.getElementById("spinBtn");
+      const volNum = document.getElementById("volNum");
+
+      let size = 520;
+      let radius = size / 2;
+      let cx = radius;
+      let cy = radius;
+      let currentAngle = -Math.PI / 2;
+      let displayAngle = currentAngle;
+      let spinning = false;
+
+      function easeOutSine(t) {
+        return Math.sin((t * Math.PI) / 2);
+      }
+
+      function getTargetRotation(index) {
+        return -Math.PI / 2 - (index + 0.5) * ARC;
+      }
+
+      function normaliseAngle(angle) {
+        return ((angle % TAU) + TAU) % TAU;
+      }
+
+      function resizeCanvas() {
+        size = wheelWrap.clientWidth || 520;
+        radius = size / 2;
+        cx = radius;
+        cy = radius;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(size * dpr);
+        canvas.height = Math.round(size * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawWheel(displayAngle);
+      }
+
+      function drawWheel(rotation) {
+        ctx.clearRect(0, 0, size, size);
+
+        for (let index = 0; index < SEGMENTS; index += 1) {
+          const startAngle = rotation + index * ARC;
+          const endAngle = startAngle + ARC;
+
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, radius - 3, startAngle, endAngle);
+          ctx.closePath();
+          ctx.fillStyle = index % 2 === 0 ? "#fbfbfb" : "#ededed";
+          ctx.fill();
+
+          ctx.strokeStyle = "#d8d8d8";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(startAngle + ARC / 2);
+
+          ctx.textAlign = "right";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "#222";
+
+          let fontSize = 8;
+          if (segments[index] < 10) fontSize = 9;
+          if (segments[index] === 100) fontSize = 7;
+
+          ctx.font = `500 ${fontSize}px "Avenir Next", "Segoe UI", sans-serif`;
+          ctx.fillText(String(segments[index]), radius - 10, 0);
+          ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius - 3, 0, TAU);
+        ctx.strokeStyle = "#bdbdbd";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function spin() {
+        if (spinning) return;
+
+        spinning = true;
+        spinBtn.disabled = true;
+        spinBtn.textContent = "Spinning";
+        volNum.classList.remove("landing");
+
+        const targetIndex = Math.floor(Math.random() * SEGMENTS);
+        const targetRotation = getTargetRotation(targetIndex);
+        const fullSpins = (5 + Math.floor(Math.random() * 4)) * TAU;
+        const delta = normaliseAngle(targetRotation - currentAngle);
+        const finalAngle = currentAngle + fullSpins + delta;
+        const startAngle = currentAngle;
+        const duration = 2800 + Math.random() * 1400;
+        const startTime = performance.now();
+
+        function frame(now) {
+          const elapsed = now - startTime;
+          const t = Math.min(elapsed / duration, 1);
+          const eased = easeOutSine(t);
+          displayAngle = startAngle + (finalAngle - startAngle) * eased;
+          drawWheel(displayAngle);
+
+          if (t < 1) {
+            requestAnimationFrame(frame);
+            return;
+          }
+
+          currentAngle = normaliseAngle(finalAngle);
+          displayAngle = currentAngle;
+          drawWheel(displayAngle);
+
+          const winner = segments[targetIndex];
+          volNum.textContent = winner;
+          volNum.classList.add("landing");
+          setTimeout(() => volNum.classList.remove("landing"), 220);
+
+          spinBtn.disabled = false;
+          spinBtn.textContent = "Spin";
+          spinning = false;
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      spinBtn.addEventListener("click", spin);
+      window.addEventListener("resize", resizeCanvas, { passive: true });
+      resizeCanvas();
+    </script>
+  </body>
+</html>

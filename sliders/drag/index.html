@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Drag and Drop | Volume</title>
+    <meta
+      name="description"
+      content="Raise the volume one percent at a time by dragging speaker icons into a box."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Drag and Drop | Volume" />
+    <meta
+      property="og:description"
+      content="Raise the volume one percent at a time by dragging speaker icons into a box."
+    />
+    <meta property="og:url" content="https://volume.vivan.site/sliders/drag/" />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Drag and Drop | Volume" />
+    <meta
+      name="twitter:description"
+      content="Raise the volume one percent at a time by dragging speaker icons into a box."
+    />
+    <link rel="canonical" href="https://volume.vivan.site/sliders/drag/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(72vh, 800px);
+        width: 100%;
+      }
+
+      .app {
+        display: grid;
+        justify-items: center;
+        gap: 28px;
+      }
+
+      .label {
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #aeaea9;
+      }
+
+      .percent {
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        color: #111;
+        letter-spacing: -0.03em;
+      }
+
+      .layout {
+        display: flex;
+        gap: 20px;
+        align-items: stretch;
+        justify-content: center;
+      }
+
+      .dropbox {
+        width: min(340px, 80vw);
+        height: min(380px, 56vh);
+        min-height: 300px;
+        background: #fff;
+        border: 1.5px dashed #ddd;
+        border-radius: 14px;
+        position: relative;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+        overflow: hidden;
+        box-shadow: 0 12px 32px rgba(17, 17, 17, 0.04);
+      }
+
+      .dropbox.drag-over {
+        border-color: #999;
+        background: #fafafa;
+      }
+
+      .dropbox-hint {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        color: #d2d2ce;
+        pointer-events: none;
+      }
+
+      .icon-in-box {
+        position: absolute;
+        cursor: grab;
+        opacity: 1;
+        transition: opacity 0.1s ease;
+        touch-action: none;
+      }
+
+      .icon-in-box:active {
+        cursor: grabbing;
+      }
+
+      .icon-in-box.is-dragging {
+        opacity: 0.2;
+      }
+
+      .source-panel {
+        width: 90px;
+        background: #fff;
+        border-radius: 14px;
+        border: 1.5px solid #e8e8e8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 10px;
+        box-shadow: 0 12px 32px rgba(17, 17, 17, 0.03);
+      }
+
+      .source-icon {
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: grab;
+        transition: transform 0.15s ease;
+        touch-action: none;
+      }
+
+      .source-icon:hover {
+        transform: scale(1.12);
+      }
+
+      .source-icon:active {
+        cursor: grabbing;
+        transform: scale(0.95);
+      }
+
+      .source-hint {
+        font-size: 0.65rem;
+        color: #c6c6c2;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      .drag-ghost {
+        position: fixed;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.6;
+        transform: translate(-50%, -50%);
+        display: none;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .layout {
+          width: 100%;
+          flex-direction: column-reverse;
+          align-items: center;
+        }
+
+        .source-panel {
+          width: min(340px, 80vw);
+          flex-direction: row;
+          justify-content: space-between;
+          padding: 16px 18px;
+        }
+
+        .source-hint {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page">
+    <div class="page-shell">
+      <header class="page-bar">
+        <div class="page-links">
+          <a class="page-link" href="../../">Homepage</a>
+          <a class="page-link page-link-secondary" href="../">All sliders</a>
+        </div>
+        <div class="page-bar-copy">
+          <h1>Drag and Drop</h1>
+          <p>Every speaker icon is worth one percent. Keep dragging.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="app">
+          <div class="label">Adjust Volume</div>
+          <div class="percent" id="percent">0%</div>
+
+          <div class="layout">
+            <div class="dropbox" id="dropbox">
+              <div class="dropbox-hint" id="hint">drag icons here</div>
+            </div>
+
+            <div class="source-panel">
+              <button
+                class="source-icon"
+                id="source"
+                type="button"
+                aria-label="Drag a speaker icon into the volume box"
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#111" />
+                  <path
+                    d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                    stroke="#111"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                    stroke="#111"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+              <div class="source-hint">drag to box</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="drag-ghost" id="ghost" aria-hidden="true">
+      <svg
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#111" />
+        <path
+          d="M15.54 8.46a5 5 0 0 1 0 7.07"
+          stroke="#111"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+
+    <script>
+      const dropbox = document.getElementById("dropbox");
+      const source = document.getElementById("source");
+      const percentEl = document.getElementById("percent");
+      const hint = document.getElementById("hint");
+      const ghost = document.getElementById("ghost");
+
+      const ICON_SIZE = 22;
+
+      let volume = 0;
+
+      const dragState = {
+        pointerId: null,
+        fromBox: false,
+        existingIcon: null,
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function updatePercent() {
+        percentEl.textContent = `${volume}%`;
+        hint.hidden = volume !== 0;
+      }
+
+      function svgHTML(size = ICON_SIZE) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#111"></path>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="#111" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>`;
+      }
+
+      function isOverBox(x, y) {
+        const rect = dropbox.getBoundingClientRect();
+        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+      }
+
+      function setGhostPosition(x, y) {
+        ghost.style.left = `${x}px`;
+        ghost.style.top = `${y}px`;
+      }
+
+      function setIconPosition(icon, clientX, clientY) {
+        const rect = dropbox.getBoundingClientRect();
+        const maxLeft = Math.max(rect.width - ICON_SIZE, 0);
+        const maxTop = Math.max(rect.height - ICON_SIZE, 0);
+        const left = clamp(clientX - rect.left - ICON_SIZE / 2, 0, maxLeft);
+        const top = clamp(clientY - rect.top - ICON_SIZE / 2, 0, maxTop);
+
+        icon.style.left = `${left}px`;
+        icon.style.top = `${top}px`;
+      }
+
+      function cleanupDrag() {
+        if (dragState.existingIcon) {
+          dragState.existingIcon.classList.remove("is-dragging");
+        }
+
+        dragState.pointerId = null;
+        dragState.fromBox = false;
+        dragState.existingIcon = null;
+        ghost.style.display = "none";
+        dropbox.classList.remove("drag-over");
+      }
+
+      function startDrag(event, fromBox, existingIcon = null) {
+        if (dragState.pointerId !== null) return;
+
+        event.preventDefault();
+        source.blur();
+
+        dragState.pointerId = event.pointerId;
+        dragState.fromBox = fromBox;
+        dragState.existingIcon = existingIcon;
+
+        if (existingIcon) {
+          existingIcon.classList.add("is-dragging");
+        }
+
+        ghost.style.display = "block";
+        setGhostPosition(event.clientX, event.clientY);
+      }
+
+      function bindBoxIcon(icon) {
+        icon.addEventListener("pointerdown", (event) => {
+          startDrag(event, true, icon);
+        });
+      }
+
+      window.addEventListener("pointermove", (event) => {
+        if (event.pointerId !== dragState.pointerId) return;
+
+        setGhostPosition(event.clientX, event.clientY);
+
+        const overBox = isOverBox(event.clientX, event.clientY);
+        dropbox.classList.toggle("drag-over", overBox && !dragState.fromBox);
+      });
+
+      function stopDrag(event) {
+        if (event.pointerId !== dragState.pointerId) return;
+
+        const overBox = isOverBox(event.clientX, event.clientY);
+        const { fromBox, existingIcon } = dragState;
+
+        if (fromBox && existingIcon) {
+          existingIcon.classList.remove("is-dragging");
+
+          if (!overBox) {
+            existingIcon.remove();
+            volume = Math.max(0, volume - 1);
+            updatePercent();
+          } else {
+            setIconPosition(existingIcon, event.clientX, event.clientY);
+          }
+        } else if (overBox && volume < 100) {
+          const icon = document.createElement("div");
+          icon.className = "icon-in-box";
+          icon.setAttribute("aria-hidden", "true");
+          icon.innerHTML = svgHTML();
+          setIconPosition(icon, event.clientX, event.clientY);
+          bindBoxIcon(icon);
+          dropbox.appendChild(icon);
+          volume += 1;
+          updatePercent();
+        }
+
+        cleanupDrag();
+      }
+
+      window.addEventListener("pointerup", stopDrag);
+      window.addEventListener("pointercancel", (event) => {
+        if (event.pointerId === dragState.pointerId) {
+          cleanupDrag();
+        }
+      });
+
+      source.addEventListener("pointerdown", (event) => {
+        startDrag(event, false);
+      });
+
+      updatePercent();
+    </script>
+  </body>
+</html>

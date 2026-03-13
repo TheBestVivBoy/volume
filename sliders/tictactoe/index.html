@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic-Tac-Toe | Volume</title>
+    <meta
+      name="description"
+      content="Change the volume by winning or losing a round of tic-tac-toe against the bot."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Tic-Tac-Toe | Volume" />
+    <meta
+      property="og:description"
+      content="Change the volume by winning or losing a round of tic-tac-toe against the bot."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/tictactoe/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Tic-Tac-Toe | Volume" />
+    <meta
+      name="twitter:description"
+      content="Change the volume by winning or losing a round of tic-tac-toe against the bot."
+    />
+    <link
+      rel="canonical"
+      href="https://volume.vivan.site/sliders/tictactoe/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --surface: #ffffff;
+        --text: #1c1c1e;
+        --muted: #8e8e93;
+        --line: #d1d1d6;
+        --accent: #0a84ff;
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(72vh, 800px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(420px, 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .title {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .volume {
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 16px;
+      }
+
+      .board {
+        position: relative;
+        width: min(360px, 86vw);
+        aspect-ratio: 1;
+        margin-bottom: 14px;
+      }
+
+      .grid-line {
+        position: absolute;
+        background: var(--line);
+        pointer-events: none;
+        border-radius: 999px;
+      }
+
+      .grid-line.vertical {
+        top: 6px;
+        bottom: 6px;
+        width: 2px;
+      }
+
+      .grid-line.horizontal {
+        left: 6px;
+        right: 6px;
+        height: 2px;
+      }
+
+      .grid-line.v1 {
+        left: calc(33.333% - 1px);
+      }
+
+      .grid-line.v2 {
+        left: calc(66.666% - 1px);
+      }
+
+      .grid-line.h1 {
+        top: calc(33.333% - 1px);
+      }
+
+      .grid-line.h2 {
+        top: calc(66.666% - 1px);
+      }
+
+      .cells {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+      }
+
+      .cell {
+        -webkit-appearance: none;
+        appearance: none;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        width: 100%;
+        height: 100%;
+        line-height: 1;
+        color: var(--text);
+        font: inherit;
+        font-size: clamp(2rem, 8vw, 2.8rem);
+        font-weight: 300;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.14s ease;
+      }
+
+      .cell:hover:enabled {
+        color: #111111;
+      }
+
+      .cell:disabled {
+        cursor: default;
+        opacity: 1;
+      }
+
+      .status {
+        min-height: 20px;
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .btn {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--text);
+        padding: 10px 16px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          border-color 0.12s ease;
+      }
+
+      .btn:hover {
+        border-color: var(--accent);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page">
+    <div class="page-shell">
+      <header class="page-bar">
+        <div class="page-links">
+          <a class="page-link" href="../../">Homepage</a>
+          <a class="page-link page-link-secondary" href="../">All sliders</a>
+        </div>
+        <div class="page-bar-copy">
+          <h1>Tic-Tac-Toe</h1>
+          <p>Win for one percent. Lose for one percent. No shortcuts.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">0%</div>
+
+          <div class="board">
+            <div class="grid-line vertical v1"></div>
+            <div class="grid-line vertical v2"></div>
+            <div class="grid-line horizontal h1"></div>
+            <div class="grid-line horizontal h2"></div>
+            <div class="cells" id="board"></div>
+          </div>
+
+          <div class="status" id="status" aria-live="polite">Your turn</div>
+          <button class="btn" id="resetBtn" type="button">New Round</button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const boardEl = document.getElementById("board");
+      const statusEl = document.getElementById("status");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const resetBtn = document.getElementById("resetBtn");
+
+      let volume = 0;
+      let board = Array(9).fill("");
+      let gameOver = false;
+      let playerTurn = true;
+      let botTimer = 0;
+
+      const WIN_LINES = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      function updateVolume() {
+        volume = Math.max(0, Math.min(100, volume));
+        volumeLabel.textContent = `${volume}%`;
+      }
+
+      function checkWinner(state, mark) {
+        return WIN_LINES.some((line) =>
+          line.every((index) => state[index] === mark),
+        );
+      }
+
+      function isDraw(state) {
+        return state.every((cell) => cell !== "");
+      }
+
+      function getEmptyCells(state) {
+        return state
+          .map((cell, index) => (cell === "" ? index : -1))
+          .filter((index) => index !== -1);
+      }
+
+      function renderBoard() {
+        boardEl.innerHTML = "";
+
+        board.forEach((value, index) => {
+          const cell = document.createElement("button");
+          cell.className = "cell";
+          cell.type = "button";
+          cell.textContent = value;
+          cell.disabled = Boolean(value) || gameOver || !playerTurn;
+          cell.setAttribute(
+            "aria-label",
+            value ? `Cell ${index + 1}, ${value}` : `Cell ${index + 1}, empty`,
+          );
+          cell.addEventListener("click", () => playerMove(index));
+          boardEl.appendChild(cell);
+        });
+      }
+
+      function finishGame(result) {
+        gameOver = true;
+        window.clearTimeout(botTimer);
+        botTimer = 0;
+
+        if (result === "win") {
+          volume += 1;
+          statusEl.textContent = "You won. +1% volume";
+        } else if (result === "lose") {
+          volume -= 1;
+          statusEl.textContent = "You lost. -1% volume";
+        } else {
+          statusEl.textContent = "Draw. No volume change";
+        }
+
+        updateVolume();
+        renderBoard();
+      }
+
+      function playerMove(index) {
+        if (gameOver || !playerTurn || board[index] !== "") return;
+
+        board[index] = "X";
+        playerTurn = false;
+        renderBoard();
+
+        if (checkWinner(board, "X")) {
+          finishGame("win");
+          return;
+        }
+
+        if (isDraw(board)) {
+          finishGame("draw");
+          return;
+        }
+
+        statusEl.textContent = "Bot thinking...";
+        window.clearTimeout(botTimer);
+        botTimer = window.setTimeout(() => {
+          botMove();
+        }, 320);
+      }
+
+      function findWinningMove(state, mark) {
+        const empty = getEmptyCells(state);
+
+        for (const index of empty) {
+          const test = [...state];
+          test[index] = mark;
+          if (checkWinner(test, mark)) return index;
+        }
+
+        return null;
+      }
+
+      function mediumBotChoice() {
+        const empty = getEmptyCells(board);
+
+        const winMove = findWinningMove(board, "O");
+        if (winMove !== null) return winMove;
+
+        const blockMove = findWinningMove(board, "X");
+        if (blockMove !== null) return blockMove;
+
+        if (board[4] === "") return 4;
+
+        const corners = [0, 2, 6, 8].filter((index) => board[index] === "");
+        if (corners.length) {
+          return corners[Math.floor(Math.random() * corners.length)];
+        }
+
+        return empty[Math.floor(Math.random() * empty.length)];
+      }
+
+      function botMove() {
+        if (gameOver) return;
+
+        botTimer = 0;
+        const move = mediumBotChoice();
+        if (move === undefined) return;
+
+        board[move] = "O";
+
+        if (checkWinner(board, "O")) {
+          finishGame("lose");
+          return;
+        }
+
+        if (isDraw(board)) {
+          finishGame("draw");
+          return;
+        }
+
+        playerTurn = true;
+        statusEl.textContent = "Your turn";
+        renderBoard();
+      }
+
+      function resetRound() {
+        window.clearTimeout(botTimer);
+        botTimer = 0;
+        board = Array(9).fill("");
+        gameOver = false;
+        playerTurn = true;
+        statusEl.textContent = "Your turn";
+        renderBoard();
+      }
+
+      resetBtn.addEventListener("click", resetRound);
+
+      updateVolume();
+      renderBoard();
+    </script>
+  </body>
+</html>

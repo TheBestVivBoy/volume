@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inertia | Volume</title>
+    <meta
+      name="description"
+      content="Use a minimal volume slider that keeps moving after you let go."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Inertia | Volume" />
+    <meta
+      property="og:description"
+      content="Use a minimal volume slider that keeps moving after you let go."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/inertia/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Inertia | Volume" />
+    <meta
+      name="twitter:description"
+      content="Use a minimal volume slider that keeps moving after you let go."
+    />
+    <link rel="canonical" href="https://volume.vivan.site/sliders/inertia/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 6px;
+      }
+
+      .volume {
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        color: #111;
+        margin-bottom: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .slider-shell {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        padding: 24px 22px;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        color: #999;
+      }
+
+      .track-wrap {
+        position: relative;
+        flex: 1;
+        height: 34px;
+        display: flex;
+        align-items: center;
+      }
+
+      .track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e9e9;
+        overflow: hidden;
+      }
+
+      .track-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      .thumb {
+        position: absolute;
+        top: 50%;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #d8d8d8;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translate(-50%, -50%);
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .thumb:active {
+        cursor: grabbing;
+      }
+
+      .thumb:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 4px;
+      }
+
+      .hint {
+        margin-top: 14px;
+        font-size: 0.8rem;
+        color: #969696;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 20px 18px;
+        }
+
+        .slider-row {
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page">
+    <div class="page-shell">
+      <header class="page-bar">
+        <div class="page-links">
+          <a class="page-link" href="../../">Homepage</a>
+          <a class="page-link page-link-secondary" href="../">All sliders</a>
+        </div>
+        <div class="page-bar-copy">
+          <h1>Inertia</h1>
+          <p>A normal slider right up until it refuses to stop moving.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">50%</div>
+
+          <div class="slider-shell">
+            <div class="slider-row">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+
+              <div class="track-wrap" id="trackWrap">
+                <div class="track">
+                  <div class="track-fill" id="trackFill"></div>
+                </div>
+                <div
+                  class="thumb"
+                  id="thumb"
+                  tabindex="0"
+                  role="slider"
+                  aria-label="Inertia volume slider"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="50"
+                  aria-valuetext="50%"
+                ></div>
+              </div>
+
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+            <div class="hint">A normal slider for once. Almost.</div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const trackWrap = document.getElementById("trackWrap");
+      const thumb = document.getElementById("thumb");
+      const trackFill = document.getElementById("trackFill");
+      const volumeLabel = document.getElementById("volumeLabel");
+
+      let trackWidth = 1;
+
+      const state = {
+        x: 0.5,
+        vx: 0,
+        dragging: false,
+        pointerId: null,
+        history: [],
+        lastTime: performance.now(),
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function setNormalized(nextValue) {
+        state.x = clamp(nextValue, 0, 1);
+        render();
+      }
+
+      function updateBounds() {
+        trackWidth = Math.max(trackWrap.clientWidth, 1);
+        render();
+      }
+
+      function render() {
+        const px = state.x * trackWidth;
+        const percentage = Math.round(state.x * 100);
+        thumb.style.left = `${px}px`;
+        trackFill.style.width = `${state.x * 100}%`;
+        volumeLabel.textContent = `${percentage}%`;
+        thumb.setAttribute("aria-valuenow", String(percentage));
+        thumb.setAttribute("aria-valuetext", `${percentage}%`);
+      }
+
+      function getLocalX(event) {
+        const rect = trackWrap.getBoundingClientRect();
+        return clamp(event.clientX - rect.left, 0, trackWidth);
+      }
+
+      function recordHistory(px) {
+        const now = performance.now();
+        state.history.push({ x: px, t: now });
+
+        while (state.history.length && now - state.history[0].t > 140) {
+          state.history.shift();
+        }
+      }
+
+      function getReleaseVelocity() {
+        if (state.history.length < 2) return 0;
+
+        const latest = state.history[state.history.length - 1];
+        let oldest = state.history[0];
+
+        for (let index = state.history.length - 2; index >= 0; index -= 1) {
+          if (latest.t - state.history[index].t >= 35) {
+            oldest = state.history[index];
+            break;
+          }
+        }
+
+        const dt = Math.max((latest.t - oldest.t) / 1000, 0.016);
+        return (latest.x - oldest.x) / dt;
+      }
+
+      thumb.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        thumb.focus({ preventScroll: true });
+
+        state.dragging = true;
+        state.pointerId = event.pointerId;
+        state.vx = 0;
+        state.history = [];
+
+        const px = getLocalX(event);
+        state.x = px / trackWidth;
+        recordHistory(px);
+        render();
+
+        thumb.setPointerCapture(event.pointerId);
+      });
+
+      window.addEventListener("pointermove", (event) => {
+        if (!state.dragging || event.pointerId !== state.pointerId) return;
+
+        const px = getLocalX(event);
+        state.x = px / trackWidth;
+        recordHistory(px);
+        render();
+      });
+
+      function stopDrag(event) {
+        if (!state.dragging || event.pointerId !== state.pointerId) return;
+
+        state.dragging = false;
+        state.pointerId = null;
+        state.vx = getReleaseVelocity() * 1.15;
+        state.history = [];
+      }
+
+      thumb.addEventListener("keydown", (event) => {
+        let nextValue = null;
+        const step = event.shiftKey ? 0.1 : 0.02;
+
+        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+          nextValue = state.x - step;
+        } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+          nextValue = state.x + step;
+        } else if (event.key === "Home") {
+          nextValue = 0;
+        } else if (event.key === "End") {
+          nextValue = 1;
+        }
+
+        if (nextValue === null) return;
+
+        event.preventDefault();
+        state.dragging = false;
+        state.pointerId = null;
+        state.vx = 0;
+        state.history = [];
+        setNormalized(nextValue);
+      });
+
+      window.addEventListener("pointerup", stopDrag);
+      window.addEventListener("pointercancel", stopDrag);
+
+      function tick(now) {
+        const dt = Math.min((now - state.lastTime) / 1000, 0.032);
+        state.lastTime = now;
+
+        if (!state.dragging) {
+          let px = state.x * trackWidth;
+          px += state.vx * dt;
+
+          if (px < 0) {
+            px = 0;
+            state.vx = Math.abs(state.vx) * 0.86;
+          } else if (px > trackWidth) {
+            px = trackWidth;
+            state.vx = -Math.abs(state.vx) * 0.86;
+          }
+
+          state.vx *= Math.pow(0.99, dt * 60);
+
+          if (Math.abs(state.vx) < 2.5) {
+            state.vx = 0;
+          }
+
+          state.x = px / trackWidth;
+          render();
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("resize", updateBounds, { passive: true });
+
+      updateBounds();
+      requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>

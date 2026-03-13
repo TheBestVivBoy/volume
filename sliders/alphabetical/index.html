@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alphabetical Order | Volume</title>
+    <meta
+      name="description"
+      content="Adjust volume with a range slider sorted by the alphabetical names of numbers instead of their numeric order."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Alphabetical Order | Volume" />
+    <meta
+      property="og:description"
+      content="Adjust volume with a range slider sorted by the alphabetical names of numbers instead of their numeric order."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/alphabetical/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Alphabetical Order | Volume" />
+    <meta
+      name="twitter:description"
+      content="Adjust volume with a range slider sorted by the alphabetical names of numbers instead of their numeric order."
+    />
+    <link
+      rel="canonical"
+      href="https://volume.vivan.site/sliders/alphabetical/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #8e8e93;
+        --line: #e5e5ea;
+        --line-2: #d1d1d6;
+      }
+
+      .project-stage {
+        min-height: min(68vh, 760px);
+        width: 100%;
+      }
+
+      .card {
+        width: min(520px, 100%);
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 250;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .word {
+        min-height: 20px;
+        font-size: 14px;
+        color: var(--muted);
+        text-transform: lowercase;
+      }
+
+      .slider-wrap {
+        display: grid;
+        gap: 12px;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 999px;
+        background: #e9e9ee;
+        outline: none;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid var(--line-2);
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      input[type="range"]::-moz-range-track {
+        height: 6px;
+        border: none;
+        border-radius: 999px;
+        background: #e9e9ee;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid var(--line-2);
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .card {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page">
+    <div class="page-shell">
+      <header class="page-bar">
+        <div class="page-links">
+          <a class="page-link" href="../../">Homepage</a>
+          <a class="page-link page-link-secondary" href="../">All sliders</a>
+        </div>
+        <div class="page-bar-copy">
+          <h1>Alphabetical Order</h1>
+          <p>Numbers sorted by name first, value second.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="card" aria-label="Alphabetical volume control">
+          <div class="volume" id="volumeLabel">Volume: 0%</div>
+          <div class="word" id="wordLabel">zero</div>
+
+          <div class="slider-wrap">
+            <input
+              id="volumeRange"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="0"
+              aria-label="Alphabetical volume slider"
+            />
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const volumeRange = document.getElementById("volumeRange");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const wordLabel = document.getElementById("wordLabel");
+
+      const ONES = [
+        "zero",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+      ];
+
+      const TENS = [
+        "",
+        "",
+        "twenty",
+        "thirty",
+        "forty",
+        "fifty",
+        "sixty",
+        "seventy",
+        "eighty",
+        "ninety",
+      ];
+
+      function numberToWords(value) {
+        if (value < 20) return ONES[value];
+        if (value < 100) {
+          const tens = Math.floor(value / 10);
+          const ones = value % 10;
+          return ones === 0 ? TENS[tens] : `${TENS[tens]} ${ONES[ones]}`;
+        }
+        return "one hundred";
+      }
+
+      const alphabetical = Array.from({ length: 101 }, (_, value) => ({
+        value,
+        word: numberToWords(value),
+      })).sort((a, b) => a.word.localeCompare(b.word));
+
+      function update() {
+        const item = alphabetical[Number(volumeRange.value)];
+        volumeLabel.textContent = `Volume: ${item.value}%`;
+        wordLabel.textContent = item.word;
+      }
+
+      volumeRange.addEventListener("input", update);
+      update();
+    </script>
+  </body>
+</html>
