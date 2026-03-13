@@ -32,102 +32,24 @@
     <link rel="icon" type="image/png" href="../assets/vivancodes_logo.png" />
     <link rel="stylesheet" href="../assets/site.css" />
   </head>
-  <body class="collection-page">
+  <body class="collection-page" data-site-root="../">
     <div class="shell">
-      <header class="collection-header">
-        <p class="eyebrow">Volume</p>
-        <h1>All sliders.</h1>
-        <p class="collection-copy">
-          The same public collection, minus the introduction. Pick a mechanic
-          and let it make one simple adjustment harder than it needs to be.
+      <div data-site-header></div>
+
+      <header class="collection-header" data-animate>
+        <h1 data-stagger>All sliders</h1>
+        <p class="collection-copy" data-stagger>
+          What's the worst volume slider you've ever seen? These beat it.
         </p>
-        <div class="link-row">
-          <a class="pill-link" href="../">Homepage</a>
-          <a
-            class="pill-link"
-            href="https://github.com/TheBestVivBoy/volume"
-            target="_blank"
-            rel="noreferrer"
-            >GitHub Repo</a
-          >
-          <a
-            class="pill-link"
-            href="https://tiktok.com/@vivancodes"
-            target="_blank"
-            rel="noreferrer"
-            >TikTok</a
-          >
-        </div>
       </header>
 
       <main>
-        <div class="collection-grid">
-          <article class="collection-card">
-            <p class="card-index">01</p>
-            <h3>Alphabetical Order</h3>
-            <p>
-              The range is sorted by the written names of numbers, not by the
-              numbers themselves.
-            </p>
-            <footer>
-              <span>Range input</span>
-              <a class="card-link" href="alphabetical/">Open</a>
-            </footer>
-          </article>
-
-          <article class="collection-card">
-            <p class="card-index">02</p>
-            <h3>Drag and Drop</h3>
-            <p>
-              Each speaker icon adds one percent. Want a louder volume? Keep
-              dragging.
-            </p>
-            <footer>
-              <span>Pointer controlled</span>
-              <a class="card-link" href="drag/">Open</a>
-            </footer>
-          </article>
-
-          <article class="collection-card">
-            <p class="card-index">03</p>
-            <h3>Inertia</h3>
-            <p>
-              A deceptively normal slider that keeps moving after you let go of
-              it.
-            </p>
-            <footer>
-              <span>Momentum based</span>
-              <a class="card-link" href="inertia/">Open</a>
-            </footer>
-          </article>
-
-          <article class="collection-card">
-            <p class="card-index">04</p>
-            <h3>Roulette Wheel</h3>
-            <p>
-              Spin the wheel and accept whatever volume the pointer decides to
-              land on.
-            </p>
-            <footer>
-              <span>Canvas spin</span>
-              <a class="card-link" href="spinner/">Open</a>
-            </footer>
-          </article>
-
-          <article class="collection-card">
-            <p class="card-index">05</p>
-            <h3>Tic-Tac-Toe</h3>
-            <p>
-              Win or lose a round against the bot to move the volume by one
-              percent.
-            </p>
-            <footer>
-              <span>Turn based</span>
-              <a class="card-link" href="tictactoe/">Open</a>
-            </footer>
-          </article>
-        </div>
+        <section class="collection-section" aria-label="All slider experiments">
+          <div class="collection-grid" id="slider-grid"></div>
+        </section>
       </main>
     </div>
+
+    <script src="../assets/site.js"></script>
   </body>
 </html>

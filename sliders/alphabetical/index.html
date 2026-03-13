@@ -135,13 +135,10 @@
       }
     </style>
   </head>
-  <body class="project-page">
+  <body class="project-page" data-site-root="../../">
     <div class="page-shell">
+      <div data-site-header></div>
       <header class="page-bar">
-        <div class="page-links">
-          <a class="page-link" href="../../">Homepage</a>
-          <a class="page-link page-link-secondary" href="../">All sliders</a>
-        </div>
         <div class="page-bar-copy">
           <h1>Alphabetical Order</h1>
           <p>Numbers sorted by name first, value second.</p>
@@ -233,5 +230,6 @@
       volumeRange.addEventListener("input", update);
       update();
     </script>
+    <script src="../../assets/site.js"></script>
   </body>
 </html>

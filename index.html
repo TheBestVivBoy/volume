@@ -3,22 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Volume | Intentionally Inconvenient Volume Sliders</title>
+    <title>Volume - Inconvenient Sliders</title>
     <meta
       name="description"
-      content="A curated frontend-only collection of intentionally inconvenient volume sliders by Vivan Codes."
+      content="What's the worst volume slider you've ever seen? These beat it."
     />
     <meta name="robots" content="index,follow,max-image-preview:large" />
     <meta name="theme-color" content="#f2f1ec" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Volume" />
-    <meta
-      property="og:title"
-      content="Volume | Intentionally Inconvenient Volume Sliders"
-    />
+    <meta property="og:title" content="Volume - Inconvenient Sliders" />
     <meta
       property="og:description"
-      content="A curated frontend-only collection of intentionally inconvenient volume sliders by Vivan Codes."
+      content="What's the worst volume slider you've ever seen? These beat it."
     />
     <meta property="og:url" content="https://volume.vivan.site/" />
     <meta
@@ -26,13 +23,10 @@
       content="https://volume.vivan.site/assets/vivancodes_logo.png"
     />
     <meta name="twitter:card" content="summary" />
-    <meta
-      name="twitter:title"
-      content="Volume | Intentionally Inconvenient Volume Sliders"
-    />
+    <meta name="twitter:title" content="Volume - Inconvenient Sliders" />
     <meta
       name="twitter:description"
-      content="A curated frontend-only collection of intentionally inconvenient volume sliders by Vivan Codes."
+      content="What's the worst volume slider you've ever seen? These beat it."
     />
     <link rel="canonical" href="https://volume.vivan.site/" />
     <link rel="icon" type="image/png" href="assets/vivancodes_logo.png" />
@@ -43,59 +37,34 @@
         "@type": "CollectionPage",
         "name": "Volume",
         "url": "https://volume.vivan.site/",
-        "description": "A curated frontend-only collection of intentionally inconvenient volume sliders by Vivan Codes.",
+        "description": "What's the worst volume slider you've ever seen? These beat it.",
         "sameAs": [
           "https://github.com/TheBestVivBoy/volume",
           "https://tiktok.com/@vivancodes"
-        ],
-        "hasPart": [
-          {
-            "@type": "WebPage",
-            "name": "Alphabetical Order",
-            "url": "https://volume.vivan.site/sliders/alphabetical/"
-          },
-          {
-            "@type": "WebPage",
-            "name": "Drag and Drop",
-            "url": "https://volume.vivan.site/sliders/drag/"
-          },
-          {
-            "@type": "WebPage",
-            "name": "Inertia",
-            "url": "https://volume.vivan.site/sliders/inertia/"
-          },
-          {
-            "@type": "WebPage",
-            "name": "Roulette Wheel",
-            "url": "https://volume.vivan.site/sliders/spinner/"
-          },
-          {
-            "@type": "WebPage",
-            "name": "Tic-Tac-Toe",
-            "url": "https://volume.vivan.site/sliders/tictactoe/"
-          }
         ]
       }
     </script>
   </head>
-  <body class="home-page">
+  <body class="home-page" data-site-root="./">
     <div class="shell">
-      <header class="hero">
-        <div class="logo-mark">
+      <div data-site-header></div>
+      <header class="hero" data-animate>
+        <div class="logo-mark" data-stagger>
           <img
             src="assets/vivancodes_logo.png"
-            alt="Vivan Codes logo"
+            alt="Vivan Codes"
             width="572"
             height="572"
           />
         </div>
-        <p class="eyebrow">Vivan Codes</p>
-        <h1>Intentionally inconvenient volume sliders.</h1>
-        <p class="hero-copy">
-          A calm, frontend-only gallery of grayscale controls that all do the
-          same job in the most inconvenient way available.
+        <div class="hero-brand" data-stagger>
+          <span class="site-brand-name">Vivan Codes</span>
+        </div>
+        <h1 data-stagger>Intentionally inconvenient volume sliders.</h1>
+        <p class="hero-copy" data-stagger>
+          What's the worst volume slider you've ever seen? These beat it.
         </p>
-        <div class="link-row">
+        <div class="link-row" data-stagger>
           <a
             class="pill-link"
             href="https://tiktok.com/@vivancodes"
@@ -108,91 +77,18 @@
             href="https://github.com/TheBestVivBoy/volume"
             target="_blank"
             rel="noreferrer"
-            >GitHub Repo</a
+            >GitHub</a
           >
           <a class="pill-link" href="sliders/">All sliders</a>
         </div>
       </header>
 
       <main>
-        <section aria-labelledby="collection-title">
-          <div class="section-head">
-            <p>Collection</p>
-            <h2 id="collection-title">Five ways to avoid a normal slider</h2>
-          </div>
-
-          <div class="collection-grid">
-            <article class="collection-card">
-              <p class="card-index">01</p>
-              <h3>Alphabetical Order</h3>
-              <p>
-                The range is sorted by the written names of numbers, not by the
-                numbers themselves.
-              </p>
-              <footer>
-                <span>Range input</span>
-                <a class="card-link" href="sliders/alphabetical/">Open</a>
-              </footer>
-            </article>
-
-            <article class="collection-card">
-              <p class="card-index">02</p>
-              <h3>Drag and Drop</h3>
-              <p>
-                Each speaker icon adds one percent. Want a louder volume? Keep
-                dragging.
-              </p>
-              <footer>
-                <span>Pointer controlled</span>
-                <a class="card-link" href="sliders/drag/">Open</a>
-              </footer>
-            </article>
-
-            <article class="collection-card">
-              <p class="card-index">03</p>
-              <h3>Inertia</h3>
-              <p>
-                A deceptively normal slider that keeps moving after you let go
-                of it.
-              </p>
-              <footer>
-                <span>Momentum based</span>
-                <a class="card-link" href="sliders/inertia/">Open</a>
-              </footer>
-            </article>
-
-            <article class="collection-card">
-              <p class="card-index">04</p>
-              <h3>Roulette Wheel</h3>
-              <p>
-                Spin the wheel and accept whatever volume the pointer decides to
-                land on.
-              </p>
-              <footer>
-                <span>Canvas spin</span>
-                <a class="card-link" href="sliders/spinner/">Open</a>
-              </footer>
-            </article>
-
-            <article class="collection-card">
-              <p class="card-index">05</p>
-              <h3>Tic-Tac-Toe</h3>
-              <p>
-                Win or lose a round against the bot to move the volume by one
-                percent.
-              </p>
-              <footer>
-                <span>Turn based</span>
-                <a class="card-link" href="sliders/tictactoe/">Open</a>
-              </footer>
-            </article>
-          </div>
+        <section class="collection-section" aria-label="Slider collection">
+          <div class="collection-grid" id="slider-grid"></div>
         </section>
       </main>
-
-      <footer class="site-footer">
-        Frontend-only collection for <strong>volume.vivan.site</strong>.
-      </footer>
     </div>
+    <script src="assets/site.js"></script>
   </body>
 </html>
