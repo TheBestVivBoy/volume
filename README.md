@@ -27,6 +27,13 @@ Each project is its own standalone static page under `sliders/<slug>/index.html`
    - `sitemap.xml`
    - Homepage JS
 
+## GIF previews
+
+Homepage and `/sliders/` cards also show a looping GIF preview from `assets/gifs/<slug>.gif`.
+
+- GIF previews are used on the homepage and the `/sliders/` page.
+- If a matching GIF is missing, the card stays in its current text-only layout.
+
 ## Frontend-only status
 
 This project is frontend-only for now. There is no auth, analytics, API integration, or database layer.

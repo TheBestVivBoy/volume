@@ -2,26 +2,31 @@ const sliders = [
   {
     title: "Alphabetical Order",
     description: "Numbers organised by letters? Strange.",
+    slug: "alphabetical",
     path: "sliders/alphabetical/",
   },
   {
     title: "Drag and Drop",
     description: "One by one...",
+    slug: "drag",
     path: "sliders/drag/",
   },
   {
     title: "Inertia",
     description: "A slider that refuses to stop.",
+    slug: "inertia",
     path: "sliders/inertia/",
   },
   {
-    title: "Roulette Wheel",
+    title: "Spinny Wheel",
     description: "Spin it. Accept your fate.",
+    slug: "spinner",
     path: "sliders/spinner/",
   },
   {
     title: "Tic-Tac-Toe",
     description: "Slow and steady wins the.. volume?",
+    slug: "tictactoe",
     path: "sliders/tictactoe/",
   },
 ];
@@ -41,6 +46,17 @@ function buildInternalHref(path) {
 
 function buildLogoSrc(path) {
   return buildInternalHref(path);
+}
+
+function buildPreviewSrc(slug) {
+  return buildInternalHref(`assets/gifs/${slug}.gif`);
+}
+
+function supportsCardPreviews() {
+  return (
+    document.body.classList.contains("home-page") ||
+    document.body.classList.contains("collection-page")
+  );
 }
 
 function renderSiteHeader() {
@@ -100,6 +116,7 @@ function renderGrid() {
   const grid = document.getElementById("slider-grid");
   if (!grid) return;
 
+  const showPreviews = supportsCardPreviews();
   grid.textContent = "";
 
   sliders.forEach((slider) => {
@@ -117,10 +134,73 @@ function renderGrid() {
     link.href = buildInternalHref(slider.path);
     link.textContent = "Open →";
 
+    if (showPreviews) {
+      card.dataset.previewSrc = buildPreviewSrc(slider.slug);
+    }
+
     card.append(title, description, link);
 
     grid.appendChild(card);
   });
+}
+
+function mountHomePreviews() {
+  if (!supportsCardPreviews()) return;
+
+  const cards = document.querySelectorAll(".collection-card[data-preview-src]");
+  if (!cards.length) return;
+
+  const injectPreview = (card) => {
+    if (card.dataset.previewLoaded === "true") return;
+
+    const previewSrc = card.dataset.previewSrc;
+    if (!previewSrc) return;
+
+    const probe = new Image();
+    probe.decoding = "async";
+
+    probe.onload = () => {
+      const frame = document.createElement("figure");
+      frame.className = "card-preview";
+      frame.setAttribute("aria-hidden", "true");
+
+      const img = document.createElement("img");
+      img.className = "card-preview-media";
+      img.src = previewSrc;
+      img.alt = "";
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      frame.appendChild(img);
+      card.insertBefore(frame, card.firstChild);
+      card.dataset.previewLoaded = "true";
+      card.classList.add("has-preview");
+    };
+
+    probe.onerror = () => {
+      card.dataset.previewLoaded = "missing";
+    };
+
+    probe.src = previewSrc;
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    cards.forEach(injectPreview);
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        injectPreview(entry.target);
+      });
+    },
+    { rootMargin: "180px 0px" },
+  );
+
+  cards.forEach((card) => observer.observe(card));
 }
 
 function initAnimations() {
@@ -151,5 +231,6 @@ function initAnimations() {
 document.addEventListener("DOMContentLoaded", () => {
   renderSiteHeader();
   renderGrid();
+  mountHomePreviews();
   initAnimations();
 });

@@ -327,11 +327,16 @@ body.project-page {
   background: var(--surface);
   border: 1px solid rgba(23, 23, 23, 0.08);
   box-shadow: 0 8px 22px rgba(17, 17, 17, 0.05);
+  overflow: hidden;
   transition:
     transform 0.24s var(--ease-out),
     border-color 0.24s ease,
     box-shadow 0.24s ease,
     background 0.24s ease;
+}
+
+.collection-card.has-preview {
+  min-height: 280px;
 }
 
 .collection-card:hover {
@@ -352,6 +357,24 @@ body.project-page {
   letter-spacing: -0.03em;
   font-weight: 600;
   line-height: 1.2;
+}
+
+.card-preview {
+  margin: -8px -8px 18px;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(234, 232, 225, 0.9)),
+    rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.card-preview-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .collection-card > p {
