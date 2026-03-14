@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horse Race | Volume</title>
+    <meta
+      name="description"
+      content="Bet some volume on a horse race and see what comes back."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Horse Race | Volume" />
+    <meta
+      property="og:description"
+      content="Bet some volume on a horse race and see what comes back."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/horse_race/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Horse Race | Volume" />
+    <meta
+      name="twitter:description"
+      content="Bet some volume on a horse race and see what comes back."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/horse_race/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #f2f2f7;
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #8a8a93;
+        --line: #e4e4ea;
+        --line-2: #d2d2d9;
+        --track: #ffffff;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          sans-serif;
+      }
+
+      .wrap {
+        width: min(460px, 100%);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(4rem, 12vw, 5.9rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shell {
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 24px;
+        padding: 18px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.045);
+        display: grid;
+        gap: 16px;
+      }
+
+      .controls {
+        display: grid;
+        gap: 10px;
+      }
+
+      .control-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 96px;
+        gap: 10px;
+      }
+
+      select,
+      input,
+      button {
+        appearance: none;
+        width: 100%;
+        border: 1.5px solid var(--line-2);
+        border-radius: 14px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 0.96rem;
+        letter-spacing: -0.01em;
+      }
+
+      select,
+      input[type="number"] {
+        box-shadow: none;
+      }
+
+      select {
+        cursor: pointer;
+      }
+
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      button {
+        cursor: pointer;
+        transition:
+          background 140ms ease,
+          transform 140ms ease,
+          box-shadow 140ms ease,
+          border-color 140ms ease;
+      }
+
+      button:hover {
+        background: #f8f8fa;
+      }
+
+      button:active {
+        transform: scale(0.985);
+      }
+
+      button:disabled,
+      select:disabled,
+      input:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      button:focus-visible,
+      select:focus-visible,
+      input:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .lanes {
+        display: grid;
+        gap: 12px;
+      }
+
+      .lane {
+        display: grid;
+        grid-template-columns: 62px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .horse-name {
+        color: var(--muted);
+        font-size: 0.9rem;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .track {
+        position: relative;
+        height: 38px;
+        border-radius: 999px;
+        background: var(--track);
+        border: 1.5px solid var(--line);
+        overflow: hidden;
+      }
+
+      .track::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        right: 12px;
+        width: 2px;
+        border-radius: 999px;
+        background: rgba(17, 17, 17, 0.16);
+      }
+
+      .horse {
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        width: 40px;
+        height: 30px;
+        transform: translate(-4px, -50%);
+        background-image: url("../../assets/horse.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        transition: left 70ms linear;
+        filter: saturate(0) contrast(1.03);
+      }
+
+      .horse.running {
+        background-image: url("../../assets/horserun.gif");
+      }
+
+      .status {
+        min-height: 1.25em;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 520px) {
+        .wrap {
+          gap: 16px;
+        }
+
+        .shell {
+          padding: 14px;
+          border-radius: 22px;
+        }
+
+        .control-row {
+          grid-template-columns: 1fr;
+        }
+
+        .lane {
+          grid-template-columns: 58px minmax(0, 1fr);
+          gap: 10px;
+        }
+
+        .horse-name {
+          font-size: 0.84rem;
+        }
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 860px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Horse Race</h1>
+          <p>Bet some volume on a winner.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Horse race volume control">
+          <div class="volume" id="volumeLabel">Volume: 20%</div>
+
+          <div class="shell">
+            <div class="controls">
+              <div class="control-row">
+                <select id="horseSelect" aria-label="Horse">
+                  <option value="0">Horse 1</option>
+                  <option value="1">Horse 2</option>
+                  <option value="2">Horse 3</option>
+                  <option value="3">Horse 4</option>
+                </select>
+
+                <input
+                  id="betInput"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="5"
+                  inputmode="numeric"
+                  aria-label="Bet"
+                />
+              </div>
+
+              <button id="raceButton" type="button">Start race</button>
+            </div>
+
+            <div class="lanes">
+              <div class="lane">
+                <div class="horse-name">Horse 1</div>
+                <div class="track">
+                  <div class="horse" id="horse0"></div>
+                </div>
+              </div>
+
+              <div class="lane">
+                <div class="horse-name">Horse 2</div>
+                <div class="track">
+                  <div class="horse" id="horse1"></div>
+                </div>
+              </div>
+
+              <div class="lane">
+                <div class="horse-name">Horse 3</div>
+                <div class="track">
+                  <div class="horse" id="horse2"></div>
+                </div>
+              </div>
+
+              <div class="lane">
+                <div class="horse-name">Horse 4</div>
+                <div class="track">
+                  <div class="horse" id="horse3"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="status" id="statusText">Choose a horse and race.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const volumeLabel = document.getElementById("volumeLabel");
+      const horseSelect = document.getElementById("horseSelect");
+      const betInput = document.getElementById("betInput");
+      const raceButton = document.getElementById("raceButton");
+      const statusText = document.getElementById("statusText");
+      const horseEls = [
+        document.getElementById("horse0"),
+        document.getElementById("horse1"),
+        document.getElementById("horse2"),
+        document.getElementById("horse3"),
+      ];
+
+      const state = {
+        volume: 20,
+        running: false,
+        raceTimer: null,
+        selectedHorse: 0,
+        bet: 5,
+        horses: [],
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function randomBetween(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function renderVolume() {
+        volumeLabel.textContent = `Volume: ${Math.round(state.volume)}%`;
+      }
+
+      function renderHorsePositions() {
+        state.horses.forEach((horse, index) => {
+          horseEls[index].style.left = `${horse.position}%`;
+        });
+      }
+
+      function setRunningVisuals(running) {
+        horseEls.forEach((horseEl) => {
+          horseEl.classList.toggle("running", running);
+        });
+      }
+
+      function resetRace() {
+        state.horses = [
+          {
+            position: 0,
+            speed: randomBetween(1.05, 1.8),
+            drift: randomBetween(-0.15, 0.15),
+            finished: false,
+          },
+          {
+            position: 0,
+            speed: randomBetween(1.05, 1.8),
+            drift: randomBetween(-0.15, 0.15),
+            finished: false,
+          },
+          {
+            position: 0,
+            speed: randomBetween(1.05, 1.8),
+            drift: randomBetween(-0.15, 0.15),
+            finished: false,
+          },
+          {
+            position: 0,
+            speed: randomBetween(1.05, 1.8),
+            drift: randomBetween(-0.15, 0.15),
+            finished: false,
+          },
+        ];
+
+        renderHorsePositions();
+        setRunningVisuals(false);
+      }
+
+      function sanitizeBet() {
+        const maxBet = Math.max(1, Math.floor(state.volume));
+        let value = Number(betInput.value);
+
+        if (!Number.isFinite(value)) {
+          value = 1;
+        }
+
+        value = Math.round(value);
+        value = clamp(value, 1, maxBet);
+
+        state.bet = value;
+        betInput.value = value;
+        betInput.max = maxBet;
+      }
+
+      function moveHorse(horse) {
+        if (horse.finished) {
+          return;
+        }
+
+        horse.speed += randomBetween(-0.26, 0.34);
+
+        if (Math.random() < 0.12) {
+          horse.speed += randomBetween(0.3, 0.82);
+        }
+
+        if (Math.random() < 0.08) {
+          horse.speed -= randomBetween(0.28, 0.72);
+        }
+
+        horse.speed = clamp(horse.speed, 0.55, 3.2);
+
+        const liveStep = horse.speed + randomBetween(-0.14, 0.14) + horse.drift;
+        horse.position = clamp(horse.position + liveStep, 0, 100);
+
+        if (horse.position >= 100) {
+          horse.position = 100;
+          horse.finished = true;
+        }
+      }
+
+      function finishRace(winnerIndex) {
+        clearInterval(state.raceTimer);
+        state.raceTimer = null;
+        state.running = false;
+
+        setRunningVisuals(false);
+        raceButton.disabled = false;
+        horseSelect.disabled = false;
+        betInput.disabled = false;
+        raceButton.textContent = "Race again";
+
+        if (winnerIndex === state.selectedHorse) {
+          const payout = state.bet * 4;
+          state.volume += payout;
+          statusText.textContent = `Horse ${winnerIndex + 1} won. +${payout}%.`;
+        } else {
+          statusText.textContent = `Horse ${winnerIndex + 1} won. -${state.bet}%.`;
+        }
+
+        renderVolume();
+        sanitizeBet();
+      }
+
+      function startRace() {
+        if (state.running) {
+          return;
+        }
+
+        if (state.volume < 1) {
+          statusText.textContent = "No volume left.";
+          return;
+        }
+
+        sanitizeBet();
+        state.selectedHorse = Number(horseSelect.value);
+
+        if (state.bet > state.volume) {
+          statusText.textContent = "Not enough volume.";
+          return;
+        }
+
+        state.volume -= state.bet;
+        renderVolume();
+
+        state.running = true;
+        raceButton.disabled = true;
+        horseSelect.disabled = true;
+        betInput.disabled = true;
+        raceButton.textContent = "Racing";
+        statusText.textContent = `Horse ${state.selectedHorse + 1}. ${state.bet}%.`;
+
+        resetRace();
+        setRunningVisuals(true);
+
+        state.raceTimer = setInterval(
+          () => {
+            let winnerIndex = -1;
+
+            state.horses.forEach((horse, index) => {
+              moveHorse(horse);
+
+              if (winnerIndex === -1 && horse.position >= 100) {
+                winnerIndex = index;
+              }
+            });
+
+            renderHorsePositions();
+
+            if (winnerIndex !== -1) {
+              finishRace(winnerIndex);
+            }
+          },
+          randomInt(80, 96),
+        );
+      }
+
+      horseSelect.addEventListener("change", () => {
+        state.selectedHorse = Number(horseSelect.value);
+      });
+
+      betInput.addEventListener("input", sanitizeBet);
+      betInput.addEventListener("change", sanitizeBet);
+      raceButton.addEventListener("click", startRace);
+
+      resetRace();
+      renderVolume();
+      sanitizeBet();
+    </script>
+  </body>
+</html>

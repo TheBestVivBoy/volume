@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DVD | Volume</title>
+    <meta
+      name="description"
+      content="Watch a DVD logo bounce around until it changes the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="DVD | Volume" />
+    <meta
+      property="og:description"
+      content="Watch a DVD logo bounce around until it changes the volume."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/dvd/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="DVD | Volume" />
+    <meta
+      name="twitter:description"
+      content="Watch a DVD logo bounce around until it changes the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/dvd/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #f2f2f7;
+        --card: #ffffff;
+        --text: #111111;
+        --line: #e5e5ea;
+        --line-2: #d1d1d6;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          sans-serif;
+      }
+
+      .card {
+        width: min(640px, 100%);
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+        display: grid;
+        gap: 16px;
+      }
+
+      .volume {
+        font-size: 56px;
+        font-weight: 250;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      canvas {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 14px;
+        border: 1.5px solid var(--line);
+        background: #fff;
+        display: block;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        border: 1.5px solid var(--line-2);
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 12px;
+        cursor: pointer;
+      }
+
+      button:active {
+        transform: scale(0.985);
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 860px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>DVD</h1>
+          <p>Wait for the bounce.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="card" aria-label="DVD volume control">
+          <div class="volume" id="volumeLabel">Volume: 0%</div>
+          <canvas id="stage"></canvas>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const canvas = document.getElementById("stage");
+      const ctx = canvas.getContext("2d");
+      const volumeLabel = document.getElementById("volumeLabel");
+
+      const logo = {
+        x: 0,
+        y: 0,
+        w: 98,
+        h: 56,
+        vx: 2.75,
+        vy: 2.15,
+        color: "#111",
+      };
+
+      const colors = ["#111", "#b91c1c", "#1d4ed8", "#059669", "#9333ea"];
+
+      let W = 0;
+      let H = 0;
+      let volume = 0;
+      let rafId = 0;
+
+      let edgeHits = 0;
+      let desiredCorner = null;
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function randomCornerThreshold() {
+        return randomInt(12, 28);
+      }
+
+      let nextCornerThreshold = randomCornerThreshold();
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function setVolume(next) {
+        volume = clamp(next, 0, 100);
+        volumeLabel.textContent = `Volume: ${volume}%`;
+      }
+
+      function pickColor() {
+        logo.color = colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      function setCanvasSize() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        W = rect.width;
+        H = rect.height;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function roundedRectPath(x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, W, H);
+
+        roundedRectPath(logo.x, logo.y, logo.w, logo.h, 14);
+        ctx.fillStyle = logo.color;
+        ctx.fill();
+
+        ctx.fillStyle = "#fff";
+        ctx.font =
+          "700 27px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("DVD", logo.x + logo.w / 2, logo.y + logo.h / 2 + 1);
+      }
+
+      function getCorners() {
+        return [
+          { x: 0, y: 0 },
+          { x: W - logo.w, y: 0 },
+          { x: 0, y: H - logo.h },
+          { x: W - logo.w, y: H - logo.h },
+        ];
+      }
+
+      function chooseCorner() {
+        const corners = getCorners();
+
+        const ranked = corners
+          .map((corner) => ({
+            ...corner,
+            d: Math.hypot(corner.x - logo.x, corner.y - logo.y),
+          }))
+          .sort((a, b) => a.d - b.d);
+        const roll = Math.random();
+
+        if (roll < 0.34) return ranked[0];
+        if (roll < 0.58) return ranked[1];
+        return ranked[randomInt(0, ranked.length - 1)];
+      }
+
+      function onEdgeBounce() {
+        edgeHits += 1;
+        setVolume(volume + 1);
+        pickColor();
+
+        if (!desiredCorner && edgeHits >= nextCornerThreshold) {
+          desiredCorner = chooseCorner();
+        }
+      }
+
+      function onCornerHit() {
+        setVolume(0);
+        pickColor();
+        edgeHits = 0;
+        desiredCorner = null;
+        nextCornerThreshold = randomCornerThreshold();
+      }
+
+      function cornerReached() {
+        const atLeft = Math.abs(logo.x - 0) < 0.0001;
+        const atRight = Math.abs(logo.x - (W - logo.w)) < 0.0001;
+        const atTop = Math.abs(logo.y - 0) < 0.0001;
+        const atBottom = Math.abs(logo.y - (H - logo.h)) < 0.0001;
+        return (atLeft || atRight) && (atTop || atBottom);
+      }
+
+      function tryAimAfterBounce(hitX, hitY, nextVx, nextVy) {
+        if (!desiredCorner) {
+          return { vx: nextVx, vy: nextVy };
+        }
+
+        const speed = Math.hypot(logo.vx, logo.vy);
+        const epsilon = 0.75;
+
+        // We only alter the component that just bounced.
+        // The other component remains the natural one.
+        if (hitX && !hitY) {
+          const vy = nextVy;
+          const dy = desiredCorner.y - logo.y;
+
+          if (Math.abs(vy) > 0.0001) {
+            const t = dy / vy;
+            if (t > 0) {
+              const requiredVx = (desiredCorner.x - logo.x) / t;
+              if (
+                Math.abs(requiredVx) > epsilon &&
+                Math.abs(requiredVx) <= speed * 1.15
+              ) {
+                return { vx: requiredVx, vy };
+              }
+            }
+          }
+        }
+
+        if (hitY && !hitX) {
+          const vx = nextVx;
+          const dx = desiredCorner.x - logo.x;
+
+          if (Math.abs(vx) > 0.0001) {
+            const t = dx / vx;
+            if (t > 0) {
+              const requiredVy = (desiredCorner.y - logo.y) / t;
+              if (
+                Math.abs(requiredVy) > epsilon &&
+                Math.abs(requiredVy) <= speed * 1.15
+              ) {
+                return { vx, vy: requiredVy };
+              }
+            }
+          }
+        }
+
+        // If both axes hit together, we have reached a corner anyway.
+        return { vx: nextVx, vy: nextVy };
+      }
+
+      function normalizeSpeed(vx, vy) {
+        const current = Math.hypot(vx, vy);
+        const target = Math.hypot(logo.vx, logo.vy);
+
+        if (current < 0.0001) {
+          return { vx: logo.vx, vy: logo.vy };
+        }
+
+        const scale = target / current;
+        return {
+          vx: vx * scale,
+          vy: vy * scale,
+        };
+      }
+
+      function updatePhysics() {
+        logo.x += logo.vx;
+        logo.y += logo.vy;
+
+        let hitX = false;
+        let hitY = false;
+
+        if (logo.x <= 0) {
+          logo.x = 0;
+          hitX = true;
+        } else if (logo.x + logo.w >= W) {
+          logo.x = W - logo.w;
+          hitX = true;
+        }
+
+        if (logo.y <= 0) {
+          logo.y = 0;
+          hitY = true;
+        } else if (logo.y + logo.h >= H) {
+          logo.y = H - logo.h;
+          hitY = true;
+        }
+
+        if (hitX && hitY) {
+          onCornerHit();
+
+          logo.vx = logo.x <= 0 ? Math.abs(logo.vx) : -Math.abs(logo.vx);
+          logo.vy = logo.y <= 0 ? Math.abs(logo.vy) : -Math.abs(logo.vy);
+          return;
+        }
+
+        if (!hitX && !hitY) {
+          return;
+        }
+
+        let nextVx = logo.vx;
+        let nextVy = logo.vy;
+
+        if (hitX) nextVx *= -1;
+        if (hitY) nextVy *= -1;
+
+        const aimed = tryAimAfterBounce(hitX, hitY, nextVx, nextVy);
+        const normalized = normalizeSpeed(aimed.vx, aimed.vy);
+
+        logo.vx = normalized.vx;
+        logo.vy = normalized.vy;
+
+        if (hitX) onEdgeBounce();
+        if (hitY) onEdgeBounce();
+      }
+
+      function loop() {
+        updatePhysics();
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function reset() {
+        cancelAnimationFrame(rafId);
+        setCanvasSize();
+        setVolume(0);
+        pickColor();
+
+        edgeHits = 0;
+        desiredCorner = null;
+        nextCornerThreshold = randomCornerThreshold();
+
+        logo.x = W * 0.21;
+        logo.y = H * 0.27;
+        logo.vx = 2.75;
+        logo.vy = 2.15;
+
+        rafId = requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("resize", () => {
+        setCanvasSize();
+        logo.x = clamp(logo.x, 0, W - logo.w);
+        logo.y = clamp(logo.y, 0, H - logo.h);
+        draw();
+      });
+
+      reset();
+    </script>
+  </body>
+</html>

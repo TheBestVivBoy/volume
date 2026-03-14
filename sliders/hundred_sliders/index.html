@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hundred Sliders | Volume</title>
+    <meta
+      name="description"
+      content="Set the volume by adding together one hundred separate sliders."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Hundred Sliders | Volume" />
+    <meta
+      property="og:description"
+      content="Set the volume by adding together one hundred separate sliders."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/hundred_sliders/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Hundred Sliders | Volume" />
+    <meta
+      name="twitter:description"
+      content="Set the volume by adding together one hundred separate sliders."
+    />
+    <link
+      rel="canonical"
+      href="https://vivancodes.com/sliders/hundred_sliders/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #f2f2f7;
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #8a8a93;
+        --line: #e4e4ea;
+        --line-2: #d2d2d9;
+        --track: #e9e9ee;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          sans-serif;
+      }
+
+      .wrap {
+        width: min(520px, 100%);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(3.8rem, 12vw, 5.6rem);
+        font-weight: 250;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shell {
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.045);
+        display: grid;
+        gap: 14px;
+      }
+
+      .grid {
+        max-height: min(62vh, 560px);
+        overflow: auto;
+        padding-right: 4px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .grid::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .grid::-webkit-scrollbar-thumb {
+        background: #d8d8de;
+        border-radius: 999px;
+        border: 2px solid #ffffff;
+      }
+
+      .slider-row {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .index {
+        color: var(--muted);
+        font-size: 0.84rem;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        user-select: none;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        margin: 0;
+        background: transparent;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 7px;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        margin-top: -6.5px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid var(--line-2);
+        box-shadow:
+          0 2px 6px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      input[type="range"]::-moz-range-track {
+        height: 7px;
+        border: none;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border: 1.5px solid var(--line-2);
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow:
+          0 2px 6px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      input[type="range"]:focus {
+        outline: none;
+      }
+
+      input[type="range"]:focus-visible::-webkit-slider-thumb {
+        box-shadow:
+          0 0 0 4px rgba(17, 17, 17, 0.08),
+          0 2px 6px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      input[type="range"]:focus-visible::-moz-range-thumb {
+        box-shadow:
+          0 0 0 4px rgba(17, 17, 17, 0.08),
+          0 2px 6px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      @media (max-width: 520px) {
+        .wrap {
+          gap: 16px;
+        }
+
+        .shell {
+          padding: 14px;
+          border-radius: 20px;
+        }
+
+        .slider-row {
+          grid-template-columns: 28px minmax(0, 1fr);
+          gap: 10px;
+        }
+
+        .index {
+          font-size: 0.8rem;
+        }
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(78vh, 920px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Hundred Sliders</h1>
+          <p>Add up one hundred tiny decisions.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Hundred sliders volume control">
+          <div class="volume" id="volumeLabel">0.00%</div>
+
+          <div class="shell">
+            <div class="grid" id="grid"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const grid = document.getElementById("grid");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const sliders = [];
+
+      function renderTotal() {
+        const total = sliders.reduce(
+          (sum, slider) => sum + Number(slider.value) / 100,
+          0,
+        );
+
+        volumeLabel.textContent = `${total.toFixed(2)}%`;
+      }
+
+      for (let index = 0; index < 100; index += 1) {
+        const row = document.createElement("label");
+        row.className = "slider-row";
+
+        const number = document.createElement("span");
+        number.className = "index";
+        number.textContent = String(index + 1).padStart(2, "0");
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100";
+        slider.step = "1";
+        slider.value = "0";
+        slider.setAttribute("aria-label", `Slider ${index + 1}`);
+
+        row.append(number, slider);
+        grid.append(row);
+        sliders.push(slider);
+
+        slider.addEventListener("input", renderTotal);
+      }
+
+      renderTotal();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown | Volume</title>
+    <meta
+      name="description"
+      content="Choose a volume from a dropdown with 10,001 different options."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Dropdown | Volume" />
+    <meta
+      property="og:description"
+      content="Choose a volume from a dropdown with 10,001 different options."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/dropdown/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dropdown | Volume" />
+    <meta
+      name="twitter:description"
+      content="Choose a volume from a dropdown with 10,001 different options."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/dropdown/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #111;
+      }
+
+      .panel {
+        width: min(92vw, 520px);
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 14px;
+        padding: 20px;
+        display: grid;
+        gap: 14px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      label {
+        font-weight: 600;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #bbb;
+        border-radius: 10px;
+        font-size: 1rem;
+        background: #fff;
+      }
+
+      .value {
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+
+      .note {
+        color: #555;
+        font-size: 0.9rem;
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(72vh, 760px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Dropdown</h1>
+          <p>Choose a volume from 10,001 options.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="panel" aria-label="Dropdown volume control">
+          <h1>Volume Selector</h1>
+
+          <label for="volumeSelect">Pick your volume:</label>
+          <select id="volumeSelect" aria-label="Volume dropdown"></select>
+
+          <div class="value" id="selectedVolume">Current volume: 0.00%</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const volumeSelect = document.getElementById("volumeSelect");
+      const selectedVolume = document.getElementById("selectedVolume");
+
+      for (let i = 0; i <= 10000; i += 1) {
+        const value = (i / 100).toFixed(2);
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = `${value}%`;
+        if (value === "0.00") {
+          option.selected = true;
+        }
+        volumeSelect.appendChild(option);
+      }
+
+      function updateVolume() {
+        selectedVolume.textContent = `Current volume: ${volumeSelect.value}%`;
+      }
+
+      volumeSelect.addEventListener("change", updateVolume);
+      updateVolume();
+    </script>
+  </body>
+</html>

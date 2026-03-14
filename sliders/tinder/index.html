@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Your Sound | Volume</title>
+    <meta
+      name="description"
+      content="Swipe through volume cards and hope for a match."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Find Your Sound | Volume" />
+    <meta
+      property="og:description"
+      content="Swipe through volume cards and hope for a match."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/tinder/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Find Your Sound | Volume" />
+    <meta
+      name="twitter:description"
+      content="Swipe through volume cards and hope for a match."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/tinder/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #f2f2f4;
+        --shell: #ffffff;
+        --text: #111111;
+        --muted: #8c8c93;
+        --line: #e5e5ea;
+        --line-2: #d8d8de;
+        --shadow: 0 8px 28px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 40px 24px;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          sans-serif;
+      }
+
+      .wrap {
+        width: min(440px, 100%);
+        display: grid;
+        gap: 16px;
+      }
+
+      /* ── Brand ── */
+      .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .brand-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      /* ── Volume readout ── */
+      .volume-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .volume-label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        letter-spacing: 0.01em;
+        font-weight: 400;
+        text-transform: none;
+      }
+
+      .volume {
+        margin: 0;
+        font-size: clamp(5rem, 19vw, 7.8rem);
+        font-weight: 260;
+        line-height: 0.88;
+        letter-spacing: -0.09em;
+        font-variant-numeric: tabular-nums;
+        transition: transform 160ms ease;
+      }
+
+      .volume.bump {
+        transform: scale(1.01);
+      }
+
+      /* ── Shell & deck ── */
+      .shell {
+        background: var(--shell);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .deck {
+        position: relative;
+        height: 390px;
+        touch-action: none;
+        user-select: none;
+      }
+
+      /* ── Cards ── */
+      .card {
+        position: absolute;
+        inset: 0;
+        border-radius: 22px;
+        border: 1px solid var(--line-2);
+        background: #fff;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 36px 28px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.025);
+        transition:
+          transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 240ms ease;
+        will-change: transform;
+        cursor: grab;
+      }
+
+      .card[data-depth="0"] {
+        z-index: 3;
+      }
+      .card[data-depth="1"] {
+        z-index: 2;
+        transform: translateY(9px) scale(0.989);
+        opacity: 0.72;
+      }
+      .card[data-depth="2"] {
+        z-index: 1;
+        transform: translateY(16px) scale(0.978);
+        opacity: 0.46;
+      }
+
+      .card.is-dragging {
+        transition: none;
+        cursor: grabbing;
+      }
+
+      .card-content {
+        display: grid;
+        gap: 14px;
+        justify-items: center;
+      }
+
+      .card-value {
+        margin: 0;
+        font-size: clamp(4.2rem, 15vw, 5.8rem);
+        font-weight: 280;
+        line-height: 0.9;
+        letter-spacing: -0.08em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .card-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.93rem;
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+      }
+
+      /* ── Toast ── */
+      .toast {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--muted);
+        letter-spacing: -0.01em;
+        height: 22px;
+        line-height: 22px;
+        opacity: 0;
+        transition: opacity 200ms ease;
+      }
+
+      .toast.visible {
+        opacity: 1;
+      }
+      .toast.matched {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 24px 18px;
+        }
+        .wrap {
+          gap: 14px;
+        }
+        .shell {
+          border-radius: 26px;
+          padding: 11px;
+        }
+        .deck {
+          height: 350px;
+        }
+        .card {
+          border-radius: 18px;
+          padding: 28px 20px;
+        }
+        .card-note {
+          font-size: 0.88rem;
+        }
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 920px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Find Your Sound</h1>
+          <p>Swipe until something matches.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Find Your Sound volume control">
+      <!-- Brand -->
+      <div class="brand">
+        <svg
+          width="22"
+          height="28"
+          viewBox="0 0 22 28"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M11 1C8.5 5 5 9.5 5 15.5C5 21 7.7 26 11 26C14.3 26 17 21 17 15.5C17 12 15 9.5 13.2 8.2C13.6 10.6 12.3 12.2 10.8 12.2C9.2 12.2 8.3 10.2 11 1Z"
+            fill="#111"
+          />
+          <ellipse
+            cx="11"
+            cy="18.5"
+            rx="2.5"
+            ry="3.5"
+            fill="#fff"
+            opacity="0.45"
+          />
+        </svg>
+        <span class="brand-name">Find Your Sound</span>
+      </div>
+
+      <!-- Volume readout -->
+      <div class="volume-wrap">
+        <span class="volume-label">Volume</span>
+        <div class="volume" id="volumeLabel" aria-live="polite">20%</div>
+      </div>
+
+      <!-- Deck -->
+      <section class="shell" aria-label="Volume control">
+        <div class="deck" id="deck"></div>
+      </section>
+
+      <!-- Toast -->
+      <div class="toast" id="toast" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const volumeLabel = document.getElementById("volumeLabel");
+      const deckEl = document.getElementById("deck");
+      const toastEl = document.getElementById("toast");
+
+      let toastTimer = null;
+
+      function showToast(msg, matched = false) {
+        clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.className = "toast visible" + (matched ? " matched" : "");
+        toastTimer = setTimeout(() => {
+          toastEl.classList.remove("visible", "matched");
+        }, 1800);
+      }
+
+      const personalitiesByRange = [
+        ["Pretty much a whisper.", "You'll forget I'm even here."],
+        ["Quiet type.", "Good for late nights and not bothering anyone."],
+        ["Easygoing volume.", "Perfect for chill rooms."],
+        ["A little more presence.", "Still polite about it."],
+        ["Right in the middle.", "Loud enough, never annoying."],
+        ["Solid everyday energy.", "Gets the job done."],
+        ["Okay, now we're talking.", "You'll start to notice me."],
+        ["Main character vibes.", "Great when the room needs a lift."],
+        ["Not exactly subtle.", "But that's kind of the point."],
+        ["Definitely party friendly.", "Subtlety left the chat."],
+        ["Absolute chaos.", "If it's too loud, it's perfect."],
+      ];
+
+      const state = {
+        currentVolume: 20,
+        deck: [],
+        nextId: 1,
+        dragging: null,
+      };
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function getPersonalityForValue(value) {
+        const rangeIndex = Math.min(
+          Math.floor(value / 10),
+          personalitiesByRange.length - 1,
+        );
+        const options = personalitiesByRange[rangeIndex];
+        return { note: options[randomInt(0, options.length - 1)] };
+      }
+
+      function createCardData(value) {
+        return {
+          id: state.nextId++,
+          value,
+          rule: getPersonalityForValue(value),
+        };
+      }
+
+      function buildBatch(size = 18) {
+        const values = new Set();
+        while (values.size < size) values.add(randomInt(0, 100));
+        return shuffle([...values]).map(createCardData);
+      }
+
+      function ensureDeck() {
+        if (state.deck.length < 6) state.deck.push(...buildBatch());
+      }
+
+      function renderVolume() {
+        volumeLabel.textContent = `${state.currentVolume}%`;
+        volumeLabel.classList.remove("bump");
+        requestAnimationFrame(() => {
+          volumeLabel.classList.add("bump");
+          setTimeout(() => volumeLabel.classList.remove("bump"), 160);
+        });
+      }
+
+      function renderDeck() {
+        ensureDeck();
+        deckEl.innerHTML = "";
+        const visible = state.deck.slice(0, 3);
+
+        [...visible].reverse().forEach((card, ri) => {
+          const depth = visible.length - 1 - ri;
+          const el = document.createElement("article");
+          el.className = "card";
+          el.dataset.id = String(card.id);
+          el.dataset.depth = String(depth);
+          el.setAttribute(
+            "aria-label",
+            `${card.value} percent. ${card.rule.note}`,
+          );
+          el.innerHTML = `
+            <div class="card-content">
+              <div class="card-value">${card.value}%</div>
+              <p class="card-note">${card.rule.note}</p>
+            </div>`;
+
+          if (depth === 0) {
+            el.tabIndex = 0;
+            el.addEventListener("pointerdown", onPointerDown);
+          }
+
+          deckEl.appendChild(el);
+        });
+      }
+
+      function getTopCard() {
+        return state.deck[0] || null;
+      }
+
+      function removeTopCard() {
+        state.deck.shift();
+        ensureDeck();
+        renderDeck();
+      }
+
+      function applySwipe(direction, card) {
+        if (direction === "left") {
+          showToast("Skipped.");
+        } else if (direction === "right") {
+          if (Math.random() < 0.33) {
+            state.currentVolume = card.value;
+            renderVolume();
+            showToast("You matched!", true);
+          } else {
+            showToast("They skipped you.");
+          }
+        }
+        removeTopCard();
+      }
+
+      function animateOff(el, direction, card, gesture) {
+        const x =
+          direction === "right"
+            ? window.innerWidth * 0.95
+            : -window.innerWidth * 0.95;
+        const rotate = direction === "right" ? 13 : -13;
+
+        el.classList.remove("is-dragging");
+        el.style.transition =
+          "transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease";
+        el.style.transform = `translate(${x}px, ${gesture.deltaY}px) rotate(${rotate}deg)`;
+        el.style.opacity = "0";
+
+        setTimeout(() => applySwipe(direction, card), 180);
+      }
+
+      function resetCard(el) {
+        el.classList.remove("is-dragging");
+        el.style.transition =
+          "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease";
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+
+      function onPointerDown(e) {
+        const el = e.currentTarget;
+        const card = getTopCard();
+        if (!card) return;
+
+        state.dragging = {
+          pointerId: e.pointerId,
+          cardEl: el,
+          card,
+          startX: e.clientX,
+          startY: e.clientY,
+          startTime: performance.now(),
+          deltaX: 0,
+          deltaY: 0,
+        };
+
+        el.classList.add("is-dragging");
+        el.setPointerCapture(e.pointerId);
+        el.addEventListener("pointermove", onPointerMove);
+        el.addEventListener("pointerup", onPointerUp);
+        el.addEventListener("pointercancel", onPointerCancel);
+      }
+
+      function onPointerMove(e) {
+        if (!state.dragging || e.pointerId !== state.dragging.pointerId) return;
+        const d = state.dragging;
+        d.deltaX = e.clientX - d.startX;
+        d.deltaY = e.clientY - d.startY;
+        d.cardEl.style.transform = `translate(${d.deltaX}px, ${d.deltaY}px) rotate(${d.deltaX / 20}deg)`;
+      }
+
+      function detachPointer(el) {
+        el.removeEventListener("pointermove", onPointerMove);
+        el.removeEventListener("pointerup", onPointerUp);
+        el.removeEventListener("pointercancel", onPointerCancel);
+      }
+
+      function onPointerUp(e) {
+        if (!state.dragging || e.pointerId !== state.dragging.pointerId) return;
+        const d = state.dragging;
+        const duration = performance.now() - d.startTime;
+        const direction =
+          d.deltaX > 110 ? "right" : d.deltaX < -110 ? "left" : null;
+
+        const gesture = {
+          deltaX: d.deltaX,
+          deltaY: d.deltaY,
+          distance: Math.abs(d.deltaX),
+          duration,
+          velocity: Math.abs(d.deltaX) / Math.max(duration, 1),
+          angle:
+            Math.atan2(Math.abs(d.deltaY), Math.abs(d.deltaX || 1)) *
+            (180 / Math.PI),
+        };
+
+        detachPointer(d.cardEl);
+
+        if (!direction) {
+          resetCard(d.cardEl);
+          state.dragging = null;
+          return;
+        }
+
+        animateOff(d.cardEl, direction, d.card, gesture);
+        state.dragging = null;
+      }
+
+      function onPointerCancel(e) {
+        if (!state.dragging || e.pointerId !== state.dragging.pointerId) return;
+        detachPointer(state.dragging.cardEl);
+        resetCard(state.dragging.cardEl);
+        state.dragging = null;
+      }
+
+      function simulateSwipe(direction) {
+        const el = deckEl.querySelector('.card[data-depth="0"]');
+        const card = getTopCard();
+        if (!el || !card) return;
+
+        const gesture = {
+          deltaX: direction === "right" ? 150 : -150,
+          deltaY: 0,
+          distance: 150,
+          duration: 320,
+          velocity: 0.47,
+          angle: 0,
+        };
+
+        animateOff(el, direction, card, gesture);
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") simulateSwipe("left");
+        if (e.key === "ArrowRight") simulateSwipe("right");
+      });
+
+      renderDeck();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uniquely Loud | Volume</title>
+    <meta
+      name="description"
+      content="Claim a volume that is not already taken by somebody else."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Uniquely Loud | Volume" />
+    <meta
+      property="og:description"
+      content="Claim a volume that is not already taken by somebody else."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/unique/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Uniquely Loud | Volume" />
+    <meta
+      name="twitter:description"
+      content="Claim a volume that is not already taken by somebody else."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/unique/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #111111;
+        --muted: #6a6a74;
+        --line: #e7e7ee;
+        --accent: #1f7cff;
+        --danger: #cf1f46;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(
+          circle at top left,
+          #ffffff 0%,
+          var(--bg) 55%,
+          #eceef7 100%
+        );
+        color: var(--text);
+        padding: 20px;
+      }
+
+      .card {
+        position: relative;
+        width: min(420px, 100%);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(19, 24, 38, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.06rem;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.35;
+        font-size: 0.94rem;
+      }
+
+      .step {
+        display: none;
+        gap: 12px;
+        flex-direction: column;
+      }
+
+      .step.active {
+        display: flex;
+      }
+
+      label {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      input[type="email"],
+      input[type="text"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        outline: none;
+        color: var(--text);
+        background: #fff;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(31, 124, 255, 0.12);
+      }
+
+      button {
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .error,
+      .hint,
+      .use {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+      }
+
+      .error {
+        color: var(--danger);
+        background: #fff3f6;
+        border-color: #ffd9e2;
+      }
+
+      .hint {
+        color: #2e4f83;
+        background: #edf4ff;
+        border-color: #d7e7ff;
+      }
+
+      .slider-wrap {
+        display: grid;
+        gap: 10px;
+        margin-top: 4px;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #223;
+      }
+
+      .use {
+        color: #5f2d00;
+        background: #fff5eb;
+        border-color: #ffe1c6;
+      }
+      .success {
+        color: #03583a;
+        background: #ebfff4;
+        border-color: #c9f2dd;
+      }
+
+      .loading {
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #25324a;
+        z-index: 2;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease;
+      }
+
+      .loading.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .card,
+      .card * {
+        font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace;
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 840px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Uniquely Loud</h1>
+          <p>Claim a volume that is not already taken.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="card" aria-label="Unique volume registry">
+          <p class="brand">Uniquely Loud</p>
+          <section id="step-login" class="step active">
+            <h1>Please create an account to change your volume.</h1>
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="you@internet.com" />
+
+            <label for="password">Password</label>
+            <input
+              id="password"
+              type="text"
+              placeholder="Put a password here"
+              autocomplete="off"
+            />
+
+            <button id="signupBtn">Create Account</button>
+            <div id="loginError" class="error" style="display: none"></div>
+          </section>
+
+          <section id="step-verify" class="step">
+            <h1>Sent a verification code to your email.</h1>
+
+            <label for="code">Verification code</label>
+            <input
+              id="code"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="000000"
+            />
+            <button id="verifyBtn">Verify</button>
+            <div id="verifyHint" class="hint" style="display: none"></div>
+          </section>
+
+          <section id="step-volume" class="step">
+            <h1>Volume</h1>
+            <div class="slider-wrap">
+              <span class="value">Current: <span id="volValue">50</span>%</span>
+              <input id="volume" type="range" min="0" max="100" value="50" />
+              <div id="useMessage" class="use">
+                This volume is already in use by Nora.
+              </div>
+            </div>
+          </section>
+          <div id="loadingScreen" class="loading">Loading...</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const stepLogin = document.getElementById("step-login");
+      const stepVerify = document.getElementById("step-verify");
+      const stepVolume = document.getElementById("step-volume");
+
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const loginError = document.getElementById("loginError");
+
+      const codeInput = document.getElementById("code");
+      const verifyHint = document.getElementById("verifyHint");
+
+      const volumeInput = document.getElementById("volume");
+      const volValue = document.getElementById("volValue");
+      const useMessage = document.getElementById("useMessage");
+      const loadingScreen = document.getElementById("loadingScreen");
+
+      const names = [
+        "Jeffrey",
+        "Nora",
+        "Mike",
+        "Priya",
+        "Liam",
+        "Sasha",
+        "Noah",
+        "Olive",
+        "Zoe",
+        "Milo",
+        "Ava",
+        "Ethan",
+        "Maya",
+        "Kai",
+        "Rina",
+        "Oscar",
+        "Bella",
+        "Theo",
+        "Ivy",
+        "Ravi",
+        "Jules",
+        "Luna",
+        "Omar",
+        "Vera",
+      ];
+
+      let volumeRequestId = 0;
+
+      function showStep(stepEl) {
+        [stepLogin, stepVerify, stepVolume].forEach((el) =>
+          el.classList.remove("active"),
+        );
+        stepEl.classList.add("active");
+      }
+
+      function ownerForVolume(value) {
+        const index = (Number(value) * 7 + 3) % names.length;
+        return names[index];
+      }
+
+      function isPasswordAvailable() {
+        return Math.random() < 0.3;
+      }
+
+      function isVolumeAvailable(value) {
+        return (Number(value) * 11 + 7) % 5 === 0;
+      }
+
+      function randomDelayMs() {
+        return Math.floor(200 + Math.random() * 801);
+      }
+
+      function setLoading(state, message = "Loading...") {
+        loadingScreen.classList.toggle("active", state);
+        loadingScreen.textContent = message;
+      }
+
+      function waitRandom(label) {
+        setLoading(true, label);
+        return new Promise((resolve) => {
+          setTimeout(resolve, randomDelayMs());
+        });
+      }
+
+      function updateVolumeMessage(value) {
+        volValue.textContent = value;
+        if (isVolumeAvailable(value)) {
+          useMessage.classList.add("success");
+          useMessage.textContent = `Successfully changed volume to ${value}.`;
+          return;
+        }
+
+        useMessage.classList.remove("success");
+        useMessage.textContent = `This volume is already in use by ${ownerForVolume(value)}.`;
+      }
+
+      document
+        .getElementById("signupBtn")
+        .addEventListener("click", async () => {
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          if (!email || !password) {
+            loginError.style.display = "block";
+            loginError.textContent =
+              "Email and password are required. Bureaucracy wins.";
+            return;
+          }
+
+          await waitRandom("Checking account request...");
+
+          if (!isPasswordAvailable()) {
+            setLoading(false);
+            loginError.style.display = "block";
+            loginError.textContent =
+              "Password is already in use by someone else.";
+            passwordInput.focus();
+            return;
+          }
+
+          loginError.style.display = "none";
+          setLoading(false);
+          showStep(stepVerify);
+          codeInput.focus();
+        });
+
+      document
+        .getElementById("verifyBtn")
+        .addEventListener("click", async () => {
+          const code = codeInput.value.trim();
+          if (code.length !== 6) {
+            verifyHint.style.display = "block";
+            verifyHint.textContent = "Use exactly 6 digits.";
+            return;
+          }
+
+          await waitRandom("Verifying code...");
+          verifyHint.style.display = "none";
+          setLoading(false);
+          showStep(stepVolume);
+          updateVolumeMessage(volumeInput.value);
+        });
+
+      volumeInput.addEventListener("input", (event) => {
+        volValue.textContent = event.target.value;
+      });
+
+      volumeInput.addEventListener("change", async (event) => {
+        const requestId = ++volumeRequestId;
+        const selectedVolume = event.target.value;
+        volumeInput.disabled = true;
+        await waitRandom("Contacting Global Volume Registry...");
+
+        if (requestId !== volumeRequestId) {
+          setLoading(false);
+          volumeInput.disabled = false;
+          return;
+        }
+
+        setLoading(false);
+        volumeInput.value = selectedVolume;
+        updateVolumeMessage(selectedVolume);
+        volumeInput.disabled = false;
+      });
+
+      updateVolumeMessage(volumeInput.value);
+    </script>
+  </body>
+</html>

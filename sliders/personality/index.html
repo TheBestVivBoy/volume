@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personality | Volume</title>
+    <meta
+      name="description"
+      content="Answer a personality quiz and accept the recommended volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Personality | Volume" />
+    <meta
+      property="og:description"
+      content="Answer a personality quiz and accept the recommended volume."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/personality/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Personality | Volume" />
+    <meta
+      name="twitter:description"
+      content="Answer a personality quiz and accept the recommended volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/personality/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #f3f3f3;
+        --panel: #ffffff;
+        --text: #121212;
+        --muted: #777;
+        --line: #dfdfdf;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background:
+          radial-gradient(circle at 14% 18%, #ffffff 0%, transparent 45%),
+          radial-gradient(circle at 84% 82%, #ececec 0%, transparent 46%),
+          var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .app {
+        width: min(92vw, 560px);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: clamp(18px, 3.4vw, 26px);
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.05);
+        display: grid;
+        gap: 18px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      .header h1 {
+        font-size: clamp(1rem, 2.9vw, 1.25rem);
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .live {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #d8d8d8;
+        transition: transform 0.15s ease;
+      }
+
+      .dot.active {
+        background: #111;
+        transform: scale(1.08);
+      }
+
+      .question {
+        font-size: clamp(1.2rem, 3.4vw, 1.7rem);
+        line-height: 1.25;
+        font-weight: 540;
+        min-height: 3.1em;
+      }
+
+      .answers {
+        display: grid;
+        gap: 10px;
+      }
+
+      .answer {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fafafa;
+        color: var(--text);
+        text-align: left;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 0.96rem;
+        cursor: pointer;
+        transition:
+          border-color 0.15s ease,
+          background-color 0.15s ease,
+          transform 0.1s ease;
+      }
+
+      .answer:hover {
+        border-color: #c8c8c8;
+        background: #f4f4f4;
+        transform: translateY(-1px);
+      }
+
+      .answer:active {
+        transform: scale(0.99);
+      }
+
+      .interstitial {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 130px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .interstitial.show {
+        display: flex;
+      }
+
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid #d9d9d9;
+        border-top-color: #111;
+        animation: spin 0.75s linear infinite;
+      }
+
+      .result {
+        display: none;
+        gap: 10px;
+        justify-items: center;
+        text-align: center;
+        padding: 10px 0 2px;
+      }
+
+      .result.show {
+        display: grid;
+      }
+
+      .volume {
+        font-size: clamp(3.1rem, 11vw, 4.8rem);
+        font-weight: 300;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: #efefef;
+        overflow: hidden;
+        border: 1px solid #e6e6e6;
+      }
+
+      .bar-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #2a2a2a, #7e7e7e);
+        transition: width 0.5s ease;
+      }
+
+      .restart {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-size: 0.88rem;
+        padding: 9px 16px;
+        cursor: pointer;
+      }
+
+      .restart:hover {
+        background: #f8f8f8;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 26px 22px 18px;
+        width: min(92vw, 360px);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+        transform: translateY(10px);
+        transition: transform 0.2s;
+      }
+
+      .modal-overlay.open .modal {
+        transform: translateY(0);
+      }
+
+      .modal h2 {
+        font-size: 1.08rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 4px;
+      }
+
+      .modal p.sub {
+        font-size: 0.78rem;
+        color: #aaa;
+        margin-bottom: 14px;
+      }
+
+      .tier {
+        border: 1.5px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 12px 13px;
+        margin-bottom: 9px;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+
+      .tier:hover {
+        border-color: #bbb;
+        background: #fafafa;
+      }
+
+      .tier.featured {
+        border-color: #111;
+      }
+
+      .tier-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #111;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .price {
+        font-weight: 400;
+        font-size: 0.82rem;
+        color: #888;
+      }
+
+      .tier-desc {
+        font-size: 0.76rem;
+        color: #aaa;
+        margin-top: 4px;
+      }
+
+      .modal-footer {
+        text-align: center;
+        margin-top: 14px;
+        min-height: 34px;
+        position: relative;
+      }
+
+      .skip-btn {
+        background: none;
+        border: none;
+        font-size: 0.73rem;
+        color: #bbb;
+        cursor: pointer;
+        font-family: inherit;
+        padding: 6px;
+        text-decoration: underline;
+        transition:
+          color 0.15s,
+          transform 0.08s;
+        position: relative;
+      }
+
+      .skip-btn:hover {
+        color: #989898;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(78vh, 960px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Personality</h1>
+          <p>Answer honestly.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="app" aria-label="Personality volume quiz">
+          <div class="header">
+            <h1>What should my volume be?</h1>
+            <div class="live" id="liveVolume">50%</div>
+          </div>
+
+          <div class="top">
+            <span id="progress">1 / 6</span>
+            <div class="dots" id="dots" aria-hidden="true"></div>
+          </div>
+
+          <h1 class="question" id="question"></h1>
+
+          <div class="answers" id="answers"></div>
+
+          <section class="interstitial" id="interstitial">
+            <div class="spinner"></div>
+            <p id="interstitialText">Reading your vibe...</p>
+          </section>
+
+          <section class="result" id="result">
+            <div class="volume" id="volume">-%</div>
+            <p class="sub">Your volume has been set.</p>
+            <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+            <button class="restart" id="restart" type="button">Retake</button>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-overlay" id="premiumModal">
+      <div class="modal">
+        <h2>Upgrade to Volume Premium</h2>
+        <p class="sub">You've reached advanced personality analysis.</p>
+
+        <div class="tier">
+          <div class="tier-name">Free Plan <span class="price">$0</span></div>
+          <div class="tier-desc">
+            One volume set a month. Volume capped at 75%.
+          </div>
+        </div>
+
+        <div class="tier featured">
+          <div class="tier-name">
+            Volume Plus <span class="price">$7.99 / week</span>
+          </div>
+          <div class="tier-desc">
+            5 volume sets a month and no volume limits.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="skip-btn" id="skipPremium" type="button">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const questions = [
+        {
+          q: "Do you like to party?",
+          a: [
+            ["I am the party", 94],
+            ["Sometimes, with snacks", 74],
+            ["Only if my friends drag me", 48],
+            ["No, I party internally", 24],
+          ],
+        },
+        {
+          q: "How loud do you speak?",
+          a: [
+            ["I have two volume settings: loud and louder", 92],
+            ["Normal voice, occasional drama", 66],
+            ["Indoor voice always", 42],
+            ["People ask me to repeat everything", 20],
+          ],
+        },
+        {
+          q: "Your laugh in a quiet room is...",
+          a: [
+            ["A jump scare", 90],
+            ["Noticeable and proud", 68],
+            ["A polite chuckle", 45],
+            ["Mostly silent shoulder shaking", 22],
+          ],
+        },
+        {
+          q: "You get one speaker for free. You choose...",
+          a: [
+            ["Huge one with bass that rattles windows", 96],
+            ["Decently loud speaker", 70],
+            ["Small bluetooth speaker", 50],
+            ["Headphones. Always headphones.", 26],
+          ],
+        },
+        {
+          q: "At karaoke, your strategy is...",
+          a: [
+            ["Mic to max, no fear", 93],
+            ["Sing loudly after one warm-up song", 74],
+            ["Duo only, for safety", 56],
+            ["Clap supportively from the table", 30],
+          ],
+        },
+        {
+          q: "Your ideal morning alarm feels like...",
+          a: [
+            ["A stadium intro", 88],
+            ["Confident but kind", 64],
+            ["Soft chimes", 41],
+            ["A whisper from the universe", 18],
+          ],
+        },
+      ];
+
+      const questionEl = document.getElementById("question");
+      const answersEl = document.getElementById("answers");
+      const progressEl = document.getElementById("progress");
+      const dotsEl = document.getElementById("dots");
+      const liveVolumeEl = document.getElementById("liveVolume");
+      const interstitialEl = document.getElementById("interstitial");
+      const interstitialTextEl = document.getElementById("interstitialText");
+      const resultEl = document.getElementById("result");
+      const volumeEl = document.getElementById("volume");
+      const barFillEl = document.getElementById("barFill");
+      const restartBtn = document.getElementById("restart");
+      const premiumModalEl = document.getElementById("premiumModal");
+      const skipPremiumBtn = document.getElementById("skipPremium");
+
+      let index = 0;
+      let total = 0;
+      let answered = 0;
+      let premiumSeen = false;
+      let locked = false;
+
+      function buildDots() {
+        dotsEl.innerHTML = "";
+        questions.forEach((_, i) => {
+          const dot = document.createElement("span");
+          dot.className = `dot${i === index ? " active" : ""}`;
+          dotsEl.appendChild(dot);
+        });
+      }
+
+      function randDelay() {
+        return 300 + Math.floor(Math.random() * 201);
+      }
+
+      function estimateLiveVolume() {
+        if (answered === 0) return "-";
+        return Math.round(Math.max(0, Math.min(100, total / answered)));
+      }
+
+      function updateLiveVolume() {
+        liveVolumeEl.textContent = `${estimateLiveVolume()}%`;
+      }
+
+      function setInterstitial(on, text = "Reading your vibe...") {
+        interstitialTextEl.textContent = text;
+        interstitialEl.classList.toggle("show", on);
+        questionEl.style.display = on ? "none" : "block";
+        answersEl.style.display = on ? "none" : "grid";
+      }
+
+      function renderQuestion() {
+        const current = questions[index];
+        progressEl.textContent = `${index + 1} / ${questions.length}`;
+        questionEl.textContent = current.q;
+        answersEl.innerHTML = "";
+        resultEl.classList.remove("show");
+        setInterstitial(false);
+        buildDots();
+        updateLiveVolume();
+
+        current.a.forEach(([label, score]) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "answer";
+          btn.textContent = label;
+          btn.addEventListener("click", () => selectAnswer(score));
+          answersEl.appendChild(btn);
+        });
+      }
+
+      function openPremium() {
+        premiumModalEl.classList.add("open");
+      }
+
+      function closePremium() {
+        premiumModalEl.classList.remove("open");
+        setTimeout(() => {
+          locked = false;
+          renderQuestion();
+        }, 120);
+      }
+
+      function selectAnswer(score) {
+        if (locked) return;
+        locked = true;
+        total += score;
+        answered += 1;
+        updateLiveVolume();
+        index += 1;
+
+        if (!premiumSeen && answered === 3) {
+          premiumSeen = true;
+          setInterstitial(true, "Analysing your answer...");
+          setTimeout(() => openPremium(), randDelay());
+          return;
+        }
+
+        if (index < questions.length) {
+          setInterstitial(true, "Analysing your answer...");
+          setTimeout(() => {
+            locked = false;
+            renderQuestion();
+          }, randDelay());
+          return;
+        }
+
+        setInterstitial(true, "Building your final volume...");
+        setTimeout(() => {
+          showResult();
+          locked = false;
+        }, 3000);
+      }
+
+      function showResult() {
+        const average = answered === 0 ? 50 : total / answered;
+        const bump = (Math.random() * 6 - 3) * 0.5;
+        const recommendation = Math.round(
+          Math.max(0, Math.min(100, average + bump)),
+        );
+
+        progressEl.textContent = "Done";
+        questionEl.textContent = "Your personality volume is ready.";
+        answersEl.innerHTML = "";
+        dotsEl.innerHTML = "";
+        setInterstitial(false);
+
+        volumeEl.textContent = `${recommendation}%`;
+        barFillEl.style.width = `${recommendation}%`;
+        liveVolumeEl.textContent = `${recommendation}%`;
+        resultEl.classList.add("show");
+      }
+
+      restartBtn.addEventListener("click", () => {
+        index = 0;
+        total = 0;
+        answered = 0;
+        premiumSeen = false;
+        locked = false;
+        progressEl.textContent = "1 / 6";
+        resultEl.classList.remove("show");
+        renderQuestion();
+      });
+
+      skipPremiumBtn.addEventListener("mouseenter", () => {
+        const x = Math.random() * 56 - 28;
+        const y = Math.random() * 14 - 7;
+        skipPremiumBtn.style.transform = `translate(${x}px, ${y}px)`;
+      });
+
+      skipPremiumBtn.addEventListener("pointerdown", (e) => {
+        const x = Math.random() * 66 - 33;
+        const y = Math.random() * 16 - 8;
+        skipPremiumBtn.style.transform = `translate(${x}px, ${y}px)`;
+      });
+
+      skipPremiumBtn.addEventListener("click", closePremium);
+
+      premiumModalEl.addEventListener("click", (e) => {
+        if (e.target === premiumModalEl) {
+          const x = Math.random() * 70 - 35;
+          const y = Math.random() * 18 - 9;
+          skipPremiumBtn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+      });
+
+      renderQuestion();
+    </script>
+  </body>
+</html>

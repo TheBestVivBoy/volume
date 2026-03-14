@@ -6,16 +6,58 @@ const sliders = [
     path: "sliders/alphabetical/",
   },
   {
+    title: "Curling",
+    description: "Slide carefully.",
+    slug: "curling",
+    path: "sliders/curling/",
+  },
+  {
     title: "Drag and Drop",
     description: "One by one...",
     slug: "drag",
     path: "sliders/drag/",
   },
   {
+    title: "Dropdown",
+    description: "10,001 options.",
+    slug: "dropdown",
+    path: "sliders/dropdown/",
+  },
+  {
+    title: "DVD",
+    description: "Wait for the bounce.",
+    slug: "dvd",
+    path: "sliders/dvd/",
+  },
+  {
+    title: "Horse Race",
+    description: "Bet volume on a winner.",
+    slug: "horse_race",
+    path: "sliders/horse_race/",
+  },
+  {
+    title: "Hundred Sliders",
+    description: "Add them all up.",
+    slug: "hundred_sliders",
+    path: "sliders/hundred_sliders/",
+  },
+  {
     title: "Inertia",
     description: "A slider that refuses to stop.",
     slug: "inertia",
     path: "sliders/inertia/",
+  },
+  {
+    title: "Personality",
+    description: "Answer honestly.",
+    slug: "personality",
+    path: "sliders/personality/",
+  },
+  {
+    title: "Plinko",
+    description: "Drop one and see.",
+    slug: "plinko",
+    path: "sliders/plinko/",
   },
   {
     title: "Spinny Wheel",
@@ -28,6 +70,30 @@ const sliders = [
     description: "Slow and steady wins the.. volume?",
     slug: "tictactoe",
     path: "sliders/tictactoe/",
+  },
+  {
+    title: "Trading Cards",
+    description: "Reveal three percentages. Pick one.",
+    slug: "tradingcards",
+    path: "sliders/tradingcards/",
+  },
+  {
+    title: "Find Your Sound",
+    description: "Swipe until it matches.",
+    slug: "tinder",
+    path: "sliders/tinder/",
+  },
+  {
+    title: "Tutorial",
+    description: "Read every step.",
+    slug: "tutorial",
+    path: "sliders/tutorial/",
+  },
+  {
+    title: "Uniquely Loud",
+    description: "Availability is limited.",
+    slug: "unique",
+    path: "sliders/unique/",
   },
 ];
 

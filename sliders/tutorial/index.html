@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial | Volume</title>
+    <meta
+      name="description"
+      content="Change the volume, but only after the required tutorial."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Tutorial | Volume" />
+    <meta
+      property="og:description"
+      content="Change the volume, but only after the required tutorial."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/tutorial/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Tutorial | Volume" />
+    <meta
+      name="twitter:description"
+      content="Change the volume, but only after the required tutorial."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/tutorial/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #f2f2f7;
+        --card: #ffffff;
+        --text: #111111;
+        --line: #e4e4ea;
+        --line-2: #d2d2d9;
+        --track: #e9e9ee;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          sans-serif;
+      }
+
+      .wrap {
+        width: min(760px, 100%);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        font-size: clamp(3rem, 11vw, 7rem);
+        font-weight: 250;
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease;
+      }
+
+      .shell {
+        position: relative;
+        background: var(--card);
+        border: 1.5px solid var(--line);
+        border-radius: 20px;
+        padding: 24px 22px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        margin: 0;
+        background: transparent;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 8px;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        margin-top: -8px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid var(--line-2);
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      input[type="range"]::-moz-range-track {
+        height: 8px;
+        border: none;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid var(--line-2);
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      .popover {
+        position: absolute;
+        left: 22px;
+        right: 22px;
+        bottom: calc(100% + 12px);
+        display: none;
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.1);
+        line-height: 1.45;
+        font-size: 0.95rem;
+      }
+
+      .popover.show {
+        display: block;
+      }
+
+      .overlay {
+        display: none;
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .dialog {
+        width: 100%;
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(20px, 4vw, 36px);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+        display: grid;
+        gap: 18px;
+        line-height: 1.5;
+        min-height: 164px;
+        align-content: space-between;
+      }
+
+      #dialogText {
+        font-size: clamp(1.1rem, 2.6vw, 1.75rem);
+        letter-spacing: -0.03em;
+        line-height: 1.18;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        border: 1.5px solid var(--line-2);
+        border-radius: 12px;
+        background: #111111;
+        color: #ffffff;
+        padding: 9px 12px;
+        font: inherit;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+
+      .wrap.is-dialog-open .volume,
+      .wrap.is-dialog-open .shell {
+        opacity: 0.28;
+        transform: translateY(6px);
+        pointer-events: none;
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 840px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          gap: 14px;
+        }
+
+        .dialog {
+          border-radius: 22px;
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Tutorial</h1>
+          <p>Change the volume, but read every step first.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Tutorial volume control">
+          <div class="overlay" id="overlay" aria-hidden="true">
+            <div class="dialog" role="dialog" aria-modal="true" aria-live="polite">
+              <div id="dialogText"></div>
+              <div class="actions">
+                <button id="dialogBtn" type="button">Continue</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="volume" id="volumeLabel">Volume: 50%</div>
+
+          <div class="shell">
+            <div class="popover" id="popover"></div>
+            <input
+              id="slider"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+              aria-label="Volume slider"
+            />
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const storageKey = "vivan-volume-slider-tutorial-complete-v2";
+      const wrap = document.querySelector(".wrap");
+      const slider = document.getElementById("slider");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const overlay = document.getElementById("overlay");
+      const dialogText = document.getElementById("dialogText");
+      const dialogBtn = document.getElementById("dialogBtn");
+      const popover = document.getElementById("popover");
+
+      const tutorial = {
+        enabled: localStorage.getItem(storageKey) !== "true",
+        modalQueue: [],
+        hoverSeen: false,
+        clickSeen: false,
+        firstDragBlocked: false,
+        safetyConfirmed: false,
+        finalConfirmPending: false,
+        postSetPending: false,
+        lockedValue: Number(slider.value),
+      };
+
+      function renderVolume() {
+        volumeLabel.textContent = `Volume: ${tutorial.lockedValue}%`;
+      }
+
+      function openDialog(message, label = "Continue") {
+        dialogText.textContent = message;
+        dialogBtn.textContent = label;
+        overlay.classList.add("show");
+        overlay.setAttribute("aria-hidden", "false");
+        wrap.classList.add("is-dialog-open");
+      }
+
+      function closeDialog() {
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
+        wrap.classList.remove("is-dialog-open");
+      }
+
+      function runNextDialog() {
+        if (!tutorial.modalQueue.length) {
+          closeDialog();
+          return;
+        }
+
+        const next = tutorial.modalQueue.shift();
+        openDialog(next.message, next.label || "Continue");
+      }
+
+      function queueDialogs(dialogs) {
+        tutorial.modalQueue.push(...dialogs);
+        if (!overlay.classList.contains("show")) {
+          runNextDialog();
+        }
+      }
+
+      function showPopover(message) {
+        popover.textContent = message;
+        popover.classList.add("show");
+      }
+
+      function hidePopover() {
+        popover.classList.remove("show");
+      }
+
+      function completeTutorial() {
+        tutorial.enabled = false;
+        tutorial.finalConfirmPending = false;
+        hidePopover();
+        localStorage.setItem(storageKey, "true");
+      }
+
+      function setSliderWithoutCommit(value) {
+        slider.value = value;
+      }
+
+      function commitSliderValue() {
+        tutorial.lockedValue = Number(slider.value);
+        renderVolume();
+      }
+
+      function queuePostSetDialogs(value) {
+        queueDialogs([
+          {
+            message: `You have set the volume to ${value}%.`,
+            label: "Continue",
+          },
+          {
+            message: `This means that the volume will be about ${value}% of the device's maximum volume.`,
+            label: "Continue",
+          },
+          {
+            message:
+              "This setting may affect how loud media, alerts, and other sounds are played.",
+            label: "Continue",
+          },
+          {
+            message:
+              "If this is not your intended volume, you can repeat the process.",
+            label: "Close",
+          },
+        ]);
+      }
+
+      dialogBtn.addEventListener("click", () => {
+        if (tutorial.modalQueue.length) {
+          runNextDialog();
+          return;
+        }
+
+        if (tutorial.finalConfirmPending) {
+          tutorial.finalConfirmPending = false;
+          commitSliderValue();
+
+          if (tutorial.enabled) {
+            completeTutorial();
+          }
+
+          tutorial.postSetPending = true;
+          queuePostSetDialogs(tutorial.lockedValue);
+          closeDialog();
+          runNextDialog();
+          return;
+        }
+
+        closeDialog();
+      });
+
+      slider.addEventListener("input", () => {
+        if (!tutorial.enabled) {
+          commitSliderValue();
+          return;
+        }
+
+        if (!tutorial.firstDragBlocked) {
+          tutorial.firstDragBlocked = true;
+          setSliderWithoutCommit(50);
+          renderVolume();
+          openDialog(
+            "Before adjusting the volume, please confirm that you intended to adjust the volume.",
+            "I did",
+          );
+          tutorial.modalQueue = [
+            {
+              message:
+                "Thank you. The slider will now be returned to its previous position.",
+              label: "Continue",
+            },
+            {
+              message: "You may now try moving it again.",
+              label: "Continue",
+            },
+          ];
+          return;
+        }
+
+        if (!tutorial.safetyConfirmed) {
+          tutorial.safetyConfirmed = true;
+          setSliderWithoutCommit(tutorial.lockedValue);
+          renderVolume();
+          openDialog(
+            "Volume changes require a brief safety acknowledgement.",
+            "Continue",
+          );
+          tutorial.modalQueue = [
+            {
+              message: "Higher values may be louder than lower values.",
+              label: "Understood",
+            },
+            {
+              message: "You can now continue with the slider.",
+              label: "Continue",
+            },
+          ];
+          return;
+        }
+      });
+
+      slider.addEventListener("change", () => {
+        if (!tutorial.enabled) {
+          commitSliderValue();
+          queuePostSetDialogs(tutorial.lockedValue);
+          runNextDialog();
+          return;
+        }
+
+        tutorial.finalConfirmPending = true;
+        openDialog(`Set volume to ${slider.value}%?`, "Set volume");
+      });
+
+      slider.addEventListener("mouseenter", () => {
+        if (!tutorial.enabled || tutorial.hoverSeen) return;
+        tutorial.hoverSeen = true;
+        showPopover("This is the volume slider.");
+      });
+
+      slider.addEventListener("pointerdown", () => {
+        if (!tutorial.enabled || tutorial.clickSeen) return;
+        tutorial.clickSeen = true;
+        showPopover("You are about to interact with the volume slider.");
+      });
+
+      slider.addEventListener("pointerup", () => {
+        if (!tutorial.enabled) return;
+        showPopover("Release detected.");
+      });
+
+      if (tutorial.enabled) {
+        queueDialogs([
+          {
+            message: "Welcome to Vivan's Volume Slider.",
+            label: "Continue",
+          },
+          {
+            message:
+              "This tutorial is required the first time you use the slider.",
+            label: "Continue",
+          },
+          {
+            message: "The large number above shows the current volume.",
+            label: "Continue",
+          },
+          {
+            message: "The control below can be used to change it.",
+            label: "Continue",
+          },
+          {
+            message: "Please proceed carefully.",
+            label: "Begin",
+          },
+        ]);
+      } else {
+        commitSliderValue();
+      }
+
+      renderVolume();
+    </script>
+  </body>
+</html>

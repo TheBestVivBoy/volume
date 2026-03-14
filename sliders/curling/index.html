@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Curling | Volume</title>
+    <meta
+      name="description"
+      content="Launch a curling stone and let it settle on your volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Curling | Volume" />
+    <meta
+      property="og:description"
+      content="Launch a curling stone and let it settle on your volume."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/curling/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Curling | Volume" />
+    <meta
+      name="twitter:description"
+      content="Launch a curling stone and let it settle on your volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/curling/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: #f5f5f5;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        padding: 24px;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111;
+      }
+
+      .shell {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+        position: relative;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 5 / 2.8;
+        cursor: crosshair;
+        touch-action: none;
+      }
+
+      /* Ad overlay */
+      .ad {
+        position: absolute;
+        inset: 0;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+        border-radius: 16px;
+      }
+      .ad.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .ad-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #bbb;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 2px 7px;
+      }
+
+      .ad-content {
+        width: 90%;
+        max-width: 320px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1.5px solid #e6e6e6;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ad-visual {
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .ad-body {
+        padding: 10px 14px 12px;
+        background: #fff;
+      }
+
+      .ad-headline {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 2px;
+      }
+
+      .ad-sub {
+        font-size: 0.72rem;
+        color: #888;
+      }
+
+      .ad-countdown {
+        font-size: 0.75rem;
+        color: #bbb;
+      }
+
+      .footer {
+        padding: 12px 16px;
+        display: flex;
+        justify-content: flex-end;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .btn {
+        font-family: inherit;
+        font-size: 0.8rem;
+        color: #969696;
+        background: transparent;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 8px;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .btn:hover {
+        color: #111;
+        border-color: #bbb;
+      }
+      .btn:active {
+        opacity: 0.6;
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(76vh, 920px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Curling</h1>
+          <p>Slide carefully.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Curling volume control">
+          <div class="title" id="titleLabel">Volume: -</div>
+          <div class="shell">
+            <canvas id="c"></canvas>
+
+            <div class="ad" id="ad">
+              <div class="ad-label">Advertisement</div>
+              <div class="ad-content" id="adContent"></div>
+              <div class="ad-countdown" id="adCountdown"></div>
+            </div>
+
+            <div class="footer">
+              <button class="btn" id="resetBtn">Restart</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const titleLabel = document.getElementById("titleLabel");
+      const resetBtn = document.getElementById("resetBtn");
+      const adEl = document.getElementById("ad");
+      const adContent = document.getElementById("adContent");
+      const adCountdown = document.getElementById("adCountdown");
+
+      let W, H, DPR;
+      let TEE_X, CY, HOUSE_R, RING, STONE_R, HACK_X;
+
+      let stone = null;
+      let aiming = false;
+      let hasShot = false;
+      let settled = false;
+      let pointerPos = null;
+
+      const ADS = [
+        {
+          bg: "#eef6ff",
+          color: "#1d4ed8",
+          icon: "🥌",
+          headline: "EdgeStone Curling Gear",
+          sub: "Built for clean slides and precise shots.",
+        },
+        {
+          bg: "#fff7ed",
+          color: "#c2410c",
+          icon: "🔥",
+          headline: "NorthRink Hand Warmers",
+          sub: "Stay warm between ends. No bulky gloves needed.",
+        },
+        {
+          bg: "#f0fdf4",
+          color: "#15803d",
+          icon: "🥤",
+          headline: "Glacier Sports Drink",
+          sub: "Light, crisp hydration for long matches.",
+        },
+      ];
+
+      let adTimer = null;
+
+      function showAd() {
+        const ad = ADS[Math.floor(Math.random() * ADS.length)];
+        adContent.innerHTML = `
+    <div class="ad-visual" style="background:${ad.bg};color:${ad.color}">
+      <span style="margin-right:10px">${ad.icon}</span>
+      <span style="font-size:1.1rem">${ad.headline}</span>
+    </div>
+    <div class="ad-body">
+      <div class="ad-headline">${ad.headline}</div>
+      <div class="ad-sub">${ad.sub}</div>
+    </div>
+  `;
+        adEl.classList.add("show");
+        let t = 3;
+        adCountdown.textContent = `Resuming in ${t}s`;
+        adTimer = setInterval(() => {
+          t--;
+          if (t <= 0) {
+            clearInterval(adTimer);
+            adEl.classList.remove("show");
+            resetStone(true);
+          } else {
+            adCountdown.textContent = `Resuming in ${t}s`;
+          }
+        }, 1000);
+      }
+
+      function resize() {
+        DPR = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        W = rect.width;
+        H = rect.height;
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        CY = H * 0.5;
+        HACK_X = W * 0.09;
+        TEE_X = W * 0.76;
+        HOUSE_R = Math.min(H * 0.43, W * 0.21);
+        RING = HOUSE_R / 4;
+        STONE_R = Math.max(8, H * 0.052);
+
+        if (!stone) resetStone(false);
+        else draw();
+      }
+
+      function resetStone(redraw = true) {
+        stone = { x: HACK_X, y: CY, vx: 0, vy: 0 };
+        aiming = hasShot = settled = false;
+        pointerPos = null;
+        titleLabel.textContent = "Volume: -";
+        if (redraw) draw();
+      }
+
+      function calcVol(x, y) {
+        const dx = x - TEE_X,
+          dy = y - CY;
+        const eff = Math.max(0, Math.hypot(dx, dy) - STONE_R * 0.5);
+        return eff > HOUSE_R ? 0 : (1 - eff / HOUSE_R) * 100;
+      }
+
+      function updateLiveVol() {
+        if (!stone) return;
+        const v = calcVol(stone.x, stone.y);
+        // Only show live vol once it's entered house area
+        const nearHouse =
+          Math.hypot(stone.x - TEE_X, stone.y - CY) < HOUSE_R + STONE_R * 2;
+        if (nearHouse || settled) {
+          titleLabel.textContent = `Volume: ${Math.round(v)}%`;
+        }
+      }
+
+      // ── Draw ──────────────────────────────────────────────────────────────────────
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Ice
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, W, H);
+
+        // Centre line (very faint)
+        ctx.beginPath();
+        ctx.moveTo(0, CY);
+        ctx.lineTo(W, CY);
+        ctx.strokeStyle = "#ebebeb";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // House rings - Olympic colours
+        const cx = TEE_X;
+        const rings = [
+          [RING * 4, "#1a5fa8"], // 12-ft blue
+          [RING * 3, "#fff"], // 8-ft white
+          [RING * 2, "#c62828"], // 4-ft red
+          [RING * 1, "#fff"], // button white
+        ];
+        for (const [r, color] of rings) {
+          ctx.beginPath();
+          ctx.arc(cx, CY, r, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(0,0,0,0.08)";
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+
+        // Aim line
+        if (aiming && pointerPos && !hasShot) {
+          const dx = stone.x - pointerPos.x,
+            dy = stone.y - pointerPos.y;
+          const len = Math.hypot(dx, dy);
+          if (len > 5) {
+            const ux = dx / len,
+              uy = dy / len;
+            const proj = Math.min(len * 2.4, W * 0.7);
+            for (let d = STONE_R + 8; d < proj; d += 14) {
+              const t = 1 - d / proj;
+              ctx.beginPath();
+              ctx.arc(
+                stone.x + ux * d,
+                stone.y + uy * d,
+                2 * t + 0.4,
+                0,
+                Math.PI * 2,
+              );
+              ctx.fillStyle = `rgba(0,0,0,${t * 0.2})`;
+              ctx.fill();
+            }
+          }
+        }
+
+        // Stone
+        if (stone) {
+          const { x, y } = stone;
+          const r = STONE_R;
+          ctx.save();
+          ctx.globalAlpha = 0.07;
+          ctx.beginPath();
+          ctx.ellipse(x + 2, y + 3, r, r * 0.38, 0, 0, Math.PI * 2);
+          ctx.fillStyle = "#000";
+          ctx.fill();
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = "#111";
+          ctx.fill();
+
+          // ctx.beginPath();
+          // ctx.arc(x, y, r * 0.44, 0, Math.PI * 2);
+          // ctx.strokeStyle = "rgba(255,255,255,0.22)";
+          // ctx.lineWidth = r * 0.11;
+          // ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(x - r * 0.22, y - r * 0.22, r * 0.13, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(255,255,255,0.13)";
+          ctx.fill();
+        }
+      }
+
+      // ── Physics ───────────────────────────────────────────────────────────────────
+      function physics() {
+        if (!hasShot || settled) return;
+        stone.x += stone.vx;
+        stone.y += stone.vy;
+        if (stone.y - STONE_R < 0) {
+          stone.y = STONE_R;
+          stone.vy *= -0.4;
+        }
+        if (stone.y + STONE_R > H) {
+          stone.y = H - STONE_R;
+          stone.vy *= -0.4;
+        }
+        if (stone.x - STONE_R < 0) {
+          stone.x = STONE_R;
+          stone.vx *= -0.4;
+        }
+        if (stone.x + STONE_R > W) {
+          stone.x = W - STONE_R;
+          stone.vx *= -0.4;
+        }
+        stone.vx *= 0.995;
+        stone.vy *= 0.995;
+
+        updateLiveVol();
+
+        if (Math.hypot(stone.vx, stone.vy) < 0.07) {
+          stone.vx = stone.vy = 0;
+          settled = true;
+          updateLiveVol();
+          setTimeout(showAd, 1000);
+        }
+      }
+
+      function loop() {
+        physics();
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      // ── Input ─────────────────────────────────────────────────────────────────────
+      function pt(e) {
+        const r = canvas.getBoundingClientRect();
+        return {
+          x: (e.clientX - r.left) * (W / r.width),
+          y: (e.clientY - r.top) * (H / r.height),
+        };
+      }
+
+      canvas.addEventListener("pointerdown", (e) => {
+        if (hasShot) return;
+        const p = pt(e);
+        if (Math.hypot(p.x - stone.x, p.y - stone.y) > STONE_R * 2.4) return;
+        aiming = true;
+        pointerPos = p;
+        canvas.setPointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener("pointermove", (e) => {
+        if (aiming) {
+          pointerPos = pt(e);
+        }
+      });
+
+      canvas.addEventListener("pointerup", (e) => {
+        if (!aiming) return;
+        aiming = false;
+        canvas.releasePointerCapture(e.pointerId);
+        const p = pt(e);
+        const dx = stone.x - p.x,
+          dy = stone.y - p.y;
+        const pull = Math.min(Math.hypot(dx, dy), Math.min(W, H) * 0.28);
+        if (pull < 5) {
+          draw();
+          return;
+        }
+        const a = Math.atan2(dy, dx);
+        stone.vx = Math.cos(a) * pull * 0.1;
+        stone.vy = Math.sin(a) * pull * 0.1;
+        hasShot = true;
+      });
+
+      canvas.addEventListener("pointercancel", () => {
+        aiming = false;
+      });
+      resetBtn.addEventListener("click", () => {
+        clearInterval(adTimer);
+        adEl.classList.remove("show");
+        resetStone(true);
+      });
+      window.addEventListener("resize", resize);
+      resize();
+      loop();
+    </script>
+  </body>
+</html>

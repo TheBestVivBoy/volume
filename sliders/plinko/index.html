@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plinko | Volume</title>
+    <meta
+      name="description"
+      content="Drop speaker balls through a Plinko board to change the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Plinko | Volume" />
+    <meta
+      property="og:description"
+      content="Drop speaker balls through a Plinko board to change the volume."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/plinko/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Plinko | Volume" />
+    <meta
+      name="twitter:description"
+      content="Drop speaker balls through a Plinko board to change the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/plinko/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: #efefef;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        user-select: none;
+      }
+
+      .container {
+        width: min(90vw, 360px);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: baseline;
+        padding: 0 4px;
+        margin-bottom: 12px;
+      }
+
+      .vol-num {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .board {
+        overflow: hidden;
+        border: 1px solid #e5e5e5;
+        border-radius: 22px;
+        background: #fff;
+        box-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.02),
+          0 10px 28px rgba(0, 0, 0, 0.04);
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        cursor: pointer;
+      }
+
+      body.project-page {
+        padding-bottom: 32px;
+        display: block;
+        min-height: 100vh;
+        color: #171717;
+        background:
+          radial-gradient(
+            ellipse at 50% 0%,
+            rgba(255, 255, 255, 0.9) 0%,
+            transparent 55%
+          ),
+          linear-gradient(180deg, #f7f6f2 0%, #f2f1ec 60%, #eae8e1 100%);
+        font-family:
+          "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .project-stage {
+        min-height: min(78vh, 960px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Plinko</h1>
+          <p>Drop one and see.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="container" aria-label="Plinko volume control">
+          <div class="topbar">
+            <div class="vol-num" id="volNum">Volume: 10%</div>
+          </div>
+
+          <div class="board">
+            <canvas id="c"></canvas>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const volNum = document.getElementById("volNum");
+
+      const SLOT_COUNT = 8;
+      const PEG_ROWS = 8;
+      const PEG_COLS = 8;
+      const BALL_R = 12;
+      const GRAVITY = 0.115;
+      const SLIDER_SPD = 2.0;
+      const WALL_DAMPING = 0.35;
+      const WALL_EPS = 0.01;
+      const STALL_SPEED_SQ = 0.08 * 0.08;
+      const STALL_MAX_FRAMES = 75;
+      const ESCAPE_NUDGE_MIN_Y = 0.26;
+      const NO_PROGRESS_EPS = 0.18;
+      const NO_PROGRESS_MAX_FRAMES = 42;
+      const MAX_BALL_LIFETIME = 1200;
+
+      const SLOT_NETS = [10, -1, 1, -5, -5, 1, -1, 10];
+      const SLOT_STYLES = {
+        10: { bg: "#edf3fb", fg: "#1e55ad", weight: 700 },
+        1: { bg: "#f4f7fb", fg: "#4c79bf", weight: 600 },
+        "-1": { bg: "#faf4f4", fg: "#bf6666", weight: 600 },
+        "-5": { bg: "#f8eded", fg: "#b93030", weight: 700 },
+      };
+
+      const BALL_SVG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="#111"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="#111" stroke-width="1.8" stroke-linecap="round"/><path d="M18.36 5.64a9 9 0 0 1 0 12.73" stroke="#111" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+      const ballImg = new Image();
+      let imgReady = false;
+      ballImg.onload = () => {
+        imgReady = true;
+      };
+      ballImg.src = "data:image/svg+xml," + encodeURIComponent(BALL_SVG);
+
+      let dpr = 1;
+      let width = 0;
+      let height = 0;
+      let boardLeft = 0;
+      let boardRight = 0;
+      let pegs = [];
+      let slots = [];
+      let balls = [];
+      let volume = 10;
+      let sliderX = 0;
+      let sliderDir = 1;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function setVolume(value) {
+        volume = Math.max(0, value);
+        volNum.textContent = `Volume: ${volume}%`;
+      }
+
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+
+        const rect = canvas.getBoundingClientRect();
+        width = rect.width;
+        height = rect.height;
+
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        buildBoard();
+
+        if (!sliderX) {
+          sliderX = (boardLeft + boardRight) / 2;
+        } else {
+          sliderX = clamp(sliderX, boardLeft, boardRight);
+        }
+      }
+
+      function buildBoard() {
+        boardLeft = width * 0.09;
+        boardRight = width * 0.91;
+
+        const pegTop = height * 0.15;
+        const pegBottom = height * 0.73;
+        const rowGap = (pegBottom - pegTop) / (PEG_ROWS - 1);
+        const colGap = (boardRight - boardLeft) / (PEG_COLS - 1);
+
+        pegs = [];
+        for (let row = 0; row < PEG_ROWS; row++) {
+          const offset = row % 2 === 1 ? colGap * 0.5 : 0;
+
+          for (let col = 0; col < PEG_COLS; col++) {
+            const x = boardLeft + col * colGap + offset;
+            if (x > boardRight + colGap * 0.05) continue;
+
+            pegs.push({
+              x,
+              y: pegTop + row * rowGap,
+              r: 3.5,
+            });
+          }
+        }
+
+        const slotTop = height * 0.8;
+        const slotBottom = height * 0.965;
+        const slotWidth = (boardRight - boardLeft) / SLOT_COUNT;
+
+        slots = SLOT_NETS.map((net, index) => ({
+          net,
+          reward: net + 1,
+          x: boardLeft + index * slotWidth,
+          y: slotTop,
+          w: slotWidth,
+          h: slotBottom - slotTop,
+        }));
+      }
+
+      function dropBall() {
+        if (volume <= 0) return;
+
+        setVolume(volume - 1);
+        balls.push({
+          x: sliderX,
+          y: height * 0.055,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: 0.8,
+          r: BALL_R,
+          dead: false,
+          stallFrames: 0,
+          noProgressFrames: 0,
+          prevY: height * 0.055,
+          age: 0,
+        });
+      }
+
+      function keepBallInBounds(ball) {
+        const left = boardLeft + ball.r;
+        const right = boardRight - ball.r;
+
+        if (ball.x < left) {
+          ball.x = left + WALL_EPS;
+          ball.vx = Math.abs(ball.vx) * WALL_DAMPING;
+        } else if (ball.x > right) {
+          ball.x = right - WALL_EPS;
+          ball.vx = -Math.abs(ball.vx) * WALL_DAMPING;
+        }
+      }
+
+      function collideWithPegs(ball) {
+        for (const peg of pegs) {
+          const dx = ball.x - peg.x;
+          const dy = ball.y - peg.y;
+          const distance = Math.hypot(dx, dy);
+          const minDistance = ball.r + peg.r;
+
+          if (!distance || distance >= minDistance) continue;
+
+          const nx = dx / distance;
+          const ny = dy / distance;
+          const overlap = minDistance - distance;
+          const dot = ball.vx * nx + ball.vy * ny;
+
+          ball.x += nx * overlap;
+          ball.y += ny * overlap;
+          ball.vx = (ball.vx - 2 * dot * nx) * 0.7;
+          ball.vy = (ball.vy - 2 * dot * ny) * 0.7;
+          ball.vx += (Math.random() - 0.5) * 0.7;
+          ball.vx = clamp(ball.vx, -3.5, 3.5);
+        }
+      }
+
+      function settleBall(ball) {
+        if (ball.y < slots[0].y) return;
+
+        const slotIndex = clamp(
+          Math.floor((ball.x - boardLeft) / slots[0].w),
+          0,
+          SLOT_COUNT - 1,
+        );
+
+        setVolume(volume + slots[slotIndex].reward);
+        ball.dead = true;
+      }
+
+      function updateSlider() {
+        sliderX += sliderDir * SLIDER_SPD;
+
+        if (sliderX >= boardRight) {
+          sliderX = boardRight;
+          sliderDir = -1;
+        }
+
+        if (sliderX <= boardLeft) {
+          sliderX = boardLeft;
+          sliderDir = 1;
+        }
+      }
+
+      function updateBalls() {
+        for (const ball of balls) {
+          if (ball.dead) continue;
+          ball.age += 1;
+
+          ball.vy += GRAVITY;
+          ball.x += ball.vx;
+          ball.y += ball.vy;
+
+          keepBallInBounds(ball);
+          collideWithPegs(ball);
+          keepBallInBounds(ball);
+
+          const speedSq = ball.vx * ball.vx + ball.vy * ball.vy;
+          if (speedSq < STALL_SPEED_SQ && ball.y > height * ESCAPE_NUDGE_MIN_Y) {
+            ball.stallFrames += 1;
+          } else {
+            ball.stallFrames = 0;
+          }
+
+          if (ball.stallFrames > STALL_MAX_FRAMES) {
+            ball.vy = Math.max(ball.vy, 1.7);
+            ball.vx += (Math.random() - 0.5) * 1.2;
+            ball.x = clamp(ball.x, boardLeft + ball.r, boardRight - ball.r);
+            ball.stallFrames = 0;
+          }
+
+          if (ball.y > ball.prevY + NO_PROGRESS_EPS) {
+            ball.noProgressFrames = 0;
+          } else {
+            ball.noProgressFrames += 1;
+          }
+          ball.prevY = ball.y;
+
+          if (
+            ball.noProgressFrames > NO_PROGRESS_MAX_FRAMES &&
+            ball.y < slots[0].y - ball.r
+          ) {
+            ball.y += ball.r * 0.75;
+            ball.vy = Math.max(ball.vy, 2.1);
+            ball.vx += (Math.random() - 0.5) * 1.6;
+            ball.noProgressFrames = 0;
+            ball.stallFrames = 0;
+          }
+
+          if (ball.age > MAX_BALL_LIFETIME) {
+            ball.y = slots[0].y + 1;
+            settleBall(ball);
+            continue;
+          }
+
+          settleBall(ball);
+        }
+
+        balls = balls.filter((ball) => !ball.dead);
+      }
+
+      function drawBackground() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#fcfcfc";
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function drawSlider() {
+        const y = height * 0.043;
+        const triangleSize = 5;
+
+        ctx.strokeStyle = "#dedede";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(boardLeft, y);
+        ctx.lineTo(boardRight, y);
+        ctx.stroke();
+
+        ctx.setLineDash([2, 4]);
+        ctx.strokeStyle = "#e7e7e7";
+        ctx.beginPath();
+        ctx.moveTo(sliderX, y + 7);
+        ctx.lineTo(sliderX, height * 0.15);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#111";
+        ctx.beginPath();
+        ctx.moveTo(sliderX, y + triangleSize * 1.6);
+        ctx.lineTo(sliderX - triangleSize, y - triangleSize * 0.3);
+        ctx.lineTo(sliderX + triangleSize, y - triangleSize * 0.3);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawSlots() {
+        for (const slot of slots) {
+          const style = SLOT_STYLES[String(slot.net)] || {
+            bg: "#f6f6f6",
+            fg: "#888",
+            weight: 600,
+          };
+
+          ctx.fillStyle = style.bg;
+          ctx.fillRect(slot.x + 0.5, slot.y, slot.w - 1, slot.h);
+
+          const label = slot.net > 0 ? `+${slot.net}` : `${slot.net}`;
+          const fontSize = Math.round(Math.max(9, slot.w * 0.25));
+          ctx.fillStyle = style.fg;
+          ctx.font = `${style.weight} ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(label, slot.x + slot.w / 2, slot.y + slot.h / 2);
+        }
+
+        ctx.strokeStyle = "#e9e9e9";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(boardLeft, slots[0].y);
+        ctx.lineTo(boardRight, slots[0].y);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.05)";
+        for (let i = 1; i < SLOT_COUNT; i++) {
+          const x = boardLeft + i * slots[0].w;
+          ctx.beginPath();
+          ctx.moveTo(x, slots[0].y);
+          ctx.lineTo(x, slots[0].y + slots[0].h);
+          ctx.stroke();
+        }
+      }
+
+      function drawPegs() {
+        ctx.fillStyle = "#cecece";
+
+        for (const peg of pegs) {
+          ctx.beginPath();
+          ctx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawBalls() {
+        const size = BALL_R * 2;
+
+        for (const ball of balls) {
+          if (ball.dead) continue;
+
+          if (imgReady) {
+            ctx.drawImage(
+              ballImg,
+              ball.x - BALL_R,
+              ball.y - BALL_R,
+              size,
+              size,
+            );
+          } else {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+            ctx.fillStyle = "#111";
+            ctx.fill();
+          }
+        }
+      }
+
+      function frame() {
+        updateSlider();
+        updateBalls();
+        drawBackground();
+        drawSlots();
+        drawPegs();
+        drawSlider();
+        drawBalls();
+        requestAnimationFrame(frame);
+      }
+
+      canvas.addEventListener("click", dropBall);
+
+      window.addEventListener("resize", resize);
+
+      resize();
+      frame();
+    </script>
+  </body>
+</html>

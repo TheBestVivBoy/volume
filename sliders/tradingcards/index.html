@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Cards | Volume</title>
+    <meta
+      name="description"
+      content="Reveal three cards and pick the volume percentage you get."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Trading Cards | Volume" />
+    <meta
+      property="og:description"
+      content="Reveal three cards and pick the volume percentage you get."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/tradingcards/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Trading Cards | Volume" />
+    <meta
+      name="twitter:description"
+      content="Reveal three cards and pick the volume percentage you get."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/tradingcards/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :root {
+        --surface: rgba(255, 255, 255, 0.82);
+        --surface-strong: rgba(255, 255, 255, 0.92);
+        --line: rgba(17, 17, 17, 0.08);
+        --line-strong: rgba(17, 17, 17, 0.12);
+        --text: #111111;
+        --muted: #6f6f73;
+        --shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+        --radius-xl: 32px;
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(76vh, 920px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(100%, 560px);
+        margin: 0 auto;
+      }
+
+      .readout {
+        margin: 10px 0 24px;
+        text-align: center;
+        font-size: clamp(44px, 9vw, 76px);
+        line-height: 0.92;
+        letter-spacing: -0.065em;
+        font-weight: 600;
+      }
+
+      .shell {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 18px;
+        overflow: hidden;
+      }
+
+      .shell-inner {
+        border: 1px solid rgba(17, 17, 17, 0.04);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.34);
+        padding: 18px;
+      }
+
+      .stage {
+        position: relative;
+        min-height: 370px;
+        display: grid;
+        align-items: center;
+      }
+
+      .prompt-view,
+      .cards-view {
+        transition:
+          opacity 420ms var(--ease),
+          transform 420ms var(--ease);
+      }
+
+      .prompt-view.hidden,
+      .cards-view.hidden {
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        position: absolute;
+        inset: 18px;
+      }
+
+      .prompt-card {
+        width: 100%;
+        min-height: 250px;
+        border-radius: 28px;
+        border: 1px solid var(--line);
+        background: var(--surface-strong);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 28px 22px;
+        cursor: pointer;
+        transition:
+          transform 240ms var(--ease),
+          box-shadow 240ms var(--ease),
+          border-color 240ms var(--ease),
+          background 240ms var(--ease);
+      }
+
+      .prompt-card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 18px 30px rgba(0, 0, 0, 0.04),
+          inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        border-color: var(--line-strong);
+        background: #ffffff;
+      }
+
+      .prompt-card:active {
+        transform: translateY(0);
+      }
+
+      .prompt-text {
+        font-size: clamp(24px, 4.8vw, 34px);
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+        font-weight: 550;
+        max-width: 280px;
+      }
+
+      .cards-view {
+        width: 100%;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .choice {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--surface-strong);
+        border-radius: 24px;
+        padding: 18px 14px 16px;
+        text-align: left;
+        min-height: 250px;
+        cursor: pointer;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transition:
+          transform 260ms var(--ease),
+          box-shadow 260ms var(--ease),
+          border-color 260ms var(--ease),
+          opacity 260ms var(--ease);
+        transform-origin: center center;
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+
+      .cards-view.revealed .choice {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .cards-view.revealed .choice:nth-child(1) {
+        transition-delay: 0ms;
+      }
+
+      .cards-view.revealed .choice:nth-child(2) {
+        transition-delay: 60ms;
+      }
+
+      .cards-view.revealed .choice:nth-child(3) {
+        transition-delay: 120ms;
+      }
+
+      .choice:hover {
+        transform: translateY(-4px);
+        border-color: var(--line-strong);
+        box-shadow:
+          0 16px 30px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      }
+
+      .choice:active {
+        transform: translateY(-1px) scale(0.995);
+      }
+
+      .choice.selected {
+        border-color: rgba(17, 17, 17, 0.18);
+        box-shadow:
+          0 18px 34px rgba(0, 0, 0, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.76);
+      }
+
+      .choice-value {
+        font-size: clamp(28px, 5vw, 42px);
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+
+      .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 3px;
+        align-content: start;
+      }
+
+      .mini-icon {
+        width: 100%;
+        aspect-ratio: 1;
+        color: #111111;
+        opacity: 0.12;
+        transition: opacity 180ms ease;
+      }
+
+      .mini-icon.active {
+        opacity: 0.92;
+      }
+
+      .mini-icon svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .action {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        border-radius: 999px;
+        height: 42px;
+        padding: 0 18px;
+        font: inherit;
+        font-size: 15px;
+        cursor: pointer;
+        transition:
+          transform 180ms var(--ease),
+          background 180ms var(--ease),
+          border-color 180ms var(--ease),
+          opacity 180ms ease;
+      }
+
+      .action:hover {
+        background: rgba(255, 255, 255, 0.92);
+        border-color: var(--line-strong);
+      }
+
+      .action:active {
+        transform: scale(0.985);
+      }
+
+      .action[hidden] {
+        display: none;
+      }
+
+      .status {
+        min-height: 24px;
+        margin-top: 14px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 700px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .choice {
+          min-height: 184px;
+        }
+
+        .stage {
+          min-height: 520px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .shell {
+          border-radius: 26px;
+          padding: 14px;
+        }
+
+        .shell-inner {
+          border-radius: 20px;
+          padding: 14px;
+        }
+
+        .prompt-card {
+          min-height: 220px;
+          border-radius: 24px;
+          padding: 24px 18px;
+        }
+
+        .choice {
+          border-radius: 20px;
+          padding: 16px 12px 14px;
+        }
+
+        .icon-grid {
+          gap: 2px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Trading Cards</h1>
+          <p>Reveal three percentages. Pick one and keep it.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Trading card volume control">
+          <div class="readout" id="readout">Volume: 5%</div>
+
+          <div class="shell">
+            <div class="shell-inner">
+              <div class="stage">
+                <div class="prompt-view" id="promptView">
+                  <button
+                    class="prompt-card"
+                    id="revealButton"
+                    type="button"
+                    aria-label="Reveal your trading cards"
+                  >
+                    <div class="prompt-text">Click to reveal your cards</div>
+                  </button>
+                </div>
+
+                <div
+                  class="cards-view hidden"
+                  id="cardsView"
+                  aria-live="polite"
+                >
+                  <div class="cards-grid" id="cardsGrid"></div>
+                </div>
+              </div>
+
+              <div class="controls">
+                <button class="action" id="againButton" type="button" hidden>
+                  Again
+                </button>
+              </div>
+
+              <div class="status" id="status">Pick one.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const readout = document.getElementById("readout");
+      const promptView = document.getElementById("promptView");
+      const cardsView = document.getElementById("cardsView");
+      const cardsGrid = document.getElementById("cardsGrid");
+      const revealButton = document.getElementById("revealButton");
+      const againButton = document.getElementById("againButton");
+      const statusEl = document.getElementById("status");
+
+      let volume = 5;
+      let locked = false;
+
+      function setReadout(value) {
+        readout.textContent = `Volume: ${value}%`;
+      }
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function speakerIcon() {
+        return `
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"></path>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+            <path d="M18.36 5.64a9 9 0 0 1 0 12.73" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+          </svg>
+        `;
+      }
+
+      function randomUniqueVolumes(count, min, max) {
+        const values = new Set();
+
+        while (values.size < count) {
+          values.add(Math.floor(Math.random() * (max - min + 1)) + min);
+        }
+
+        return [...values];
+      }
+
+      function createIconGrid(value) {
+        const grid = document.createElement("div");
+        grid.className = "icon-grid";
+
+        for (let index = 1; index <= 100; index += 1) {
+          const icon = document.createElement("div");
+          icon.className = "mini-icon" + (index <= value ? " active" : "");
+          icon.innerHTML = speakerIcon();
+          grid.appendChild(icon);
+        }
+
+        return grid;
+      }
+
+      function makeCard(value) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice";
+        button.setAttribute("aria-label", `Set volume to ${value}%`);
+
+        const number = document.createElement("div");
+        number.className = "choice-value";
+        number.textContent = `${value}%`;
+
+        button.append(number, createIconGrid(value));
+
+        button.addEventListener("click", () => {
+          if (locked) return;
+
+          locked = true;
+          volume = value;
+          setReadout(volume);
+          setStatus(`Set volume to ${value}%.`);
+          button.classList.add("selected");
+          againButton.hidden = false;
+
+          [...cardsGrid.children].forEach((card) => {
+            if (card !== button) {
+              card.style.opacity = "0.62";
+            }
+
+            card.disabled = true;
+          });
+        });
+
+        return button;
+      }
+
+      function showCards() {
+        locked = false;
+        cardsGrid.innerHTML = "";
+
+        randomUniqueVolumes(3, 0, 100)
+          .sort((a, b) => a - b)
+          .forEach((value) => {
+            cardsGrid.appendChild(makeCard(value));
+          });
+
+        promptView.classList.add("hidden");
+        cardsView.classList.remove("hidden");
+
+        requestAnimationFrame(() => {
+          cardsView.classList.add("revealed");
+        });
+
+        againButton.hidden = true;
+        setStatus("Pick one.");
+      }
+
+      function resetView() {
+        cardsView.classList.remove("revealed");
+        cardsView.classList.add("hidden");
+        promptView.classList.remove("hidden");
+        cardsGrid.innerHTML = "";
+        locked = false;
+        againButton.hidden = true;
+        setStatus("Pick one.");
+      }
+
+      revealButton.addEventListener("click", showCards);
+      againButton.addEventListener("click", resetView);
+
+      setReadout(volume);
+    </script>
+  </body>
+</html>
