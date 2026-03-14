@@ -280,7 +280,6 @@
 
     <script src="../../assets/site.js" defer></script>
     <script>
-      const storageKey = "vivan-volume-slider-tutorial-complete-v2";
       const wrap = document.querySelector(".wrap");
       const slider = document.getElementById("slider");
       const volumeLabel = document.getElementById("volumeLabel");
@@ -290,7 +289,7 @@
       const popover = document.getElementById("popover");
 
       const tutorial = {
-        enabled: localStorage.getItem(storageKey) !== "true",
+        enabled: true,
         modalQueue: [],
         hoverSeen: false,
         clickSeen: false,
@@ -349,7 +348,6 @@
         tutorial.enabled = false;
         tutorial.finalConfirmPending = false;
         hidePopover();
-        localStorage.setItem(storageKey, "true");
       }
 
       function setSliderWithoutCommit(value) {
