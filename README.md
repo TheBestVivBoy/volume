@@ -2,7 +2,7 @@
 
 `Volume` is a frontend-only static website for a collection of intentionally inconvenient volume sliders. The presentation stays calm, grayscale, and minimal, and the joke comes from the mechanic instead of the styling.
 
-The site is intended to be served at `https://volume.vivan.site/`.
+The site is intended to be served at `https://vivancodes.com/`.
 
 ## What it includes
 

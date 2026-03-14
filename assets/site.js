@@ -26,12 +26,21 @@ const sliders = [
   },
 ];
 
+const logoSources = {
+  small: "assets/vivancodes_logo-84.webp",
+  large: "assets/vivancodes_logo-168.webp",
+};
+
 function getSiteRoot() {
   return document.body.dataset.siteRoot || "./";
 }
 
 function buildInternalHref(path) {
   return `${getSiteRoot()}${path}`;
+}
+
+function buildLogoSrc(path) {
+  return buildInternalHref(path);
 }
 
 function renderSiteHeader() {
@@ -48,10 +57,13 @@ function renderSiteHeader() {
       <a class="site-brand" href="${buildInternalHref("")}" aria-label="Go to homepage">
         <span class="site-brand-mark">
           <img
-            src="${buildInternalHref("assets/vivancodes_logo.png")}"
+            src="${buildLogoSrc(logoSources.small)}"
+            srcset="${buildLogoSrc(logoSources.small)} 84w, ${buildLogoSrc(logoSources.large)} 168w"
+            sizes="42px"
             alt="Vivan Codes"
-            width="572"
-            height="572"
+            width="42"
+            height="42"
+            decoding="async"
           />
         </span>
         <span class="site-brand-text">

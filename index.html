@@ -17,10 +17,10 @@
       property="og:description"
       content="What's the worst volume slider you've ever seen? These beat it."
     />
-    <meta property="og:url" content="https://volume.vivan.site/" />
+    <meta property="og:url" content="https://vivancodes.com/" />
     <meta
       property="og:image"
-      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
     />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Volume - Inconvenient Sliders" />
@@ -28,15 +28,23 @@
       name="twitter:description"
       content="What's the worst volume slider you've ever seen? These beat it."
     />
-    <link rel="canonical" href="https://volume.vivan.site/" />
+    <link rel="canonical" href="https://vivancodes.com/" />
     <link rel="icon" type="image/png" href="assets/vivancodes_logo.png" />
+    <link
+      rel="preload"
+      as="image"
+      href="assets/vivancodes_logo-168.webp"
+      imagesrcset="assets/vivancodes_logo-84.webp 84w, assets/vivancodes_logo-168.webp 168w"
+      imagesizes="84px"
+      fetchpriority="high"
+    />
     <link rel="stylesheet" href="assets/site.css" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         "name": "Volume",
-        "url": "https://volume.vivan.site/",
+        "url": "https://vivancodes.com/",
         "description": "What's the worst volume slider you've ever seen? These beat it.",
         "sameAs": [
           "https://github.com/TheBestVivBoy/volume",
@@ -51,10 +59,17 @@
       <header class="hero" data-animate>
         <div class="logo-mark" data-stagger>
           <img
-            src="assets/vivancodes_logo.png"
+            src="assets/vivancodes_logo-84.webp"
+            srcset="
+              assets/vivancodes_logo-84.webp   84w,
+              assets/vivancodes_logo-168.webp 168w
+            "
+            sizes="84px"
             alt="Vivan Codes"
-            width="572"
-            height="572"
+            width="84"
+            height="84"
+            decoding="async"
+            fetchpriority="high"
           />
         </div>
         <div class="hero-brand" data-stagger>
@@ -89,6 +104,6 @@
         </section>
       </main>
     </div>
-    <script src="assets/site.js"></script>
+    <script src="assets/site.js" defer></script>
   </body>
 </html>

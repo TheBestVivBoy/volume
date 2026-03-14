@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://volume.vivan.site/sitemap.xml
+Sitemap: https://vivancodes.com/sitemap.xml

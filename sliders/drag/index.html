@@ -17,10 +17,10 @@
       property="og:description"
       content="Raise the volume one percent at a time by dragging speaker icons into a box."
     />
-    <meta property="og:url" content="https://volume.vivan.site/sliders/drag/" />
+    <meta property="og:url" content="https://vivancodes.com/sliders/drag/" />
     <meta
       property="og:image"
-      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
     />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Drag and Drop | Volume" />
@@ -28,7 +28,7 @@
       name="twitter:description"
       content="Raise the volume one percent at a time by dragging speaker icons into a box."
     />
-    <link rel="canonical" href="https://volume.vivan.site/sliders/drag/" />
+    <link rel="canonical" href="https://vivancodes.com/sliders/drag/" />
     <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
     <link rel="stylesheet" href="../../assets/site.css" />
     <style>
@@ -198,7 +198,7 @@
       <header class="page-bar">
         <div class="page-bar-copy">
           <h1>Drag and Drop</h1>
-          <p>Every speaker icon is worth one percent. Keep dragging.</p>
+          <p>Keep dragging.</p>
         </div>
       </header>
 
@@ -302,7 +302,9 @@
 
       function isOverBox(x, y) {
         const rect = dropbox.getBoundingClientRect();
-        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        return (
+          x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+        );
       }
 
       function setGhostPosition(x, y) {
