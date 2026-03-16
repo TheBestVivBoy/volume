@@ -1,3 +1,15 @@
+const BMC_URL = "https://buymeacoffee.com/vivancodes";
+const POPUP_COOLDOWN_MS = 7 * 60 * 1000;
+const MIN_VISITS = 2;
+const FIRST_VISIT_DELAY_MS = 10 * 60 * 1000;
+const POPUP_DELAY_AFTER_PAGELOAD = 15 * 1000;
+
+const STORAGE_KEYS = {
+  firstVisitTimestamp: "firstVisitTimestamp",
+  visitCount: "visitCount",
+  lastPopupTimestamp: "lastPopupTimestamp",
+};
+
 const sliders = [
   {
     title: "Alphabetical Order",
@@ -66,6 +78,12 @@ const sliders = [
     path: "sliders/spinner/",
   },
   {
+    title: "Stacking",
+    description: "Build it one layer at a time.",
+    slug: "stacking",
+    path: "sliders/stacking/",
+  },
+  {
     title: "Tic-Tac-Toe",
     description: "Slow and steady wins the.. volume?",
     slug: "tictactoe",
@@ -102,6 +120,18 @@ const logoSources = {
   large: "assets/vivancodes_logo-168.webp",
 };
 
+let popupTimer = 0;
+let lastPopupFocus = null;
+let popupListenersBound = false;
+
+window.VolumeSiteConfig = {
+  BMC_URL,
+  POPUP_COOLDOWN_MS,
+  MIN_VISITS,
+  FIRST_VISIT_DELAY_MS,
+  POPUP_DELAY_AFTER_PAGELOAD,
+};
+
 function getSiteRoot() {
   return document.body.dataset.siteRoot || "./";
 }
@@ -123,6 +153,28 @@ function supportsCardPreviews() {
     document.body.classList.contains("home-page") ||
     document.body.classList.contains("collection-page")
   );
+}
+
+function supportsStorage() {
+  try {
+    const probe = "__volume_probe__";
+    window.localStorage.setItem(probe, probe);
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function readStoredNumber(key) {
+  if (!supportsStorage()) return 0;
+  const value = Number.parseInt(window.localStorage.getItem(key) || "0", 10);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function writeStoredNumber(key, value) {
+  if (!supportsStorage()) return;
+  window.localStorage.setItem(key, String(value));
 }
 
 function renderSiteHeader() {
@@ -269,12 +321,249 @@ function mountHomePreviews() {
   cards.forEach((card) => observer.observe(card));
 }
 
+function renderHomeSupport() {
+  if (!document.body.classList.contains("home-page")) return;
+
+  const anchor = document.querySelector("[data-home-support-anchor]");
+  if (!anchor) return;
+
+  anchor.innerHTML = `
+    <section class="support-inline support-inline--home" data-animate aria-label="Support Vivan Codes">
+      <div class="support-inline-copy">
+        <span class="support-inline-eyebrow">Support</span>
+        <p class="support-inline-title">To keep vivancodes.com free for everyone.</p>
+        <p class="support-inline-text">If the sliders made you smile, a small donation helps keep new ones coming.</p>
+      </div>
+      <div class="support-inline-actions">
+        <a
+          class="support-link"
+          href="${BMC_URL}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Support Vivan Codes on Buy Me a Coffee"
+        >Buy me volume</a>
+      </div>
+    </section>
+  `;
+}
+
+function createPopup() {
+  let popup = document.getElementById("support-popup");
+  if (popup) return popup;
+
+  popup = document.createElement("div");
+  popup.id = "support-popup";
+  popup.className = "support-popup";
+  popup.hidden = true;
+  popup.innerHTML = `
+    <div
+      class="support-popup__panel"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="support-popup-title"
+      aria-describedby="support-popup-copy"
+    >
+      <div class="support-popup__top">
+        <span class="support-popup__eyebrow">Support</span>
+        <button
+          type="button"
+          class="support-popup__icon"
+          data-popup-close
+          aria-label="Close support prompt"
+        >×</button>
+      </div>
+      <h2 class="support-popup__title" id="support-popup-title">
+        To keep vivancodes.com free for everyone.
+      </h2>
+      <p class="support-popup__copy" id="support-popup-copy">
+        a small donation helps keep the next inconvenient slider online.
+      </p>
+      <div class="support-popup__actions">
+        <a
+          class="support-link support-link--compact"
+          href="${BMC_URL}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Support Vivan Codes on Buy Me a Coffee"
+        >Buy me volume</a>
+        <button
+          type="button"
+          class="support-popup__dismiss"
+          data-popup-close
+          aria-label="Dismiss support prompt for now"
+        >Maybe later</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  popup.querySelectorAll("[data-popup-close]").forEach((button) => {
+    button.addEventListener("click", () => closePopup());
+  });
+
+  return popup;
+}
+
+function getFocusableElements(scope) {
+  return Array.from(
+    scope.querySelectorAll(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter(
+    (element) =>
+      !element.hidden && element.getAttribute("aria-hidden") !== "true",
+  );
+}
+
+function bindPopupListeners() {
+  if (popupListenersBound) return;
+
+  document.addEventListener("keydown", (event) => {
+    const popup = document.getElementById("support-popup");
+    if (!popup || popup.hidden) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePopup();
+      return;
+    }
+
+    if (event.key !== "Tab" || !popup.contains(document.activeElement)) return;
+
+    const focusable = getFocusableElements(popup);
+    if (!focusable.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  document.addEventListener("focusin", (event) => {
+    const popup = document.getElementById("support-popup");
+    if (!popup || popup.hidden) return;
+    if (popup.contains(event.target)) return;
+
+    const focusable = getFocusableElements(popup);
+    focusable[0]?.focus();
+  });
+
+  popupListenersBound = true;
+}
+
+function openPopup() {
+  const popup = createPopup();
+  if (!popup.hidden) return;
+
+  writeStoredNumber(STORAGE_KEYS.lastPopupTimestamp, Date.now());
+  lastPopupFocus =
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+
+  popup.hidden = false;
+  window.requestAnimationFrame(() => {
+    popup.classList.add("is-visible");
+    const preferredFocus =
+      popup.querySelector(".support-popup__dismiss") ||
+      getFocusableElements(popup)[0];
+    preferredFocus?.focus();
+  });
+}
+
+function closePopup() {
+  const popup = document.getElementById("support-popup");
+  if (!popup || popup.hidden) return;
+
+  writeStoredNumber(STORAGE_KEYS.lastPopupTimestamp, Date.now());
+  popup.classList.remove("is-visible");
+
+  window.setTimeout(() => {
+    popup.hidden = true;
+  }, 180);
+
+  if (lastPopupFocus && document.contains(lastPopupFocus)) {
+    lastPopupFocus.focus();
+  }
+}
+
+function trackVisit() {
+  const now = Date.now();
+  let firstVisitTimestamp = readStoredNumber(STORAGE_KEYS.firstVisitTimestamp);
+  let visitCount = readStoredNumber(STORAGE_KEYS.visitCount);
+  const lastPopupTimestamp = readStoredNumber(STORAGE_KEYS.lastPopupTimestamp);
+
+  if (!firstVisitTimestamp || firstVisitTimestamp > now) {
+    firstVisitTimestamp = now;
+    visitCount = 1;
+  } else {
+    visitCount = Math.max(visitCount, 0) + 1;
+  }
+
+  writeStoredNumber(STORAGE_KEYS.firstVisitTimestamp, firstVisitTimestamp);
+  writeStoredNumber(STORAGE_KEYS.visitCount, visitCount);
+
+  return {
+    now,
+    firstVisitTimestamp,
+    visitCount,
+    lastPopupTimestamp,
+  };
+}
+
+function shouldSchedulePopup(state) {
+  if (!supportsStorage()) return false;
+  if (state.visitCount < MIN_VISITS) return false;
+  if (state.now - state.firstVisitTimestamp < FIRST_VISIT_DELAY_MS)
+    return false;
+  if (
+    state.lastPopupTimestamp &&
+    state.now - state.lastPopupTimestamp < POPUP_COOLDOWN_MS
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function initSupportPopup() {
+  if (!document.body.classList.contains("home-page")) return;
+
+  createPopup();
+  bindPopupListeners();
+
+  const visitState = trackVisit();
+  if (!shouldSchedulePopup(visitState)) return;
+
+  const delay = POPUP_DELAY_AFTER_PAGELOAD + Math.floor(Math.random() * 7000);
+  popupTimer = window.setTimeout(() => {
+    openPopup();
+  }, delay);
+}
+
 function initAnimations() {
   const staggerEls = document.querySelectorAll("[data-stagger]");
   staggerEls.forEach((el, i) => {
     el.style.setProperty("--stagger-index", i);
     el.classList.add("stagger-in");
   });
+
+  const animateTargets = document.querySelectorAll("[data-animate]");
+  if (!animateTargets.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    animateTargets.forEach((el) => {
+      el.classList.add("fade-up", "visible");
+    });
+    return;
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -288,7 +577,7 @@ function initAnimations() {
     { threshold: 0.08 },
   );
 
-  document.querySelectorAll("[data-animate]").forEach((el) => {
+  animateTargets.forEach((el) => {
     el.classList.add("fade-up");
     observer.observe(el);
   });
@@ -298,5 +587,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSiteHeader();
   renderGrid();
   mountHomePreviews();
+  renderHomeSupport();
+  document.body.classList.add("has-bmc-widget");
+  initSupportPopup();
   initAnimations();
 });

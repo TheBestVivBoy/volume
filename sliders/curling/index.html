@@ -154,6 +154,38 @@
         color: #bbb;
       }
 
+      .ad-actions {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      .ad-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0.58rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid #d8dbe6;
+        background: #f8f9fc;
+        color: #111;
+        font-size: 0.76rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          transform 0.15s ease,
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+
+      .ad-cta:hover {
+        transform: translateY(-1px);
+        border-color: #b8becf;
+        background: #ffffff;
+      }
+
       .footer {
         padding: 12px 16px;
         display: flex;
@@ -223,7 +255,7 @@
             <canvas id="c"></canvas>
 
             <div class="ad" id="ad">
-              <div class="ad-label">Advertisement</div>
+              <div class="ad-label" id="adLabel">Advertisement</div>
               <div class="ad-content" id="adContent"></div>
               <div class="ad-countdown" id="adCountdown"></div>
             </div>
@@ -235,6 +267,34 @@
         </section>
       </main>
     </div>
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
 
     <script src="../../assets/site.js" defer></script>
     <script>
@@ -243,6 +303,7 @@
       const titleLabel = document.getElementById("titleLabel");
       const resetBtn = document.getElementById("resetBtn");
       const adEl = document.getElementById("ad");
+      const adLabel = document.getElementById("adLabel");
       const adContent = document.getElementById("adContent");
       const adCountdown = document.getElementById("adCountdown");
 
@@ -260,29 +321,43 @@
           bg: "#eef6ff",
           color: "#1d4ed8",
           icon: "🥌",
+          label: "Advertisement",
+          duration: 3,
           headline: "EdgeStone Curling Gear",
           sub: "Built for clean slides and precise shots.",
-        },
-        {
-          bg: "#fff7ed",
-          color: "#c2410c",
-          icon: "🔥",
-          headline: "NorthRink Hand Warmers",
-          sub: "Stay warm between ends. No bulky gloves needed.",
         },
         {
           bg: "#f0fdf4",
           color: "#15803d",
           icon: "🥤",
+          label: "Advertisement",
+          duration: 3,
           headline: "Glacier Sports Drink",
           sub: "Light, crisp hydration for long matches.",
+        },
+        {
+          bg: "#f6f4ff",
+          color: "#3f51b5",
+          icon: "🔊",
+          label: "Support",
+          duration: 4,
+          headline: "Keep Volume free",
+          sub: "a small donation helps keep more inconvenient sliders online.",
+          cta: {
+            label: "Buy me volume",
+            href:
+              (window.VolumeSiteConfig && window.VolumeSiteConfig.BMC_URL) ||
+              "https://buymeacoffee.com/vivancodes",
+          },
         },
       ];
 
       let adTimer = null;
 
       function showAd() {
+        clearInterval(adTimer);
         const ad = ADS[Math.floor(Math.random() * ADS.length)];
+        adLabel.textContent = ad.label || "Advertisement";
         adContent.innerHTML = `
     <div class="ad-visual" style="background:${ad.bg};color:${ad.color}">
       <span style="margin-right:10px">${ad.icon}</span>
@@ -291,10 +366,23 @@
     <div class="ad-body">
       <div class="ad-headline">${ad.headline}</div>
       <div class="ad-sub">${ad.sub}</div>
+      ${
+        ad.cta
+          ? `<div class="ad-actions">
+      <a
+        class="ad-cta"
+        href="${ad.cta.href}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Support Vivan Codes on Buy Me a Coffee"
+      >${ad.cta.label}</a>
+    </div>`
+          : ""
+      }
     </div>
   `;
         adEl.classList.add("show");
-        let t = 3;
+        let t = ad.duration || 3;
         adCountdown.textContent = `Resuming in ${t}s`;
         adTimer = setInterval(() => {
           t--;

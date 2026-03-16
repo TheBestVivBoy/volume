@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stacking | Volume</title>
+    <meta
+      name="description"
+      content="Raise the volume by stacking moving layers without trimming the tower away."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Stacking | Volume" />
+    <meta
+      property="og:description"
+      content="Raise the volume by stacking moving layers without trimming the tower away."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/stacking/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Stacking | Volume" />
+    <meta
+      name="twitter:description"
+      content="Raise the volume by stacking moving layers without trimming the tower away."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/stacking/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --panel: #fbfaf7;
+        --panel-line: rgba(17, 17, 17, 0.08);
+        --panel-shadow: 0 14px 32px rgba(17, 17, 17, 0.05);
+        --text-strong: #111111;
+        --text-muted: #6e6b65;
+        --line-soft: rgba(17, 17, 17, 0.05);
+        --line-strong: rgba(17, 17, 17, 0.12);
+        --block-a: #d6d8de;
+        --block-b: #c8cdd4;
+        --block-active: #939aa7;
+        --block-debris: #bcc2cb;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        user-select: none;
+      }
+
+      body.project-page {
+        background: #f2f1ec;
+      }
+
+      body.project-page::before,
+      body.project-page::after {
+        display: none;
+      }
+
+      .project-stage {
+        width: 100%;
+        min-height: min(78vh, 920px);
+        display: flex;
+        justify-content: center;
+        padding: 12px 0 0;
+      }
+
+      .stacking-app {
+        width: min(100%, 560px);
+      }
+
+      .stacking-card {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border: 1px solid var(--panel-line);
+        border-radius: 20px;
+        background: var(--panel);
+        box-shadow: var(--panel-shadow);
+      }
+
+      .stacking-topbar {
+        display: grid;
+        justify-items: center;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .readout {
+        margin: 0;
+        font-size: clamp(2.7rem, 9vw, 4.5rem);
+        line-height: 0.94;
+        letter-spacing: -0.07em;
+        font-weight: 450;
+        color: var(--text-strong);
+      }
+
+      .board-shell {
+        position: relative;
+      }
+
+      .board {
+        position: relative;
+        height: clamp(330px, 50vh, 440px);
+        border: 1px solid var(--panel-line);
+        border-radius: 16px;
+        overflow: hidden;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.55),
+            rgba(255, 255, 255, 0) 34%
+          ),
+          linear-gradient(180deg, #faf8f2 0%, #f3f0e9 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        touch-action: manipulation;
+        cursor: pointer;
+        outline: none;
+        transition: transform 140ms ease;
+      }
+
+      .board:focus-visible {
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.78),
+          0 0 0 3px rgba(17, 17, 17, 0.08);
+      }
+
+      .board.hit {
+        animation: board-hit 150ms cubic-bezier(0.2, 0.9, 0.25, 1);
+      }
+
+      .board::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border-radius: 10px;
+        background:
+          repeating-linear-gradient(
+            to top,
+            transparent 0 35px,
+            rgba(17, 17, 17, 0.035) 35px 36px
+          ),
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0) 28%
+          );
+        pointer-events: none;
+      }
+
+      .board::after {
+        content: "";
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        height: 1px;
+        background: rgba(17, 17, 17, 0.12);
+        pointer-events: none;
+      }
+
+      .camera-rig,
+      .layer {
+        position: absolute;
+        inset: 0;
+      }
+
+      .camera-rig {
+        will-change: transform;
+      }
+
+      .block {
+        --fill: var(--block-a);
+        position: absolute;
+        height: 22px;
+        border-radius: 3px;
+        background: var(--fill);
+        border: 1px solid rgba(17, 17, 17, 0.08);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.35),
+          0 3px 8px rgba(17, 17, 17, 0.03);
+        transition:
+          background 140ms ease,
+          border-color 140ms ease,
+          box-shadow 140ms ease;
+        will-change: left, width, transform;
+      }
+
+      .block[data-tone="b"] {
+        --fill: var(--block-b);
+      }
+
+      .block.active {
+        --fill: var(--block-active);
+        border-color: rgba(17, 17, 17, 0.14);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.28),
+          0 10px 20px rgba(17, 17, 17, 0.08);
+      }
+
+      .block.locking {
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.3),
+          0 6px 12px rgba(17, 17, 17, 0.05);
+      }
+
+      .block.perfect {
+        animation: perfect-flash 220ms ease-out;
+      }
+
+      .block.debris {
+        --drift-x: 0px;
+        --drift-rotate: 0deg;
+        --fall-y: 170px;
+        --fall-opacity: 0;
+        --fill: var(--block-debris);
+        transition:
+          transform 540ms cubic-bezier(0.28, 0.88, 0.34, 1),
+          opacity 540ms ease;
+      }
+
+      .block.debris.falling {
+        transform: translateX(var(--drift-x)) translateY(var(--fall-y))
+          rotate(var(--drift-rotate));
+        opacity: var(--fall-opacity);
+      }
+
+      .meta {
+        display: grid;
+        justify-items: center;
+      }
+
+      .action {
+        appearance: none;
+        min-width: 144px;
+        height: 46px;
+        padding: 0 24px;
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 999px;
+        background: #f5f2eb;
+        color: var(--text-strong);
+        font: inherit;
+        font-size: 0.98rem;
+        cursor: pointer;
+        transition:
+          transform 140ms ease,
+          background 140ms ease,
+          border-color 140ms ease,
+          box-shadow 140ms ease;
+      }
+
+      .action:hover {
+        background: #efebe3;
+        border-color: rgba(17, 17, 17, 0.15);
+        box-shadow: 0 8px 18px rgba(17, 17, 17, 0.05);
+      }
+
+      .action:active {
+        transform: scale(0.985);
+      }
+
+      .action:disabled {
+        opacity: 0.6;
+        cursor: default;
+        box-shadow: none;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @keyframes perfect-flash {
+        0% {
+          filter: brightness(1.08);
+        }
+        100% {
+          filter: brightness(1);
+        }
+      }
+
+      @keyframes board-hit {
+        0% {
+          transform: scale(1);
+        }
+        45% {
+          transform: scale(0.996);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .stacking-card {
+          padding: 16px;
+          border-radius: 18px;
+        }
+
+        .board {
+          height: clamp(320px, 44vh, 380px);
+          border-radius: 14px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar" data-animate>
+        <div class="page-bar-copy">
+          <h1 data-stagger>Stacking</h1>
+          <p data-stagger>Drop each layer in line and build the volume one slab at a time.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="stacking-app" aria-label="Stacking volume control">
+          <div class="stacking-card">
+            <div class="stacking-topbar">
+              <p class="readout" id="readout" aria-live="polite">Volume 0%</p>
+              <p class="sr-only" id="status" aria-live="polite">
+                Press start, then place each moving layer.
+              </p>
+            </div>
+
+            <div class="board-shell">
+              <div
+                class="board"
+                id="board"
+                tabindex="0"
+                role="button"
+                aria-label="Stacking control. Press start, then tap the board to place each moving layer."
+              >
+                <div class="camera-rig" id="cameraRig">
+                  <div class="layer" id="placedLayers"></div>
+                  <div class="layer" id="debrisLayers"></div>
+                  <div class="layer" id="activeLayers"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="meta">
+              <button class="action" id="actionButton" type="button">
+                Start
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const board = document.getElementById("board");
+      const cameraRig = document.getElementById("cameraRig");
+      const placedLayers = document.getElementById("placedLayers");
+      const debrisLayers = document.getElementById("debrisLayers");
+      const activeLayers = document.getElementById("activeLayers");
+      const readout = document.getElementById("readout");
+      const status = document.getElementById("status");
+      const actionButton = document.getElementById("actionButton");
+
+      const FIELD_INSET = 18;
+      const BOARD_FLOOR = 18;
+      const BLOCK_HEIGHT = 22;
+      const ROW_SPACING = 24;
+      const MAX_VOLUME = 100;
+      const PERFECT_TOLERANCE = 4;
+      const BASE_CYCLE_DURATION = 2520;
+      const MIN_CYCLE_DURATION = 1500;
+      const PLACEMENT_ANIMATION_MS = 150;
+      const NEXT_BLOCK_DELAY_MS = 90;
+
+      let boardWidth = 0;
+      let boardHeight = 0;
+      let fieldWidth = 0;
+
+      const state = {
+        started: false,
+        playing: false,
+        ended: false,
+        won: false,
+        settling: false,
+        volume: 0,
+        cycleDuration: BASE_CYCLE_DURATION,
+        rows: [],
+        current: null,
+        camera: 0,
+        cameraTarget: 0,
+        lastTime: 0,
+        rafId: 0,
+        pendingSpawnTimer: 0,
+      };
+
+      function syncBoardMetrics() {
+        boardWidth = board.clientWidth || 320;
+        boardHeight = board.clientHeight || 440;
+        fieldWidth = Math.max(180, boardWidth - FIELD_INSET * 2);
+      }
+
+      function toneForRow(rowIndex) {
+        return rowIndex % 2 === 0 ? "a" : "b";
+      }
+
+      function setBlockPosition(element, left, width, rowIndex) {
+        element.style.left = `${FIELD_INSET + left}px`;
+        element.style.width = `${width}px`;
+        element.style.bottom = `${BOARD_FLOOR + rowIndex * ROW_SPACING}px`;
+      }
+
+      function createBlock(left, width, rowIndex, className = "") {
+        const element = document.createElement("div");
+        element.className = `block ${className}`.trim();
+        element.dataset.tone = toneForRow(rowIndex);
+        setBlockPosition(element, left, width, rowIndex);
+        return element;
+      }
+
+      function updateReadout() {
+        readout.textContent = `Volume ${state.volume}%`;
+      }
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      function updateCameraTarget() {
+        const towerTop =
+          BOARD_FLOOR + (state.rows.length + 1) * ROW_SPACING + BLOCK_HEIGHT;
+        const ceiling = boardHeight - 116;
+        state.cameraTarget = Math.max(0, towerTop - ceiling);
+      }
+
+      function clearPendingSpawn() {
+        if (state.pendingSpawnTimer) {
+          window.clearTimeout(state.pendingSpawnTimer);
+          state.pendingSpawnTimer = 0;
+        }
+      }
+
+      function stopLoop() {
+        cancelAnimationFrame(state.rafId);
+        state.rafId = 0;
+      }
+
+      function pulseBoard() {
+        board.classList.remove("hit");
+        void board.offsetWidth;
+        board.classList.add("hit");
+      }
+
+      function initBoard() {
+        syncBoardMetrics();
+
+        const baseWidth = Math.min(240, fieldWidth - 24);
+        const baseLeft = (fieldWidth - baseWidth) / 2;
+        const baseElement = createBlock(baseLeft, baseWidth, 0);
+
+        placedLayers.appendChild(baseElement);
+        state.rows = [
+          { left: baseLeft, width: baseWidth, element: baseElement },
+        ];
+        state.started = true;
+        state.playing = false;
+        state.ended = false;
+        state.won = false;
+        state.settling = false;
+        state.volume = 0;
+        state.cycleDuration = BASE_CYCLE_DURATION;
+        state.current = null;
+        state.camera = 0;
+        state.cameraTarget = 0;
+
+        cameraRig.style.transform = "translateY(0px)";
+        updateReadout();
+        setStatus("Press start, then place each moving layer.");
+      }
+
+      function spawnNextBlock() {
+        const previous = state.rows[state.rows.length - 1];
+        const nextFromLeft = state.rows.length % 2 === 0;
+        const startLeft = nextFromLeft ? 0 : fieldWidth - previous.width;
+
+        const element = createBlock(
+          startLeft,
+          previous.width,
+          state.rows.length,
+          "active",
+        );
+
+        activeLayers.appendChild(element);
+        state.current = {
+          left: startLeft,
+          width: previous.width,
+          element,
+          phase: nextFromLeft ? -Math.PI / 2 : Math.PI / 2,
+        };
+      }
+
+      function startGame() {
+        if (!state.started) {
+          initBoard();
+        }
+
+        if (!state.current) {
+          spawnNextBlock();
+        }
+
+        state.playing = true;
+        state.ended = false;
+        state.won = false;
+        state.settling = false;
+        actionButton.textContent = "Place";
+        actionButton.disabled = false;
+        setStatus("Place the moving layer when it lines up.");
+
+        stopLoop();
+        state.lastTime = performance.now();
+        state.rafId = requestAnimationFrame(tick);
+      }
+
+      function createDebris(left, width, rowIndex, direction) {
+        if (width <= 0) return;
+
+        const debris = createBlock(left, width, rowIndex, "debris");
+        debris.style.setProperty("--drift-x", `${direction * 28}px`);
+        debris.style.setProperty("--drift-rotate", `${direction * 5}deg`);
+        debris.style.setProperty("--fall-y", "170px");
+        debris.style.setProperty("--fall-opacity", "0");
+        debrisLayers.appendChild(debris);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            debris.classList.add("falling");
+          });
+        });
+      }
+
+      function finishRun(message) {
+        state.playing = false;
+        state.settling = false;
+        state.ended = true;
+        clearPendingSpawn();
+        stopLoop();
+        actionButton.textContent = "Restart";
+        actionButton.disabled = false;
+        setStatus(message);
+      }
+
+      function triggerGameOver() {
+        if (state.current) {
+          const current = state.current;
+          current.element.classList.remove("active");
+          current.element.classList.add("debris");
+
+          const previous = state.rows[state.rows.length - 1];
+          const previousCenter = previous.left + previous.width / 2;
+          const currentCenter = current.left + current.width / 2;
+          const direction = currentCenter < previousCenter ? -1 : 1;
+
+          current.element.style.setProperty("--drift-x", `${direction * 34}px`);
+          current.element.style.setProperty(
+            "--drift-rotate",
+            `${direction * 6}deg`,
+          );
+          current.element.style.setProperty("--fall-y", "180px");
+          current.element.style.setProperty("--fall-opacity", "0");
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              current.element.classList.add("falling");
+            });
+          });
+
+          state.current = null;
+        }
+
+        finishRun("The layer missed. Restart to build again.");
+      }
+
+      function triggerWin() {
+        state.won = true;
+        finishRun("Maximum volume reached.");
+      }
+
+      function animatePlacement(element, left, width, rowIndex, onDone) {
+        element.classList.add("locking");
+        element.style.transition =
+          "left 150ms cubic-bezier(0.22, 1, 0.36, 1), width 150ms cubic-bezier(0.22, 1, 0.36, 1), transform 150ms cubic-bezier(0.22, 1, 0.36, 1)";
+        element.style.transform = "translateY(-4px)";
+
+        requestAnimationFrame(() => {
+          setBlockPosition(element, left, width, rowIndex);
+          element.style.transform = "translateY(0)";
+        });
+
+        window.setTimeout(() => {
+          element.style.transition = "";
+          element.style.transform = "";
+          element.classList.remove("locking");
+          onDone?.();
+        }, PLACEMENT_ANIMATION_MS);
+      }
+
+      function placeBlock() {
+        if (!state.playing || !state.current || state.settling) return;
+
+        const previous = state.rows[state.rows.length - 1];
+        const current = state.current;
+        const previousLeft = previous.left;
+        const previousRight = previous.left + previous.width;
+        const currentLeft = current.left;
+        const currentRight = current.left + current.width;
+        const overlapLeft = Math.max(previousLeft, currentLeft);
+        const overlapRight = Math.min(previousRight, currentRight);
+        const overlapWidth = overlapRight - overlapLeft;
+
+        current.element.classList.remove("active");
+        current.element.style.transform = "";
+
+        if (overlapWidth <= 0) {
+          triggerGameOver();
+          return;
+        }
+
+        state.playing = false;
+        state.settling = true;
+        pulseBoard();
+
+        const drift = Math.abs(current.left - previous.left);
+        const trimmedWidth = current.width - overlapWidth;
+        const rowIndex = state.rows.length;
+
+        if (drift <= PERFECT_TOLERANCE) {
+          current.left = previous.left;
+          current.width = previous.width;
+          current.element.classList.add("perfect");
+          setStatus("Perfect placement.");
+        } else {
+          current.left = overlapLeft;
+          current.width = overlapWidth;
+
+          if (trimmedWidth > 0) {
+            if (currentLeft < overlapLeft) {
+              createDebris(currentLeft, trimmedWidth, rowIndex, -1);
+            } else {
+              createDebris(overlapRight, trimmedWidth, rowIndex, 1);
+            }
+          }
+
+          setStatus("Layer placed.");
+        }
+
+        animatePlacement(
+          current.element,
+          current.left,
+          current.width,
+          rowIndex,
+          () => {
+            placedLayers.appendChild(current.element);
+            state.rows.push(current);
+            state.current = null;
+
+            state.volume = Math.min(MAX_VOLUME, state.rows.length - 1);
+            state.cycleDuration = Math.max(
+              MIN_CYCLE_DURATION,
+              BASE_CYCLE_DURATION - state.volume * 11,
+            );
+
+            updateReadout();
+            updateCameraTarget();
+
+            if (state.volume >= MAX_VOLUME) {
+              triggerWin();
+              return;
+            }
+
+            clearPendingSpawn();
+            state.pendingSpawnTimer = window.setTimeout(() => {
+              spawnNextBlock();
+              state.settling = false;
+              state.playing = true;
+              actionButton.textContent = "Place";
+              state.lastTime = performance.now();
+              stopLoop();
+              state.rafId = requestAnimationFrame(tick);
+              state.pendingSpawnTimer = 0;
+            }, NEXT_BLOCK_DELAY_MS);
+          },
+        );
+      }
+
+      function resetGame(
+        message = "Press start, then place each moving layer.",
+      ) {
+        clearPendingSpawn();
+        stopLoop();
+
+        placedLayers.innerHTML = "";
+        debrisLayers.innerHTML = "";
+        activeLayers.innerHTML = "";
+
+        actionButton.textContent = "Start";
+        actionButton.disabled = false;
+
+        initBoard();
+        setStatus(message);
+      }
+
+      function handleAction() {
+        if (state.settling) return;
+
+        if (state.ended || state.won) {
+          resetGame();
+          return;
+        }
+
+        if (!state.playing) {
+          startGame();
+          return;
+        }
+
+        placeBlock();
+      }
+
+      function tick(now) {
+        if (!state.playing) return;
+
+        const dt = Math.min(32, now - state.lastTime || 16);
+        state.lastTime = now;
+
+        if (state.current) {
+          const travel = Math.max(0, fieldWidth - state.current.width);
+          const angularVelocity = (Math.PI * 2) / state.cycleDuration;
+
+          state.current.phase += angularVelocity * dt;
+          state.current.left =
+            travel * ((Math.sin(state.current.phase) + 1) / 2);
+
+          const hoverY = Math.sin(state.current.phase * 2) * 1.4;
+          state.current.element.style.transform = `translateY(${hoverY}px)`;
+
+          setBlockPosition(
+            state.current.element,
+            state.current.left,
+            state.current.width,
+            state.rows.length,
+          );
+        }
+
+        state.camera += (state.cameraTarget - state.camera) * 0.09;
+        cameraRig.style.transform = `translateY(${state.camera}px)`;
+        state.rafId = requestAnimationFrame(tick);
+      }
+
+      board.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        handleAction();
+      });
+
+      board.addEventListener("keydown", (event) => {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          handleAction();
+        }
+      });
+
+      actionButton.addEventListener("click", handleAction);
+
+      window.addEventListener("resize", () => {
+        if (boardWidth === 0 && boardHeight === 0) {
+          return;
+        }
+
+        const nextWidth = board.clientWidth || 0;
+        const nextHeight = board.clientHeight || 0;
+
+        if (
+          Math.abs(nextWidth - boardWidth) < 2 &&
+          Math.abs(nextHeight - boardHeight) < 2
+        ) {
+          return;
+        }
+
+        resetGame("Layout changed. Tower reset for a clean run.");
+      });
+
+      resetGame();
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>
