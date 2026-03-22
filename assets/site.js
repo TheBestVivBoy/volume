@@ -18,6 +18,13 @@ const sliders = [
     path: "sliders/alphabetical/",
   },
   {
+    title: "Cannon",
+    description: "Aim the speaker. Release.",
+    slug: "cannon",
+    path: "sliders/cannon/",
+    preview: false,
+  },
+  {
     title: "Curling",
     description: "Slide carefully.",
     slug: "curling",
@@ -58,6 +65,13 @@ const sliders = [
     description: "A slider that refuses to stop.",
     slug: "inertia",
     path: "sliders/inertia/",
+  },
+  {
+    title: "Memory",
+    description: "Match a pair. That's the volume.",
+    slug: "memory",
+    path: "sliders/memory/",
+    preview: false,
   },
   {
     title: "Personality",

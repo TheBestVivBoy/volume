@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cannon | Volume</title>
+    <meta
+      name="description"
+      content="Hold to set the angle. Release to find the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Cannon | Volume" />
+    <meta
+      property="og:description"
+      content="Hold to set the angle. Release to find the volume."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/cannon/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Cannon | Volume" />
+    <meta
+      name="twitter:description"
+      content="Hold to set the angle. Release to find the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/cannon/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --ink: #111111;
+        --muted: #8c8c8c;
+        --line: rgba(17, 17, 17, 0.1);
+        --line-strong: rgba(17, 17, 17, 0.16);
+        --panel: #ffffff;
+        --track: #e7e7e4;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(72vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 520px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(3.4rem, 12vw, 5.25rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      .shell {
+        background: var(--panel);
+        border: 1.5px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 14px;
+      }
+
+      .range-status {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .stage {
+        position: relative;
+        height: 158px;
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        background:
+          linear-gradient(to bottom, rgba(17, 17, 17, 0.015), rgba(17, 17, 17, 0)),
+          #fbfbf9;
+        overflow: hidden;
+      }
+
+      .range-track {
+        position: absolute;
+        left: 22px;
+        right: 22px;
+        bottom: 20px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--track);
+        overflow: hidden;
+      }
+
+      .range-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: inherit;
+        background: var(--ink);
+        transition: width 80ms linear;
+      }
+
+      .range-marker {
+        position: absolute;
+        top: -4px;
+        width: 1.5px;
+        height: 18px;
+        background: rgba(17, 17, 17, 0.14);
+      }
+
+      .gun {
+        position: absolute;
+        left: 34px;
+        bottom: 24px;
+        width: 80px;
+        height: 80px;
+      }
+
+      .pivot {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+
+      .barrel {
+        position: absolute;
+        left: 6px;
+        bottom: 6px;
+        width: 58px;
+        height: 12px;
+        border-radius: 999px;
+        background: var(--ink);
+        transform-origin: 6px 50%;
+      }
+
+      .launcher {
+        position: absolute;
+        left: -10px;
+        top: -10px;
+        width: 78px;
+        height: 78px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        touch-action: none;
+        border-radius: 50%;
+      }
+
+      .launcher:focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 6px;
+      }
+
+      .projectile {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ink);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .hint {
+        min-height: 1.25em;
+        margin: 0;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 520px) {
+        .shell {
+          padding: 14px;
+          border-radius: 20px;
+        }
+
+        .stage {
+          height: 144px;
+          border-radius: 16px;
+        }
+
+        .gun {
+          left: 22px;
+          width: 72px;
+          height: 72px;
+        }
+
+        .barrel {
+          width: 50px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .range-fill {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Cannon</h1>
+          <p>Hold to set the angle. Release.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <p class="volume" id="volumeLabel">0%</p>
+
+          <section class="shell" aria-label="Cannon volume control">
+            <div class="range-status" aria-hidden="true">
+              <span>0</span>
+              <span>100</span>
+            </div>
+
+            <div class="stage" id="stage">
+              <div class="gun" id="gun">
+                <div class="pivot" aria-hidden="true"></div>
+                <div class="barrel" id="barrel" aria-hidden="true"></div>
+                <button
+                  class="launcher"
+                  id="launcher"
+                  type="button"
+                  aria-label="Hold to set the angle, release to fire"
+                ></button>
+              </div>
+
+              <div class="range-track" aria-hidden="true">
+                <div class="range-fill" id="rangeFill"></div>
+                <div class="range-marker" style="left: 24.5%"></div>
+                <div class="range-marker" style="left: 49.5%"></div>
+                <div class="range-marker" style="left: 74.5%"></div>
+              </div>
+
+              <div class="projectile" id="projectile" aria-hidden="true"></div>
+            </div>
+
+            <p class="hint" id="hint">Hold to aim. Release to fire.</p>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script src="../../assets/site.js"></script>
+    <script>
+      const stage = document.getElementById("stage");
+      const gun = document.getElementById("gun");
+      const barrel = document.getElementById("barrel");
+      const launcher = document.getElementById("launcher");
+      const projectile = document.getElementById("projectile");
+      const rangeFill = document.getElementById("rangeFill");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const hint = document.getElementById("hint");
+
+      const MIN_ANGLE = -0.86;
+      const MAX_ANGLE = -0.08;
+      const ANGLE_SPEED = 1.95;
+      const GRAVITY = 520;
+      const PROJECTILE_R = 5;
+
+      const state = {
+        width: 0,
+        height: 0,
+        trackLeft: 0,
+        trackWidth: 0,
+        trackY: 0,
+        pivotX: 0,
+        pivotY: 0,
+        barrelLength: 0,
+        angle: -0.34,
+        direction: 1,
+        aiming: false,
+        shot: null,
+        speed: 0,
+        volume: 0,
+        lastTime: performance.now(),
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function setVolume(nextValue) {
+        state.volume = clamp(Math.round(nextValue), 0, 100);
+        volumeLabel.textContent = `${state.volume}%`;
+        rangeFill.style.width = `${state.volume}%`;
+      }
+
+      function percentageToTrackX(value) {
+        return state.trackLeft + (value / 100) * state.trackWidth;
+      }
+
+      function trackXToPercentage(value) {
+        return ((value - state.trackLeft) / state.trackWidth) * 100;
+      }
+
+      function layout() {
+        const stageRect = stage.getBoundingClientRect();
+        const gunRect = gun.getBoundingClientRect();
+        const track = stage.querySelector(".range-track").getBoundingClientRect();
+
+        state.width = stageRect.width;
+        state.height = stageRect.height;
+        state.trackLeft = track.left - stageRect.left;
+        state.trackWidth = track.width;
+        state.trackY = track.top - stageRect.top + track.height / 2;
+        state.pivotX = gunRect.left - stageRect.left + 6;
+        state.pivotY = gunRect.top - stageRect.top + gunRect.height - 6;
+        state.barrelLength = parseFloat(getComputedStyle(barrel).width) + 6;
+
+        const reach = state.trackLeft + state.trackWidth - state.pivotX;
+        state.speed = Math.sqrt((reach * GRAVITY) / Math.sin(-2 * MIN_ANGLE));
+
+        drawBarrel();
+        snapProjectile();
+      }
+
+      function muzzlePosition() {
+        return {
+          x: state.pivotX + Math.cos(state.angle) * state.barrelLength,
+          y: state.pivotY + Math.sin(state.angle) * state.barrelLength,
+        };
+      }
+
+      function drawBarrel() {
+        barrel.style.transform = `rotate(${state.angle}rad)`;
+      }
+
+      function snapProjectile() {
+        projectile.style.left = `${percentageToTrackX(state.volume)}px`;
+        projectile.style.top = `${state.trackY}px`;
+      }
+
+      function beginAim() {
+        if (state.shot) return;
+        state.aiming = true;
+        hint.textContent = "Release to fire.";
+      }
+
+      function fire() {
+        if (!state.aiming || state.shot) return;
+
+        const muzzle = muzzlePosition();
+        state.aiming = false;
+        state.shot = {
+          x: muzzle.x,
+          y: muzzle.y,
+          vx: Math.cos(state.angle) * state.speed,
+          vy: Math.sin(state.angle) * state.speed,
+        };
+
+        projectile.style.left = `${muzzle.x}px`;
+        projectile.style.top = `${muzzle.y}px`;
+        hint.textContent = "In flight.";
+      }
+
+      function land(atX) {
+        const clampedX = clamp(
+          atX,
+          state.trackLeft,
+          state.trackLeft + state.trackWidth,
+        );
+        setVolume(trackXToPercentage(clampedX));
+        state.shot = null;
+        snapProjectile();
+        hint.textContent = `${state.volume}%. Hold again.`;
+      }
+
+      launcher.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        beginAim();
+      });
+
+      window.addEventListener("pointerup", (event) => {
+        if (event.button === 0) {
+          fire();
+        }
+      });
+
+      window.addEventListener("pointercancel", fire);
+
+      launcher.addEventListener("keydown", (event) => {
+        if (event.repeat) return;
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          beginAim();
+        }
+      });
+
+      launcher.addEventListener("keyup", (event) => {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          fire();
+        }
+      });
+
+      function tick(now) {
+        const dt = Math.min((now - state.lastTime) / 1000, 0.05);
+        state.lastTime = now;
+
+        if (state.aiming) {
+          state.angle += state.direction * ANGLE_SPEED * dt;
+
+          if (state.angle <= MIN_ANGLE) {
+            state.angle = MIN_ANGLE;
+            state.direction = 1;
+          }
+
+          if (state.angle >= MAX_ANGLE) {
+            state.angle = MAX_ANGLE;
+            state.direction = -1;
+          }
+
+          drawBarrel();
+        }
+
+        if (state.shot) {
+          state.shot.vy += GRAVITY * dt;
+          state.shot.x += state.shot.vx * dt;
+          state.shot.y += state.shot.vy * dt;
+
+          if (state.shot.x <= PROJECTILE_R) {
+            state.shot.x = PROJECTILE_R;
+            state.shot.vx *= -0.2;
+          }
+
+          if (state.shot.x >= state.width - PROJECTILE_R) {
+            state.shot.x = state.width - PROJECTILE_R;
+            state.shot.vx *= -0.2;
+          }
+
+          projectile.style.left = `${state.shot.x}px`;
+          projectile.style.top = `${state.shot.y}px`;
+
+          if (state.shot.vy > 0 && state.shot.y >= state.trackY) {
+            land(state.shot.x);
+          }
+        }
+
+        window.requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("resize", layout, { passive: true });
+
+      setVolume(0);
+      layout();
+      window.requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>

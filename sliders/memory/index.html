@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory | Volume</title>
+    <meta
+      name="description"
+      content="Match one pair. That pair becomes the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Memory | Volume" />
+    <meta
+      property="og:description"
+      content="Match one pair. That pair becomes the volume."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/memory/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Memory | Volume" />
+    <meta
+      name="twitter:description"
+      content="Match one pair. That pair becomes the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/memory/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --ink: #111111;
+        --muted: #8d8d8d;
+        --line: rgba(17, 17, 17, 0.1);
+        --line-strong: rgba(17, 17, 17, 0.16);
+        --panel: #ffffff;
+        --surface: #fbfbf9;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 780px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(94vw, 560px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(3.4rem, 12vw, 5.25rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+      }
+
+      .shell {
+        background: var(--panel);
+        border: 1.5px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 14px;
+      }
+
+      .control-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .button {
+        appearance: none;
+        border: 1.5px solid var(--line-strong);
+        background: #ffffff;
+        color: var(--ink);
+        border-radius: 14px;
+        padding: 10px 14px;
+        font: inherit;
+        font-size: 0.92rem;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+      }
+
+      .button:hover {
+        background: #f7f7f5;
+      }
+
+      .button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .button[hidden] {
+        display: none;
+      }
+
+      .board-shell {
+        position: relative;
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+        padding: 10px;
+        overflow: hidden;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 5px;
+      }
+
+      .card {
+        position: relative;
+        aspect-ratio: 1;
+        border: none;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+        perspective: 500px;
+      }
+
+      .card[disabled] {
+        cursor: default;
+      }
+
+      .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 180ms ease;
+      }
+
+      .card.is-up .card-inner,
+      .card.is-done .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .card-face {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 6px;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .card-face.back {
+        background: #ffffff;
+        border: 1px solid var(--line);
+      }
+
+      .card-face.front {
+        background: #111111;
+        color: #ffffff;
+        border: 1px solid #111111;
+        font-size: clamp(0.46rem, 1.5vw, 0.72rem);
+        transform: rotateY(180deg);
+      }
+
+      .card.is-done .card-face.front {
+        background: #d9d9d5;
+        border-color: #d9d9d5;
+        color: #7b7b7b;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(251, 251, 249, 0.94);
+      }
+
+      .overlay[hidden] {
+        display: none;
+      }
+
+      .hint {
+        min-height: 1.25em;
+        margin: 0;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 560px) {
+        .shell {
+          padding: 14px;
+          border-radius: 20px;
+        }
+
+        .board-shell {
+          padding: 8px;
+          border-radius: 16px;
+        }
+
+        .board {
+          gap: 4px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card-inner {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Memory</h1>
+          <p>Match one pair. That pair becomes the volume.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <p class="volume" id="volumeLabel">—</p>
+
+          <section class="shell" aria-label="Memory volume control">
+            <div class="control-row">
+              <button class="button" id="startButton" type="button">Start</button>
+              <button class="button" id="resetButton" type="button" hidden>
+                Reset
+              </button>
+            </div>
+
+            <div class="board-shell">
+              <div class="board" id="board"></div>
+              <div class="overlay" id="overlay">
+                <button class="button" id="overlayButton" type="button">
+                  Start
+                </button>
+              </div>
+            </div>
+
+            <p class="hint" id="hint">Press start to begin.</p>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script src="../../assets/site.js"></script>
+    <script>
+      const board = document.getElementById("board");
+      const overlay = document.getElementById("overlay");
+      const overlayButton = document.getElementById("overlayButton");
+      const startButton = document.getElementById("startButton");
+      const resetButton = document.getElementById("resetButton");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const hint = document.getElementById("hint");
+
+      const POOL = Array.from({ length: 50 }, (_, index) => (index + 1) * 2);
+
+      let cards = [];
+      let firstPick = null;
+      let locked = false;
+      let solvedCount = 0;
+
+      function shuffle(values) {
+        const next = [...values];
+
+        for (let index = next.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+        }
+
+        return next;
+      }
+
+      function setVolume(value) {
+        volumeLabel.textContent = `${value}%`;
+      }
+
+      function buildBoard() {
+        board.textContent = "";
+        cards = [];
+        firstPick = null;
+        locked = false;
+        solvedCount = 0;
+
+        const values = shuffle([...POOL, ...POOL]);
+
+        values.forEach((value, index) => {
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = "card";
+          card.dataset.value = String(value);
+          card.dataset.index = String(index);
+          card.setAttribute("aria-label", "Memory card");
+          card.innerHTML = `
+            <span class="card-inner">
+              <span class="card-face back" aria-hidden="true"></span>
+              <span class="card-face front">${value}</span>
+            </span>
+          `;
+
+          card.addEventListener("click", () => handlePick(card));
+          board.appendChild(card);
+          cards.push(card);
+        });
+      }
+
+      function reveal(card) {
+        card.classList.add("is-up");
+      }
+
+      function hide(card) {
+        card.classList.remove("is-up");
+      }
+
+      function complete(card) {
+        card.classList.remove("is-up");
+        card.classList.add("is-done");
+        card.disabled = true;
+      }
+
+      function handlePick(card) {
+        if (locked || card.disabled || card.classList.contains("is-up")) {
+          return;
+        }
+
+        reveal(card);
+
+        if (!firstPick) {
+          firstPick = card;
+          return;
+        }
+
+        const previousPick = firstPick;
+        firstPick = null;
+        locked = true;
+
+        if (
+          previousPick.dataset.value === card.dataset.value &&
+          previousPick.dataset.index !== card.dataset.index
+        ) {
+          window.setTimeout(() => {
+            complete(previousPick);
+            complete(card);
+            solvedCount += 2;
+            setVolume(Number(card.dataset.value));
+            hint.textContent =
+              solvedCount === cards.length
+                ? `${card.dataset.value}%. All matched.`
+                : `${card.dataset.value}%. Keep going.`;
+            locked = false;
+          }, 220);
+          return;
+        }
+
+        hint.textContent = "No match.";
+
+        window.setTimeout(() => {
+          hide(previousPick);
+          hide(card);
+          hint.textContent = "Find the matching pair.";
+          locked = false;
+        }, 700);
+      }
+
+      function startGame() {
+        buildBoard();
+        volumeLabel.textContent = "—";
+        hint.textContent = "Memorise.";
+        overlay.hidden = true;
+        resetButton.hidden = false;
+
+        locked = true;
+        cards.forEach((card) => reveal(card));
+
+        window.setTimeout(() => {
+          cards.forEach((card) => hide(card));
+          window.setTimeout(() => {
+            locked = false;
+            hint.textContent = "Find the matching pair.";
+          }, 180);
+        }, 1800);
+      }
+
+      function resetGame() {
+        buildBoard();
+        volumeLabel.textContent = "—";
+        hint.textContent = "Press start to begin.";
+        overlay.hidden = false;
+        resetButton.hidden = true;
+      }
+
+      overlayButton.addEventListener("click", startGame);
+      startButton.addEventListener("click", startGame);
+      resetButton.addEventListener("click", resetGame);
+
+      buildBoard();
+    </script>
+  </body>
+</html>
