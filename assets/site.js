@@ -8,7 +8,13 @@ const STORAGE_KEYS = {
   firstVisitTimestamp: "firstVisitTimestamp",
   visitCount: "visitCount",
   lastPopupTimestamp: "lastPopupTimestamp",
+  previewGifCacheMeta: "previewGifCacheMeta",
 };
+
+const PREVIEW_GIF_CACHE_NAME = "volume-preview-gifs-v1";
+const PREVIEW_GIF_CACHE_TTL_MS = 30 * 60 * 1000;
+const previewGifObjectUrls = new Map();
+let previewGifCleanupBound = false;
 
 const sliders = [
   {
@@ -230,6 +236,93 @@ function writeStoredNumber(key, value) {
   window.localStorage.setItem(key, String(value));
 }
 
+function supportsCacheStorage() {
+  return typeof window.caches !== "undefined";
+}
+
+function readPreviewGifCacheMeta() {
+  if (!supportsStorage()) return {};
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.previewGifCacheMeta);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+}
+
+function writePreviewGifCacheMeta(meta) {
+  if (!supportsStorage()) return;
+  window.localStorage.setItem(STORAGE_KEYS.previewGifCacheMeta, JSON.stringify(meta));
+}
+
+function trimPreviewGifCacheMeta(meta, now) {
+  const nextMeta = {};
+
+  Object.entries(meta).forEach(([src, fetchedAt]) => {
+    const fetchedAtNumber = Number(fetchedAt);
+    if (!Number.isFinite(fetchedAtNumber)) return;
+    if (now - fetchedAtNumber >= PREVIEW_GIF_CACHE_TTL_MS) return;
+    nextMeta[src] = fetchedAtNumber;
+  });
+
+  return nextMeta;
+}
+
+function bindPreviewGifCleanup() {
+  if (previewGifCleanupBound) return;
+  previewGifCleanupBound = true;
+
+  window.addEventListener("beforeunload", () => {
+    previewGifObjectUrls.forEach((entry) => {
+      URL.revokeObjectURL(entry.objectUrl);
+    });
+    previewGifObjectUrls.clear();
+  });
+}
+
+async function loadGifSourceFromCache(gifSrc) {
+  const now = Date.now();
+  const cachedObjectUrl = previewGifObjectUrls.get(gifSrc);
+  if (cachedObjectUrl && now - cachedObjectUrl.fetchedAt < PREVIEW_GIF_CACHE_TTL_MS) {
+    return cachedObjectUrl.objectUrl;
+  }
+  if (cachedObjectUrl) {
+    URL.revokeObjectURL(cachedObjectUrl.objectUrl);
+    previewGifObjectUrls.delete(gifSrc);
+  }
+
+  if (!supportsCacheStorage()) {
+    return gifSrc;
+  }
+
+  const cache = await window.caches.open(PREVIEW_GIF_CACHE_NAME);
+  const currentMeta = trimPreviewGifCacheMeta(readPreviewGifCacheMeta(), now);
+  const cachedAt = Number(currentMeta[gifSrc] || 0);
+
+  let response = null;
+  if (cachedAt > 0) {
+    response = await cache.match(gifSrc);
+  }
+
+  if (!response) {
+    response = await fetch(gifSrc, { cache: "no-cache" });
+    if (!response.ok) {
+      throw new Error(`GIF request failed for ${gifSrc}`);
+    }
+    await cache.put(gifSrc, response.clone());
+    currentMeta[gifSrc] = now;
+    writePreviewGifCacheMeta(currentMeta);
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  previewGifObjectUrls.set(gifSrc, { objectUrl, fetchedAt: now });
+  return objectUrl;
+}
+
 function renderSiteHeader() {
   const mount = document.querySelector("[data-site-header]");
   if (!mount) return;
@@ -353,29 +446,26 @@ function mountHomePreviews() {
 
         card.dataset.previewRequested = "true";
         if (img.dataset.gifStatus === "loaded") {
-          img.src = gifSrc;
+          img.src = img.dataset.gifResolvedSrc || gifSrc;
           card.classList.add("is-preview-animated");
           return;
         }
         if (img.dataset.gifStatus === "loading") return;
-
-        const gifProbe = new Image();
-        gifProbe.decoding = "async";
         img.dataset.gifStatus = "loading";
+        bindPreviewGifCleanup();
 
-        gifProbe.onload = () => {
-          img.dataset.gifStatus = "loaded";
-          if (card.dataset.previewRequested === "true") {
-            img.src = gifSrc;
-            card.classList.add("is-preview-animated");
-          }
-        };
-
-        gifProbe.onerror = () => {
-          img.dataset.gifStatus = "missing";
-        };
-
-        gifProbe.src = gifSrc;
+        loadGifSourceFromCache(gifSrc)
+          .then((resolvedSrc) => {
+            img.dataset.gifStatus = "loaded";
+            img.dataset.gifResolvedSrc = resolvedSrc;
+            if (card.dataset.previewRequested === "true") {
+              img.src = resolvedSrc;
+              card.classList.add("is-preview-animated");
+            }
+          })
+          .catch(() => {
+            img.dataset.gifStatus = "missing";
+          });
       };
 
       const showPoster = () => {
