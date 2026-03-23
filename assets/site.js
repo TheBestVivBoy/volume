@@ -25,6 +25,13 @@ const sliders = [
     preview: false,
   },
   {
+    title: "Crank",
+    description: "Turn continuously. It fades.",
+    slug: "crank",
+    path: "sliders/crank/",
+    preview: false,
+  },
+  {
     title: "Curling",
     description: "Slide carefully.",
     slug: "curling",
@@ -49,6 +56,13 @@ const sliders = [
     path: "sliders/dvd/",
   },
   {
+    title: "Flappy Bird",
+    description: "Pass pipes. Your score becomes the volume.",
+    slug: "flappybird",
+    path: "sliders/flappybird/",
+    preview: false,
+  },
+  {
     title: "Horse Race",
     description: "Bet volume on a winner.",
     slug: "horse_race",
@@ -67,6 +81,13 @@ const sliders = [
     path: "sliders/inertia/",
   },
   {
+    title: "Lock Dial",
+    description: "Miss once. Start again.",
+    slug: "lock",
+    path: "sliders/lock/",
+    preview: false,
+  },
+  {
     title: "Memory",
     description: "Match a pair. That's the volume.",
     slug: "memory",
@@ -78,6 +99,13 @@ const sliders = [
     description: "Answer honestly.",
     slug: "personality",
     path: "sliders/personality/",
+  },
+  {
+    title: "Pump",
+    description: "Compress to keep it up.",
+    slug: "pump",
+    path: "sliders/pump/",
+    preview: false,
   },
   {
     title: "Plinko",
@@ -127,6 +155,13 @@ const sliders = [
     slug: "unique",
     path: "sliders/unique/",
   },
+  {
+    title: "Vertical",
+    description: "A slider. Drag the wrong way.",
+    slug: "vertical",
+    path: "sliders/vertical/",
+    preview: false,
+  },
 ];
 
 const logoSources = {
@@ -158,7 +193,11 @@ function buildLogoSrc(path) {
   return buildInternalHref(path);
 }
 
-function buildPreviewSrc(slug) {
+function buildPreviewPosterSrc(slug) {
+  return buildInternalHref(`assets/gifs/${slug}.webp`);
+}
+
+function buildPreviewGifSrc(slug) {
   return buildInternalHref(`assets/gifs/${slug}.gif`);
 }
 
@@ -266,8 +305,9 @@ function renderGrid() {
     link.href = buildInternalHref(slider.path);
     link.textContent = "Open →";
 
-    if (showPreviews) {
-      card.dataset.previewSrc = buildPreviewSrc(slider.slug);
+    if (showPreviews && slider.preview !== false) {
+      card.dataset.previewPosterSrc = buildPreviewPosterSrc(slider.slug);
+      card.dataset.previewGifSrc = buildPreviewGifSrc(slider.slug);
     }
 
     card.append(title, description, link);
@@ -279,14 +319,15 @@ function renderGrid() {
 function mountHomePreviews() {
   if (!supportsCardPreviews()) return;
 
-  const cards = document.querySelectorAll(".collection-card[data-preview-src]");
+  const cards = document.querySelectorAll(".collection-card[data-preview-poster-src]");
   if (!cards.length) return;
 
   const injectPreview = (card) => {
     if (card.dataset.previewLoaded === "true") return;
 
-    const previewSrc = card.dataset.previewSrc;
-    if (!previewSrc) return;
+    const previewPosterSrc = card.dataset.previewPosterSrc;
+    if (!previewPosterSrc) return;
+    const previewGifSrc = card.dataset.previewGifSrc || "";
 
     const probe = new Image();
     probe.decoding = "async";
@@ -298,10 +339,62 @@ function mountHomePreviews() {
 
       const img = document.createElement("img");
       img.className = "card-preview-media";
-      img.src = previewSrc;
+      img.src = previewPosterSrc;
       img.alt = "";
       img.loading = "lazy";
       img.decoding = "async";
+      img.dataset.posterSrc = previewPosterSrc;
+      img.dataset.gifSrc = previewGifSrc;
+      img.dataset.gifStatus = "idle";
+
+      const requestGif = () => {
+        const gifSrc = img.dataset.gifSrc;
+        if (!gifSrc || img.dataset.gifStatus === "missing") return;
+
+        card.dataset.previewRequested = "true";
+        if (img.dataset.gifStatus === "loaded") {
+          img.src = gifSrc;
+          card.classList.add("is-preview-animated");
+          return;
+        }
+        if (img.dataset.gifStatus === "loading") return;
+
+        const gifProbe = new Image();
+        gifProbe.decoding = "async";
+        img.dataset.gifStatus = "loading";
+
+        gifProbe.onload = () => {
+          img.dataset.gifStatus = "loaded";
+          if (card.dataset.previewRequested === "true") {
+            img.src = gifSrc;
+            card.classList.add("is-preview-animated");
+          }
+        };
+
+        gifProbe.onerror = () => {
+          img.dataset.gifStatus = "missing";
+        };
+
+        gifProbe.src = gifSrc;
+      };
+
+      const showPoster = () => {
+        const posterSrc = img.dataset.posterSrc;
+        card.dataset.previewRequested = "false";
+        card.classList.remove("is-preview-animated");
+        if (posterSrc && img.src !== posterSrc) {
+          img.src = posterSrc;
+        }
+      };
+
+      card.addEventListener("mouseenter", requestGif);
+      card.addEventListener("mouseleave", showPoster);
+      card.addEventListener("focusin", requestGif);
+      card.addEventListener("focusout", (event) => {
+        if (card.contains(event.relatedTarget)) return;
+        showPoster();
+      });
+      card.addEventListener("touchstart", requestGif, { passive: true });
 
       frame.appendChild(img);
       card.insertBefore(frame, card.firstChild);
@@ -313,7 +406,7 @@ function mountHomePreviews() {
       card.dataset.previewLoaded = "missing";
     };
 
-    probe.src = previewSrc;
+    probe.src = previewPosterSrc;
   };
 
   if (!("IntersectionObserver" in window)) {
