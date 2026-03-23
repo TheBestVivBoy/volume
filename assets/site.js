@@ -69,6 +69,13 @@ const sliders = [
     preview: false,
   },
   {
+    title: "Gates",
+    description: "Move lane to lane and keep the run going.",
+    slug: "gates",
+    path: "sliders/gates/",
+    preview: false,
+  },
+  {
     title: "Horse Race",
     description: "Bet volume on a winner.",
     slug: "horse_race",

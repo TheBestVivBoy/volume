@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://vivancodes.com/</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-17</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/</loc>
-    <lastmod>2026-03-13</lastmod>
+    <lastmod>2026-03-17</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/alphabetical/</loc>
@@ -15,6 +15,10 @@
   <url>
     <loc>https://vivancodes.com/sliders/cannon/</loc>
     <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vivancodes.com/sliders/crank/</loc>
+    <lastmod>2026-03-19</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/curling/</loc>
@@ -45,12 +49,20 @@
     <lastmod>2026-03-13</lastmod>
   </url>
   <url>
+    <loc>https://vivancodes.com/sliders/lock/</loc>
+    <lastmod>2026-03-17</lastmod>
+  </url>
+  <url>
     <loc>https://vivancodes.com/sliders/memory/</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/personality/</loc>
     <lastmod>2026-03-14</lastmod>
+  </url>
+  <url>
+    <loc>https://vivancodes.com/sliders/pump/</loc>
+    <lastmod>2026-03-19</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/plinko/</loc>
@@ -65,8 +77,24 @@
     <lastmod>2026-03-16</lastmod>
   </url>
   <url>
+    <loc>https://vivancodes.com/sliders/flappybird/</loc>
+    <lastmod>2026-03-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vivancodes.com/sliders/gates/</loc>
+    <lastmod>2026-03-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vivancodes.com/sliders/vertical/</loc>
+    <lastmod>2026-03-19</lastmod>
+  </url>
+  <url>
     <loc>https://vivancodes.com/sliders/tictactoe/</loc>
     <lastmod>2026-03-13</lastmod>
+  </url>
+  <url>
+    <loc>https://vivancodes.com/sliders/tenpixels.html</loc>
+    <lastmod>2026-03-19</lastmod>
   </url>
   <url>
     <loc>https://vivancodes.com/sliders/tinder/</loc>

@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lock Dial | Volume</title>
+    <meta
+      name="description"
+      content="Tap on the notch at exactly the right moment to force the volume down from 99%."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Lock Dial | Volume" />
+    <meta
+      property="og:description"
+      content="Tap on the notch at exactly the right moment to force the volume down from 99%."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/lock/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Lock Dial | Volume" />
+    <meta
+      name="twitter:description"
+      content="Tap on the notch at exactly the right moment to force the volume down from 99%."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/lock/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --text: #111111;
+        --muted: #8f8f8a;
+        --panel: #ffffff;
+        --line: #dcdcd7;
+        --surface: #f5f4ef;
+        --ring: #182d4f;
+        --target: #ef4d5a;
+        --marker: #f3c52c;
+        --shadow: 0 12px 36px rgba(0, 0, 0, 0.05);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(76vh, 860px);
+        width: 100%;
+      }
+
+      .app {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .volume-readout {
+        font-size: clamp(2.8rem, 9.4vw, 4.9rem);
+        font-weight: 300;
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+      }
+
+      .control-card {
+        width: 100%;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 24px 22px 20px;
+      }
+
+      .lock-stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        outline: none;
+        touch-action: manipulation;
+      }
+
+      .lock-stage:focus-visible .lock-shell {
+        box-shadow:
+          0 0 0 1px #111,
+          0 0 0 8px rgba(17, 17, 17, 0.08);
+      }
+
+      /* Proportions: ring body takes up the full shell width,
+         shackle scaled to match */
+      .lock-shell {
+        position: relative;
+        width: min(62vw, 260px);
+        padding-top: 68px;
+        transition: transform 0.18s ease;
+      }
+
+      .shackle {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 88px;
+        height: 90px;
+        margin-left: -44px;
+        border: 22px solid var(--ring);
+        border-bottom: 0;
+        border-radius: 44px 44px 0 0;
+        box-sizing: border-box;
+      }
+
+      .lock-ring {
+        --marker-angle: 0rad;
+        --target-angle: 0rad;
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--ring);
+        transition: transform 0.18s ease;
+      }
+
+      .target,
+      .marker-orbit {
+        position: absolute;
+        inset: 0;
+      }
+
+      .target {
+        transform: rotate(var(--target-angle));
+      }
+
+      /* Notch: sits on the ring surface, no glow */
+      .target-notch {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        width: 24px;
+        height: 24px;
+        margin-left: -12px;
+        border-radius: 50%;
+        background: var(--target);
+      }
+
+      .marker-orbit {
+        transform: rotate(var(--marker-angle));
+      }
+
+      /* Marker: chunky pill, sits on the ring surface */
+      .marker {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        width: 14px;
+        height: 36px;
+        margin-left: -7px;
+        border-radius: 999px;
+        background: var(--marker);
+        transition: transform 0.18s ease;
+      }
+
+      /* Hub: large center circle, ~58% of ring diameter */
+      .hub {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+        width: 58%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--surface);
+      }
+
+      .lock-ring.is-hit {
+        transform: scale(1.03);
+      }
+
+      .lock-ring.is-hit .marker {
+        transform: scale(1.25);
+      }
+
+      .lock-ring.is-miss {
+        transform: scale(0.97);
+      }
+
+      /* Status: plain text, no uppercase, no wide tracking */
+      .status-line {
+        min-height: 1.3em;
+        font-size: 0.88rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .action {
+        appearance: none;
+        border: none;
+        background: var(--ring);
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.88rem 2.6rem;
+        font: inherit;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: transform 0.14s ease;
+      }
+
+      .action:hover {
+        transform: translateY(-1px);
+      }
+
+      .action:active {
+        transform: scale(0.98);
+      }
+
+      .action:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 4px;
+      }
+
+      .action[hidden] {
+        display: none;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .control-card {
+          border-radius: 24px;
+          padding: 22px 18px 18px;
+        }
+
+        .lock-shell {
+          width: min(72vw, 248px);
+          padding-top: 62px;
+        }
+
+        .shackle {
+          width: 82px;
+          height: 84px;
+          margin-left: -41px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Lock Dial</h1>
+          <p>Tap exactly on the notch to make the volume smaller.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="app" aria-label="Lock dial volume control">
+          <div class="volume-readout" id="volumeReadout" aria-live="polite">
+            Volume: 99%
+          </div>
+
+          <div class="control-card">
+            <div
+              class="lock-stage"
+              id="lockStage"
+              tabindex="0"
+              aria-label="Tap when the moving marker reaches the notch"
+            >
+              <div class="lock-shell">
+                <div class="shackle" aria-hidden="true"></div>
+                <div class="lock-ring" id="lockRing">
+                  <div class="target">
+                    <div class="target-notch"></div>
+                  </div>
+                  <div class="marker-orbit">
+                    <div class="marker"></div>
+                  </div>
+                  <div class="hub" aria-hidden="true"></div>
+                </div>
+              </div>
+
+              <div class="status-line" id="statusLine" aria-live="polite">
+                Pop the lock!
+              </div>
+
+              <button class="action" id="actionButton" type="button">
+                Begin
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script>
+      const TAU = Math.PI * 2;
+      const START_VOLUME = 99;
+      const MIN_VOLUME = 1;
+      const STEP = 2;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
+
+      const volumeReadout = document.getElementById("volumeReadout");
+      const lockStage = document.getElementById("lockStage");
+      const lockRing = document.getElementById("lockRing");
+      const statusLine = document.getElementById("statusLine");
+      const actionButton = document.getElementById("actionButton");
+
+      const state = {
+        running: false,
+        angle: -Math.PI / 2,
+        targetAngle: Math.PI / 4,
+        direction: 1,
+        hits: 0,
+        volume: START_VOLUME,
+        speed: 0,
+        frame: 0,
+        lastTime: 0,
+        statusTimer: 0,
+      };
+
+      function hitWindow() {
+        return reducedMotion.matches ? 0.22 : 0.16;
+      }
+
+      function baseSpeed() {
+        return reducedMotion.matches ? 1.15 : 1.45;
+      }
+
+      function speedStep() {
+        return reducedMotion.matches ? 0.03 : 0.045;
+      }
+
+      function normaliseAngle(a) {
+        return ((a % TAU) + TAU) % TAU;
+      }
+
+      function angleDistance(a, b) {
+        const d = Math.abs(normaliseAngle(a) - normaliseAngle(b));
+        return Math.min(d, TAU - d);
+      }
+
+      function setStatus(message, timeout = 0) {
+        window.clearTimeout(state.statusTimer);
+        statusLine.textContent = message;
+
+        if (!timeout) return;
+
+        state.statusTimer = window.setTimeout(() => {
+          if (state.running) statusLine.textContent = "Tap on the mark.";
+        }, timeout);
+      }
+
+      function render() {
+        volumeReadout.textContent = `Volume: ${state.volume}%`;
+        lockRing.style.setProperty("--marker-angle", `${state.angle}rad`);
+        lockRing.style.setProperty("--target-angle", `${state.targetAngle}rad`);
+        lockStage.setAttribute(
+          "aria-label",
+          `Volume ${state.volume} percent. Tap when the moving marker reaches the notch.`,
+        );
+      }
+
+      function pickAngle(avoid = []) {
+        for (let i = 0; i < 24; i++) {
+          const c = Math.random() * TAU;
+          if (avoid.every((a) => angleDistance(c, a) > 0.55)) return c;
+        }
+        return normaliseAngle((avoid[0] || 0) + Math.PI * 0.78);
+      }
+
+      function pulse(className) {
+        lockRing.classList.remove("is-hit", "is-miss");
+        void lockRing.offsetWidth;
+        lockRing.classList.add(className);
+        window.setTimeout(() => lockRing.classList.remove(className), 180);
+      }
+
+      function resetRound() {
+        state.running = false;
+        state.angle = pickAngle();
+        state.targetAngle = pickAngle([state.angle]);
+        state.direction = Math.random() < 0.5 ? 1 : -1;
+        state.hits = 0;
+        state.volume = START_VOLUME;
+        state.speed = baseSpeed();
+        state.lastTime = 0;
+        window.cancelAnimationFrame(state.frame);
+        render();
+      }
+
+      function finishRound(message) {
+        state.running = false;
+        window.cancelAnimationFrame(state.frame);
+        setStatus(message);
+        actionButton.hidden = false;
+        actionButton.textContent = "Again";
+      }
+
+      function succeed() {
+        state.hits += 1;
+        state.volume = Math.max(MIN_VOLUME, START_VOLUME - state.hits * STEP);
+        state.speed = baseSpeed() + state.hits * speedStep();
+        state.direction *= -1;
+        pulse("is-hit");
+        render();
+
+        if (state.volume <= MIN_VOLUME) {
+          finishRound("Done.");
+          return;
+        }
+
+        state.targetAngle = pickAngle([state.angle, state.targetAngle]);
+        setStatus("Good. Keep going.", 320);
+        render();
+      }
+
+      function fail() {
+        pulse("is-miss");
+        finishRound(`Missed. Stopped at ${state.volume}%.`);
+      }
+
+      function handleTap() {
+        if (!state.running) return;
+
+        if (angleDistance(state.angle, state.targetAngle) <= hitWindow()) {
+          succeed();
+        } else {
+          fail();
+        }
+      }
+
+      function tick(now) {
+        if (!state.running) return;
+        if (!state.lastTime) state.lastTime = now;
+
+        const delta = Math.min((now - state.lastTime) / 1000, 0.032);
+        state.lastTime = now;
+        state.angle = normaliseAngle(
+          state.angle + state.direction * state.speed * delta,
+        );
+        render();
+        state.frame = window.requestAnimationFrame(tick);
+      }
+
+      function startRound() {
+        if (actionButton.textContent === "Again") {
+          resetRound();
+        }
+        state.running = true;
+        actionButton.hidden = true;
+        setStatus("Tap on the mark.");
+        state.lastTime = 0;
+        state.frame = window.requestAnimationFrame(tick);
+      }
+
+      actionButton.addEventListener("click", startRound);
+      lockStage.addEventListener("pointerdown", handleTap);
+
+      window.addEventListener("keydown", (e) => {
+        if (!state.running) return;
+        if (e.key !== " " && e.key !== "Enter") return;
+        e.preventDefault();
+        handleTap();
+      });
+
+      const handleMotionChange = () => {
+        resetRound();
+        setStatus("Pop the lock!");
+        actionButton.hidden = false;
+        actionButton.textContent = "Begin";
+      };
+
+      if (typeof reducedMotion.addEventListener === "function") {
+        reducedMotion.addEventListener("change", handleMotionChange);
+      } else if (typeof reducedMotion.addListener === "function") {
+        reducedMotion.addListener(handleMotionChange);
+      }
+
+      resetRound();
+      setStatus("Pop the lock!");
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crank | Volume</title>
+    <meta
+      name="description"
+      content="Turn a crank to raise the volume while it drifts back down."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Crank | Volume" />
+    <meta
+      property="og:description"
+      content="Turn a crank to raise the volume while it drifts back down."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/crank/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Crank | Volume" />
+    <meta
+      name="twitter:description"
+      content="Turn a crank to raise the volume while it drifts back down."
+    />
+    <link rel="canonical" href="https://volume.vivan.site/sliders/crank/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 6px;
+      }
+
+      .volume {
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        color: #111;
+        margin-bottom: 22px;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        padding: 24px 22px;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+
+      /* meter bar — same language as Inertia's track */
+      .meter-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        color: #999;
+      }
+
+      .meter-track {
+        flex: 1;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e9e9;
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      /* dial */
+      .dial {
+        position: relative;
+        width: min(160px, 54vw);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #d8d8d8;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        touch-action: none;
+        cursor: grab;
+        outline: none;
+      }
+
+      .dial:active {
+        cursor: grabbing;
+      }
+
+      .dial:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 4px;
+      }
+
+      .dial::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .dial-arm {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 58px;
+        height: 3px;
+        border-radius: 999px;
+        background: #111;
+        transform-origin: 0 50%;
+        transform: translateY(-50%) rotate(0rad);
+      }
+
+      .dial-handle {
+        position: absolute;
+        right: -9px;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #d8d8d8;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translateY(-50%);
+      }
+
+      .dial-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #111;
+        transform: translate(-50%, -50%);
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 20px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Crank</h1>
+          <p>Keep turning...</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel" aria-live="polite">0%</div>
+
+          <div class="slider-shell">
+            <div class="meter-row">
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <div class="meter-track" aria-hidden="true">
+                <div class="meter-fill" id="meterFill"></div>
+              </div>
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+            <div
+              class="dial"
+              id="dial"
+              tabindex="0"
+              role="slider"
+              aria-label="Crank the volume clockwise"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <div class="dial-arm" id="dialArm">
+                <div class="dial-handle"></div>
+              </div>
+              <div class="dial-center" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script src="../../assets/site.js"></script>
+    <script>
+      const dial = document.getElementById("dial");
+      const dialArm = document.getElementById("dialArm");
+      const meterFill = document.getElementById("meterFill");
+      const volumeLabel = document.getElementById("volumeLabel");
+
+      const state = {
+        angle: -Math.PI / 4,
+        volume: 0,
+        dragging: false,
+        pointerId: null,
+        lastAngle: 0,
+        lastTime: performance.now(),
+      };
+
+      const TURN_GAIN = 0.8;
+      const DECAY_PER_SECOND = 6;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function normalizeDelta(delta) {
+        if (delta > Math.PI) return delta - Math.PI * 2;
+        if (delta < -Math.PI) return delta + Math.PI * 2;
+        return delta;
+      }
+
+      function render() {
+        const rounded = Math.round(state.volume);
+        dialArm.style.transform = `translateY(-50%) rotate(${state.angle}rad)`;
+        meterFill.style.width = `${state.volume}%`;
+        volumeLabel.textContent = `${rounded}%`;
+        dial.setAttribute("aria-valuenow", rounded);
+      }
+
+      function getPointerAngle(event) {
+        const rect = dial.getBoundingClientRect();
+        const x = event.clientX - (rect.left + rect.width / 2);
+        const y = event.clientY - (rect.top + rect.height / 2);
+        return Math.atan2(y, x);
+      }
+
+      function startDrag(event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        state.dragging = true;
+        state.pointerId = event.pointerId;
+        state.lastAngle = getPointerAngle(event);
+        dial.setPointerCapture(event.pointerId);
+        dial.focus({ preventScroll: true });
+      }
+
+      function moveDrag(event) {
+        if (!state.dragging || event.pointerId !== state.pointerId) return;
+        const nextAngle = getPointerAngle(event);
+        const delta = normalizeDelta(nextAngle - state.lastAngle);
+        state.angle = nextAngle;
+        state.lastAngle = nextAngle;
+        if (delta > 0) {
+          state.volume = clamp(state.volume + delta * TURN_GAIN, 0, 100);
+        }
+        render();
+      }
+
+      function releasePointerCaptureSafe(element, pointerId) {
+        if (
+          pointerId !== null &&
+          element.hasPointerCapture &&
+          element.hasPointerCapture(pointerId)
+        ) {
+          element.releasePointerCapture(pointerId);
+        }
+      }
+
+      function endDrag(event) {
+        if (event.pointerId !== state.pointerId) return;
+        state.dragging = false;
+        releasePointerCaptureSafe(dial, state.pointerId);
+        state.pointerId = null;
+      }
+
+      dial.addEventListener("pointerdown", startDrag);
+      dial.addEventListener("pointermove", moveDrag);
+      dial.addEventListener("pointerup", endDrag);
+      dial.addEventListener("pointercancel", endDrag);
+
+      dial.addEventListener("keydown", (event) => {
+        if (
+          ["ArrowUp", "ArrowRight", "PageUp", " ", "Enter"].includes(event.key)
+        ) {
+          event.preventDefault();
+          state.angle += 0.18;
+          state.volume = clamp(
+            state.volume + (event.key === "PageUp" ? 5 : 2),
+            0,
+            100,
+          );
+          render();
+          return;
+        }
+        if (event.key === "Home") {
+          event.preventDefault();
+          state.volume = 0;
+          render();
+        }
+      });
+
+      function tick(now) {
+        const dt = Math.min((now - state.lastTime) / 1000, 0.05);
+        state.lastTime = now;
+        if (state.volume > 0) {
+          state.volume = clamp(state.volume - dt * DECAY_PER_SECOND, 0, 100);
+          render();
+        }
+        requestAnimationFrame(tick);
+      }
+
+      render();
+      requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>

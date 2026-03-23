@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flappy Bird | Volume</title>
+    <meta
+      name="description"
+      content="Pass pipes. Your score becomes the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Flappy Bird | Volume" />
+    <meta
+      property="og:description"
+      content="Pass pipes. Your score becomes the volume."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/flappybird/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Flappy Bird | Volume" />
+    <meta
+      name="twitter:description"
+      content="Pass pipes. Your score becomes the volume."
+    />
+    <link
+      rel="canonical"
+      href="https://vivancodes.com/sliders/flappybird/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --ink: #161615;
+        --muted: #6f6d67;
+        --panel: rgba(255, 255, 255, 0.84);
+        --line: rgba(23, 23, 23, 0.1);
+        --line-strong: rgba(23, 23, 23, 0.16);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        width: 100%;
+      }
+
+      .app {
+        width: min(94vw, 380px);
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .volume-readout {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: clamp(2rem, 8vw, 3.2rem);
+        font-weight: 300;
+        line-height: 1;
+        letter-spacing: -0.045em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .volume-readout svg {
+        flex-shrink: 0;
+        opacity: 0.82;
+      }
+
+      .control-card {
+        width: 100%;
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        backdrop-filter: blur(14px);
+      }
+
+      .status-line {
+        min-height: 1.3em;
+        color: var(--muted);
+        font-size: 0.84rem;
+        text-align: center;
+      }
+
+      .stage-frame {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #f5f5f3;
+        aspect-ratio: 360 / 400;
+        touch-action: manipulation;
+        outline: none;
+        width: 100%;
+      }
+
+      .stage-frame:focus-visible {
+        border-color: var(--line-strong);
+        box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.08);
+      }
+
+      .ground {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 40px;
+        background: #e8e8e5;
+        border-top: 1px solid rgba(17, 17, 17, 0.08);
+        pointer-events: none;
+      }
+
+      canvas {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .action {
+        appearance: none;
+        border: 1px solid var(--line-strong);
+        border-radius: 10px;
+        background: #171717;
+        color: #fff;
+        padding: 0.52rem 0.82rem;
+        font: inherit;
+        font-size: 0.84rem;
+        cursor: pointer;
+        transition:
+          background 0.14s ease,
+          opacity 0.14s ease;
+        white-space: nowrap;
+      }
+
+      .action:hover {
+        background: #0f0f0f;
+      }
+      .action:active {
+        opacity: 0.88;
+      }
+      .action:focus-visible {
+        outline: 2px solid #171717;
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 640px) {
+        .control-card {
+          border-radius: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Flappy Bird</h1>
+          <p>Pass pipes. Your score becomes the volume.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="app" aria-label="Flappy Bird volume control">
+          <p class="volume-readout" id="volumeLabel" aria-live="polite">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#111" />
+              <path
+                d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                stroke="#111"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                stroke="#111"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span id="volumeText">Volume: 0%</span>
+          </p>
+
+          <div class="control-card">
+            <div class="status-line" id="statusLine">
+              Tap, click, or press space to begin.
+            </div>
+
+            <div
+              class="stage-frame"
+              id="stageFrame"
+              tabindex="0"
+              aria-label="Flappy Bird game area"
+            >
+              <div class="ground" aria-hidden="true"></div>
+              <canvas id="stage" width="360" height="400"></canvas>
+            </div>
+
+            <div class="controls">
+              <span class="hint">Tap or press space to flap.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const canvas = document.getElementById("stage");
+      const ctx = canvas.getContext("2d");
+      const stageFrame = document.getElementById("stageFrame");
+      const volumeText = document.getElementById("volumeText");
+      const statusLine = document.getElementById("statusLine");
+
+      const WORLD_WIDTH = 360;
+      const WORLD_HEIGHT = 400;
+      const GROUND_Y = 360;
+      const PIPE_WIDTH = 52;
+      const PIPE_GAP = 140;
+      const PIPE_SPACING = 180;
+      const PIPE_SPEED = 2.25;
+      const GRAVITY = 0.24;
+      const FLAP = -4.45;
+      const MAX_SCORE = 100;
+
+      const bird = { x: 96, y: 180, vy: 0, width: 30, height: 24 };
+
+      let dpr = 1,
+        viewWidth = WORLD_WIDTH,
+        viewHeight = WORLD_HEIGHT;
+      let score = 0,
+        animationId = 0,
+        lastTime = 0,
+        state = "idle",
+        pipes = [];
+
+      function clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+      }
+      function randomGapY() {
+        return 100 + Math.random() * 170;
+      }
+
+      function updateVolume(next) {
+        score = clamp(next, 0, MAX_SCORE);
+        volumeText.textContent = `Volume: ${score}%`;
+      }
+
+      function setStatus(msg) {
+        statusLine.textContent = msg;
+      }
+
+      function resetRun() {
+        bird.y = 180;
+        bird.vy = 0;
+        pipes = [];
+        for (let i = 0; i < 3; i++) {
+          pipes.push({
+            x: WORLD_WIDTH + 100 + i * PIPE_SPACING,
+            gapY: randomGapY(),
+            scored: false,
+          });
+        }
+      }
+
+      function resetGame() {
+        state = "idle";
+        updateVolume(0);
+        resetRun();
+        setStatus("Tap, click, or press space to begin.");
+      }
+
+      function restartAndLaunch() {
+        resetGame();
+        startRun();
+        flap();
+      }
+
+      function startRun() {
+        if (state === "running") return;
+        state = "running";
+        setStatus("");
+      }
+
+      function endRun(kind) {
+        if (kind === "win") {
+          state = "won";
+          setStatus("Volume set to 100%.");
+          return;
+        }
+        state = "gameover";
+        setStatus(`Set volume to ${score}%. Tap to try again.`);
+      }
+
+      function flap() {
+        bird.vy = FLAP;
+      }
+
+      function handleInput() {
+        stageFrame.focus({ preventScroll: true });
+        if (state === "idle") {
+          startRun();
+          flap();
+          return;
+        }
+        if (state === "gameover" || state === "won") {
+          restartAndLaunch();
+          return;
+        }
+        flap();
+      }
+
+      function resizeCanvas() {
+        dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        viewWidth = rect.width || WORLD_WIDTH;
+        viewHeight = rect.height || WORLD_HEIGHT;
+        canvas.width = Math.round(viewWidth * dpr);
+        canvas.height = Math.round(viewHeight * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function sx(v) {
+        return (v / WORLD_WIDTH) * viewWidth;
+      }
+      function sy(v) {
+        return (v / WORLD_HEIGHT) * viewHeight;
+      }
+
+      function roundRect(x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      function collidesWithPipe(pipe) {
+        const left = bird.x - bird.width / 2,
+          right = bird.x + bird.width / 2;
+        const top = bird.y - bird.height / 2,
+          bottom = bird.y + bird.height / 2;
+        const gapTop = pipe.gapY - PIPE_GAP / 2,
+          gapBottom = pipe.gapY + PIPE_GAP / 2;
+        if (!(right > pipe.x && left < pipe.x + PIPE_WIDTH)) return false;
+        return top < gapTop || bottom > gapBottom;
+      }
+
+      function update(dt) {
+        if (state !== "running") return;
+
+        bird.vy += GRAVITY * dt;
+        bird.y += bird.vy * dt;
+
+        for (const pipe of pipes) {
+          pipe.x -= PIPE_SPEED * dt;
+          if (!pipe.scored && pipe.x + PIPE_WIDTH < bird.x) {
+            pipe.scored = true;
+            updateVolume(score + 1);
+            if (score >= MAX_SCORE) {
+              endRun("win");
+              return;
+            }
+          }
+        }
+
+        if (pipes.length && pipes[0].x + PIPE_WIDTH < -18) pipes.shift();
+
+        const last = pipes[pipes.length - 1];
+        if (last && last.x < WORLD_WIDTH - PIPE_SPACING) {
+          pipes.push({
+            x: last.x + PIPE_SPACING,
+            gapY: randomGapY(),
+            scored: false,
+          });
+        }
+
+        const hitBounds =
+          bird.y - bird.height / 2 <= 0 || bird.y + bird.height / 2 >= GROUND_Y;
+        if (hitBounds || pipes.some(collidesWithPipe)) {
+          bird.y = clamp(bird.y, bird.height / 2, GROUND_Y - bird.height / 2);
+          endRun("crash");
+        }
+      }
+
+      function drawPipe(pipe) {
+        const x = sx(pipe.x),
+          w = sx(PIPE_WIDTH);
+        const gapTop = sy(pipe.gapY - PIPE_GAP / 2);
+        const gapBottom = sy(pipe.gapY + PIPE_GAP / 2);
+        const cap = sy(13);
+
+        ctx.fillStyle = "#2e2e2c";
+        ctx.fillRect(x, 0, w, gapTop - cap);
+        ctx.fillRect(x, gapBottom + cap, w, sy(GROUND_Y) - gapBottom - cap);
+
+        ctx.fillStyle = "#1a1a18";
+        ctx.fillRect(x - sx(4), gapTop - cap, w + sx(8), cap);
+        ctx.fillRect(x - sx(4), gapBottom, w + sx(8), cap);
+
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.fillRect(x + sx(6), 0, sx(5), gapTop - cap);
+        ctx.fillRect(
+          x + sx(6),
+          gapBottom + cap,
+          sx(5),
+          sy(GROUND_Y) - gapBottom - cap,
+        );
+      }
+
+      function drawBird() {
+        const x = sx(bird.x),
+          y = sy(bird.y);
+        const w = sx(bird.width),
+          h = sy(bird.height);
+        const tilt = clamp(bird.vy * 0.08, -0.4, 0.55);
+        const scale = Math.min(w, h) / 24;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(tilt);
+        ctx.scale(scale, scale);
+        ctx.translate(-12, -12);
+
+        ctx.fillStyle = "#111111";
+        ctx.beginPath();
+        ctx.moveTo(11, 5);
+        ctx.lineTo(6, 9);
+        ctx.lineTo(2, 9);
+        ctx.lineTo(2, 15);
+        ctx.lineTo(6, 15);
+        ctx.lineTo(11, 19);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = "#111111";
+        ctx.lineWidth = 1.8;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.arc(15.54, 12, 5, -Math.PI / 4, Math.PI / 4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(18.36, 12, 9, -Math.PI / 4, Math.PI / 4);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawFrame() {
+        ctx.clearRect(0, 0, viewWidth, viewHeight);
+        ctx.strokeStyle = "rgba(17,17,17,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, sy(GROUND_Y));
+        ctx.lineTo(viewWidth, sy(GROUND_Y));
+        ctx.stroke();
+        pipes.forEach(drawPipe);
+        drawBird();
+      }
+
+      function tick(time) {
+        const delta = lastTime ? time - lastTime : 16.67;
+        const dt = Math.min(delta, 34) / 16.67;
+        lastTime = time;
+        update(dt);
+        drawFrame();
+        animationId = window.requestAnimationFrame(tick);
+      }
+
+      stageFrame.addEventListener("pointerdown", handleInput);
+      window.addEventListener("keydown", (e) => {
+        if (e.code !== "Space") return;
+        const tag = document.activeElement?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "BUTTON") return;
+        e.preventDefault();
+        handleInput();
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+
+      resizeCanvas();
+      resetGame();
+      drawFrame();
+      animationId = window.requestAnimationFrame(tick);
+
+      window.addEventListener("beforeunload", () => {
+        if (animationId) window.cancelAnimationFrame(animationId);
+      });
+    </script>
+  </body>
+</html>
