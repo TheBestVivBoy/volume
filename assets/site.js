@@ -139,6 +139,13 @@ const sliders = [
     path: "sliders/stacking/",
   },
   {
+    title: "Slots",
+    description: "Bet volume. Spin.",
+    slug: "slots",
+    path: "sliders/slots/",
+    preview: false,
+  },
+  {
     title: "Tic-Tac-Toe",
     description: "Slow and steady wins the.. volume?",
     slug: "tictactoe",

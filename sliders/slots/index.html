@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slots | Volume</title>
+    <meta
+      name="description"
+      content="Bet some volume on a slot machine and see what comes back."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Slots | Volume" />
+    <meta
+      property="og:description"
+      content="Bet some volume on a slot machine and see what comes back."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/slots/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Slots | Volume" />
+    <meta
+      name="twitter:description"
+      content="Bet some volume on a slot machine and see what comes back."
+    />
+    <link rel="canonical" href="https://volume.vivan.site/sliders/slots/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      .wrap {
+        width: min(92vw, 520px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(4rem, 12vw, 5.9rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shell {
+        background: #fff;
+        border: 1.5px solid #e6e3dc;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.045);
+        display: grid;
+        gap: 14px;
+      }
+
+      .control-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 108px;
+        gap: 10px;
+      }
+
+      input,
+      button {
+        appearance: none;
+        width: 100%;
+        border: 1.5px solid #d6d1c8;
+        border-radius: 14px;
+        background: #fff;
+        color: #111;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 0.96rem;
+        letter-spacing: -0.01em;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      button {
+        cursor: pointer;
+        transition:
+          background 140ms ease,
+          transform 140ms ease,
+          box-shadow 140ms ease;
+      }
+
+      button:hover {
+        background: #f8f7f3;
+      }
+
+      button:active {
+        transform: scale(0.985);
+      }
+
+      button:disabled,
+      input:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .reels {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .reel-window {
+        position: relative;
+        height: 88px;
+        border-radius: 16px;
+        border: 1.5px solid #e6e3dc;
+        background: #fbfaf7;
+        overflow: hidden;
+      }
+
+      .reel-window::before,
+      .reel-window::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 18px;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .reel-window::before {
+        top: 0;
+        background: linear-gradient(180deg, #fbfaf7 0%, rgba(251, 250, 247, 0) 100%);
+      }
+
+      .reel-window::after {
+        bottom: 0;
+        background: linear-gradient(0deg, #fbfaf7 0%, rgba(251, 250, 247, 0) 100%);
+      }
+
+      .reel-window.is-win {
+        border-color: #bdb7ad;
+        background: #ffffff;
+      }
+
+      .reel-window.is-lose {
+        border-color: #e6e3dc;
+      }
+
+      .reel-center {
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        right: 8px;
+        height: 56px;
+        transform: translateY(-50%);
+        border: 1px solid rgba(17, 17, 17, 0.06);
+        border-radius: 12px;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .reel-strip {
+        transform: translateY(0);
+        will-change: transform;
+      }
+
+      .reel-item {
+        height: 88px;
+        display: grid;
+        place-items: center;
+        color: #111;
+      }
+
+      .symbol {
+        width: 38px;
+        height: 38px;
+        display: block;
+      }
+
+      .status {
+        min-height: 1.25em;
+        text-align: center;
+        color: #8a8a93;
+        font-size: 0.92rem;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .shell {
+          padding: 14px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .control-row {
+          grid-template-columns: 1fr;
+        }
+
+        .reel-window,
+        .reel-item {
+          height: 80px;
+        }
+
+        .symbol {
+          width: 34px;
+          height: 34px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .reel-strip,
+        button {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Slots</h1>
+          <p>Bet some volume. Spin.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Slots volume control">
+          <p class="volume" id="volumeLabel">20%</p>
+
+          <div class="shell">
+            <div class="control-row">
+              <input
+                id="betInput"
+                type="number"
+                min="1"
+                step="1"
+                value="5"
+                inputmode="numeric"
+                aria-label="Bet amount"
+              />
+              <button id="spinButton" type="button">Spin</button>
+            </div>
+
+            <div class="reels" aria-hidden="true">
+              <div class="reel-window" id="window0">
+                <div class="reel-center"></div>
+                <div class="reel-strip" id="strip0"></div>
+              </div>
+              <div class="reel-window" id="window1">
+                <div class="reel-center"></div>
+                <div class="reel-strip" id="strip1"></div>
+              </div>
+              <div class="reel-window" id="window2">
+                <div class="reel-center"></div>
+                <div class="reel-strip" id="strip2"></div>
+              </div>
+            </div>
+
+            <div class="status" id="statusText">Two pays. Three pays more.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      const volumeLabel = document.getElementById("volumeLabel");
+      const betInput = document.getElementById("betInput");
+      const spinButton = document.getElementById("spinButton");
+      const statusText = document.getElementById("statusText");
+
+      const reelWindows = [
+        document.getElementById("window0"),
+        document.getElementById("window1"),
+        document.getElementById("window2"),
+      ];
+
+      const reelStrips = [
+        document.getElementById("strip0"),
+        document.getElementById("strip1"),
+        document.getElementById("strip2"),
+      ];
+
+      const mobileQuery = window.matchMedia("(max-width: 520px)");
+      const REPEAT_CYCLES = 16;
+
+      const SYMBOLS = [
+        { bars: 0, weight: 20, two: 0.8, three: 0.5 },
+        { bars: 1, weight: 30, two: 1.05, three: 1.1 },
+        { bars: 2, weight: 20, two: 1.1, three: 1.2 },
+        { bars: 3, weight: 15, two: 1.2, three: 1.4 },
+        { bars: 4, weight: 10, two: 1.8, three: 2.4 },
+        { bars: 5, weight: 5, two: 3, three: 5 },
+      ];
+
+      const state = {
+        volume: 20,
+        running: false,
+        bet: 5,
+        results: [0, 0, 0],
+      };
+
+      function getItemHeight() {
+        return mobileQuery.matches ? 80 : 88;
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function roundTo(value, places = 2) {
+        const factor = 10 ** places;
+        return Math.round(value * factor) / factor;
+      }
+
+      function formatNumber(value) {
+        const rounded = roundTo(value, 2);
+        return Number.isInteger(rounded)
+          ? String(rounded)
+          : rounded.toFixed(2).replace(/\.?0+$/, "");
+      }
+
+      function renderVolume() {
+        volumeLabel.textContent = `${formatNumber(state.volume)}%`;
+      }
+
+      function sanitizeBet() {
+        const maxBet = Math.max(1, Math.floor(state.volume));
+        let value = Number(betInput.value);
+
+        if (!Number.isFinite(value)) {
+          value = 1;
+        }
+
+        value = clamp(Math.round(value), 1, maxBet);
+        state.bet = value;
+        betInput.value = value;
+        betInput.max = maxBet;
+      }
+
+      function shuffle(array) {
+        const copy = [...array];
+        for (let index = copy.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+        }
+        return copy;
+      }
+
+      function volumeIcon(bars) {
+        const waves = [
+          '<path d="M14.4 10.15a2.65 2.65 0 0 1 0 3.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+          '<path d="M15.7 8.55a4.95 4.95 0 0 1 0 6.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+          '<path d="M17.05 7.05a6.9 6.9 0 0 1 0 9.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+          '<path d="M18.35 5.7a8.8 8.8 0 0 1 0 12.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+          '<path d="M19.65 4.35a10.7 10.7 0 0 1 0 15.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+        ]
+          .slice(0, bars)
+          .join("");
+
+        return `
+          <svg class="symbol" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+            ${waves}
+          </svg>
+        `;
+      }
+
+      function buildStrip(stripEl) {
+        const order = shuffle(SYMBOLS.map((symbol) => symbol.bars));
+        const sequence = [];
+
+        for (let cycle = 0; cycle < REPEAT_CYCLES; cycle += 1) {
+          sequence.push(...order);
+        }
+
+        stripEl.innerHTML = sequence
+          .map(
+            (bars) =>
+              `<div class="reel-item" data-bars="${bars}">${volumeIcon(bars)}</div>`,
+          )
+          .join("");
+
+        return { order };
+      }
+
+      function pickWeightedBars() {
+        const totalWeight = SYMBOLS.reduce(
+          (sum, symbol) => sum + symbol.weight,
+          0,
+        );
+        let roll = Math.random() * totalWeight;
+
+        for (const symbol of SYMBOLS) {
+          roll -= symbol.weight;
+          if (roll <= 0) {
+            return symbol.bars;
+          }
+        }
+
+        return SYMBOLS[SYMBOLS.length - 1].bars;
+      }
+
+      function clearReelStates() {
+        reelWindows.forEach((windowEl) => {
+          windowEl.classList.remove("is-win", "is-lose");
+        });
+      }
+
+      function showIdleSymbols() {
+        const itemHeight = getItemHeight();
+
+        reelStrips.forEach((stripEl, index) => {
+          buildStrip(stripEl);
+          const startIndex = 7 + index;
+          stripEl.style.transition = "none";
+          stripEl.style.transform = `translateY(-${startIndex * itemHeight}px)`;
+          stripEl.offsetHeight;
+        });
+      }
+
+      function getSymbolConfig(bars) {
+        return SYMBOLS.find((symbol) => symbol.bars === bars);
+      }
+
+      function evaluateResults(results, bet) {
+        const counts = new Map();
+
+        results.forEach((bars) => {
+          counts.set(bars, (counts.get(bars) || 0) + 1);
+        });
+
+        let matchBars = null;
+        let kind = 0;
+
+        counts.forEach((count, bars) => {
+          if (count === 3) {
+            matchBars = bars;
+            kind = 3;
+          }
+        });
+
+        if (kind !== 3) {
+          counts.forEach((count, bars) => {
+            if (count === 2) {
+              matchBars = bars;
+              kind = 2;
+            }
+          });
+        }
+
+        if (!kind) {
+          return { kind: 0, bars: null, multiplier: 0, payout: 0 };
+        }
+
+        const symbol = getSymbolConfig(matchBars);
+        const multiplier = kind === 3 ? symbol.three : symbol.two;
+        const payout = roundTo(bet * multiplier, 2);
+
+        return { kind, bars: matchBars, multiplier, payout };
+      }
+
+      function setStatusFromResult(result, bet) {
+        if (!result.kind) {
+          statusText.textContent = `No match. -${formatNumber(bet)}%.`;
+          return;
+        }
+
+        if (result.kind === 3) {
+          statusText.textContent = `Three ${result.bars}. +${formatNumber(result.payout)}%.`;
+          return;
+        }
+
+        statusText.textContent = `Two ${result.bars}. +${formatNumber(result.payout)}%.`;
+      }
+
+      function startSpin() {
+        if (state.running) {
+          return;
+        }
+
+        if (state.volume < 1) {
+          statusText.textContent = "No volume left.";
+          return;
+        }
+
+        sanitizeBet();
+
+        if (state.bet > state.volume) {
+          statusText.textContent = "Not enough volume.";
+          return;
+        }
+
+        state.volume = roundTo(state.volume - state.bet, 2);
+        renderVolume();
+
+        state.running = true;
+        spinButton.disabled = true;
+        betInput.disabled = true;
+        spinButton.textContent = "Spinning";
+        statusText.textContent = `Bet ${formatNumber(state.bet)}%.`;
+        clearReelStates();
+
+        const results = [
+          pickWeightedBars(),
+          pickWeightedBars(),
+          pickWeightedBars(),
+        ];
+
+        state.results = results;
+
+        const itemHeight = getItemHeight();
+
+        reelStrips.forEach((stripEl, index) => {
+          const { order } = buildStrip(stripEl);
+          const targetBars = results[index];
+          const positionInOrder = order.indexOf(targetBars);
+          const targetCycle = REPEAT_CYCLES - 3 + index;
+          const targetIndex = targetCycle * order.length + positionInOrder;
+          const duration = 2050 + index * 420;
+
+          stripEl.style.transition = "none";
+          stripEl.style.transform = "translateY(0px)";
+          stripEl.offsetHeight;
+          stripEl.style.transition = `transform ${duration}ms cubic-bezier(.16,.84,.2,1)`;
+          stripEl.style.transform = `translateY(-${targetIndex * itemHeight}px)`;
+        });
+
+        const finalDelay = 2050 + (reelStrips.length - 1) * 420 + 120;
+
+        window.setTimeout(() => {
+          const result = evaluateResults(results, state.bet);
+
+          if (result.kind) {
+            state.volume = roundTo(state.volume + result.payout, 2);
+            reelWindows.forEach((windowEl, index) => {
+              const isMatch = results[index] === result.bars;
+              windowEl.classList.toggle("is-win", isMatch);
+              windowEl.classList.toggle("is-lose", !isMatch);
+            });
+          } else {
+            reelWindows.forEach((windowEl) => {
+              windowEl.classList.add("is-lose");
+            });
+          }
+
+          renderVolume();
+          setStatusFromResult(result, state.bet);
+
+          state.running = false;
+          spinButton.disabled = false;
+          betInput.disabled = false;
+          spinButton.textContent = "Spin";
+          sanitizeBet();
+        }, finalDelay);
+      }
+
+      betInput.addEventListener("input", sanitizeBet);
+      betInput.addEventListener("change", sanitizeBet);
+      betInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          startSpin();
+        }
+      });
+      spinButton.addEventListener("click", startSpin);
+      mobileQuery.addEventListener("change", showIdleSymbols);
+
+      showIdleSymbols();
+      renderVolume();
+      sanitizeBet();
+    </script>
+  </body>
+</html>
