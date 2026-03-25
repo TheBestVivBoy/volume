@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-03-25T09:34:02Z",
+  "tracks": [
+    {
+      "id": "station-static",
+      "name": "Station Static",
+      "file": "Station Static.m4a",
+      "mime": "audio/mp4",
+      "duration": 102.121,
+      "bytes": 836536,
+      "version": "c7e41e64b578"
+    }
+  ]
+}

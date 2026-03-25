@@ -177,6 +177,14 @@ body.project-page {
   gap: 8px;
 }
 
+.site-header-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .site-nav-link,
 .pill-link {
   display: inline-flex;
@@ -216,6 +224,178 @@ body.project-page {
 .site-nav-link.is-current {
   background: rgba(255, 255, 255, 0.9);
   border-color: var(--line-hover);
+}
+
+.site-audio {
+  position: relative;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.site-audio-toggle,
+.site-audio-mode,
+.site-audio-trigger,
+.site-audio-option {
+  min-height: 38px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+  color: var(--text);
+  font: inherit;
+}
+
+.site-audio-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    transform 0.18s var(--ease-out),
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.site-audio-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.site-audio-trigger {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition:
+    transform 0.18s var(--ease-out),
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.site-audio-mode {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s var(--ease-out),
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.site-audio-trigger svg {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+
+.site-audio-toggle:hover:not(:disabled),
+.site-audio-mode:hover:not(:disabled),
+.site-audio-trigger:hover:not(:disabled),
+.site-audio-option:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--line-hover);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-md);
+}
+
+.site-audio-toggle.is-active {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: var(--line-hover);
+}
+
+.site-audio-toggle:disabled,
+.site-audio-mode:disabled,
+.site-audio-trigger:disabled,
+.site-audio-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.site-audio-toggle:focus-visible,
+.site-audio-mode:focus-visible,
+.site-audio-trigger:focus-visible,
+.site-audio-option:focus-visible {
+  outline: 2px solid rgba(95, 127, 255, 0.4);
+  outline-offset: 2px;
+}
+
+.site-audio-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(220px, calc(100vw - 40px));
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  background: rgba(247, 246, 242, 0.96);
+  box-shadow: var(--shadow-md);
+  z-index: 12;
+}
+
+.site-audio-options {
+  display: grid;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.site-audio-track-row {
+  display: grid;
+}
+
+.site-audio-option {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.62rem 0.85rem;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s var(--ease-out),
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.site-audio-option.is-selected {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--line-hover);
+}
+
+.site-audio-mode.is-selected {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--line-hover);
+}
+
+.site-audio-status {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .hero,
@@ -695,6 +875,11 @@ body.project-page.has-bmc-widget {
     gap: 14px;
   }
 
+  .site-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .site-nav {
     justify-content: flex-start;
   }
@@ -720,8 +905,25 @@ body.project-page.has-bmc-widget {
     width: 100%;
   }
 
+  .site-header-actions {
+    align-items: stretch;
+  }
+
+  .site-audio {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .site-audio-panel {
+    position: static;
+    width: 100%;
+  }
+
   .site-nav-link,
-  .pill-link {
+  .pill-link,
+  .site-audio-mode,
+  .site-audio-trigger,
+  .site-audio-option {
     min-height: 36px;
     padding-inline: 0.85rem;
   }

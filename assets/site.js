@@ -9,12 +9,72 @@ const STORAGE_KEYS = {
   visitCount: "visitCount",
   lastPopupTimestamp: "lastPopupTimestamp",
   previewGifCacheMeta: "previewGifCacheMeta",
+  audioEnabled: "audioEnabled",
+  audioTrackId: "audioTrackId",
+  audioCurrentTime: "audioCurrentTime",
 };
 
 const PREVIEW_GIF_CACHE_NAME = "volume-preview-gifs-v1";
 const PREVIEW_GIF_CACHE_TTL_MS = 30 * 60 * 1000;
+const AUDIO_MANIFEST_PATH = "assets/audio/manifest.json";
+const DEFAULT_PAGE_AUDIO_VOLUME = 0.3;
+const AUDIO_STATE_SAVE_INTERVAL_MS = 1500;
 const previewGifObjectUrls = new Map();
 let previewGifCleanupBound = false;
+let audioSaveTimestamp = 0;
+let deferredAudioUnlockBound = false;
+
+const AUDIO_VOLUME_SELECTORS_BY_SLUG = {
+  alphabetical: ["#volumeLabel"],
+  cannon: ["#volLabel"],
+  crank: ["#volumeLabel"],
+  curling: ["#titleLabel"],
+  drag: ["#percent"],
+  dropdown: ["#selectedVolume", "#volumeSelect"],
+  dvd: ["#volumeLabel"],
+  flappybird: ["#volumeText", "#volumeLabel"],
+  gates: ["#volReadout"],
+  horse_race: ["#volumeLabel"],
+  hundred_sliders: ["#volumeLabel"],
+  inertia: ["#volumeLabel"],
+  lock: ["#volumeReadout"],
+  memory: ["#volLabel"],
+  personality: ["#volume", "#liveVolume"],
+  plinko: ["#volNum"],
+  pump: ["#volumeLabel"],
+  slots: ["#volumeLabel"],
+  spinner: ["#volNum"],
+  stacking: ["#readout"],
+  tictactoe: ["#volumeLabel"],
+  tinder: ["#volumeLabel"],
+  tradingcards: ["#readout"],
+  tutorial: ["#volumeLabel", "#slider"],
+  unique: ["#volValue", "#volume"],
+  vertical: ["#volumeLabel"],
+};
+
+const audioState = {
+  audio: null,
+  toggle: null,
+  panel: null,
+  modeOn: null,
+  modeOff: null,
+  trackRow: null,
+  trigger: null,
+  triggerLabel: null,
+  options: null,
+  status: null,
+  tracks: [],
+  enabled: false,
+  ready: false,
+  panelOpen: false,
+  optionsOpen: false,
+  pendingAutoplay: false,
+  resumeTime: 0,
+  pageVolume: DEFAULT_PAGE_AUDIO_VOLUME,
+  lastTrackSrc: "",
+  volumeObserver: null,
+};
 
 const sliders = [
   {
@@ -250,6 +310,28 @@ function writeStoredNumber(key, value) {
   window.localStorage.setItem(key, String(value));
 }
 
+function readStoredString(key) {
+  if (!supportsStorage()) return "";
+  return window.localStorage.getItem(key) || "";
+}
+
+function writeStoredString(key, value) {
+  if (!supportsStorage()) return;
+  if (!value) {
+    window.localStorage.removeItem(key);
+    return;
+  }
+  window.localStorage.setItem(key, value);
+}
+
+function readStoredBoolean(key) {
+  return readStoredString(key) === "1";
+}
+
+function writeStoredBoolean(key, value) {
+  writeStoredString(key, value ? "1" : "");
+}
+
 function supportsCacheStorage() {
   return typeof window.caches !== "undefined";
 }
@@ -366,28 +448,590 @@ function renderSiteHeader() {
         </span>
       </a>
 
-      <nav class="site-nav" aria-label="Primary">
-        <a class="site-nav-link${isHome ? " is-current" : ""}" href="${buildInternalHref("")}"${
-          isHome ? ' aria-current="page"' : ""
-        }>Home</a>
-        <a class="site-nav-link${inSliderSection ? " is-current" : ""}" href="${buildInternalHref(
-          "sliders/",
-        )}"${inSliderSection ? ' aria-current="page"' : ""}>Sliders</a>
-        <a
-          class="site-nav-link"
-          href="https://github.com/TheBestVivBoy/volume"
-          target="_blank"
-          rel="noreferrer"
-        >GitHub</a>
-        <a
-          class="site-nav-link"
-          href="https://tiktok.com/@vivancodes"
-          target="_blank"
-          rel="noreferrer"
-        >TikTok</a>
-      </nav>
+      <div class="site-header-actions">
+        <nav class="site-nav" aria-label="Primary">
+          <a class="site-nav-link${isHome ? " is-current" : ""}" href="${buildInternalHref("")}"${
+            isHome ? ' aria-current="page"' : ""
+          }>Home</a>
+          <a class="site-nav-link${inSliderSection ? " is-current" : ""}" href="${buildInternalHref(
+            "sliders/",
+          )}"${inSliderSection ? ' aria-current="page"' : ""}>Sliders</a>
+          <a
+            class="site-nav-link"
+            href="https://github.com/TheBestVivBoy/volume"
+            target="_blank"
+            rel="noreferrer"
+          >GitHub</a>
+          <a
+            class="site-nav-link"
+            href="https://tiktok.com/@vivancodes"
+            target="_blank"
+            rel="noreferrer"
+          >TikTok</a>
+        </nav>
+
+        <div class="site-audio">
+          <button
+            type="button"
+            class="site-audio-toggle"
+            data-audio-toggle
+            aria-pressed="false"
+            aria-expanded="false"
+            aria-controls="site-audio-panel"
+            aria-label="Toggle site music"
+            title="Toggle site music"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M10 4.5v11.2a3.1 3.1 0 1 1-1.4-2.6V7.6l9.4-2.1v8.1a3.1 3.1 0 1 1-1.4-2.6V4.5L10 6z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+
+          <div class="site-audio-panel" id="site-audio-panel" data-audio-panel hidden>
+            <button type="button" class="site-audio-mode" data-audio-mode="on">
+              On
+            </button>
+
+            <button type="button" class="site-audio-mode" data-audio-mode="off">
+              Off
+            </button>
+
+            <div class="site-audio-track-row" data-audio-track-row hidden>
+            <button
+              type="button"
+              class="site-audio-trigger"
+              data-audio-trigger
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="site-audio-options"
+            >
+              <span data-audio-trigger-label>Off</span>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M4 6.5 8 10l4-3.5"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+            </div>
+
+            <div
+              class="site-audio-options"
+              id="site-audio-options"
+              data-audio-options
+              role="listbox"
+              aria-label="Choose a music track"
+              hidden
+            ></div>
+            <p class="site-audio-status" data-audio-status hidden></p>
+          </div>
+        </div>
+      </div>
     </header>
   `;
+}
+
+function getPageSlug() {
+  const match = window.location.pathname.match(/\/sliders\/([^/]+)\/?$/);
+  return match ? match[1] : "";
+}
+
+function encodeAssetPath(path) {
+  return path
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
+function buildAudioTrackSrc(track) {
+  const version = track.version ? `?v=${encodeURIComponent(track.version)}` : "";
+  return `${buildInternalHref(encodeAssetPath(`assets/audio/${track.file}`))}${version}`;
+}
+
+function getStoredAudioTrackId() {
+  return readStoredString(STORAGE_KEYS.audioTrackId);
+}
+
+function saveAudioPlaybackState(force = false) {
+  if (!audioState.audio) return;
+
+  const now = Date.now();
+  if (!force && now - audioSaveTimestamp < AUDIO_STATE_SAVE_INTERVAL_MS) {
+    return;
+  }
+
+  audioSaveTimestamp = now;
+  writeStoredNumber(
+    STORAGE_KEYS.audioCurrentTime,
+    Math.max(0, Math.floor(audioState.audio.currentTime * 1000)),
+  );
+}
+
+function getStoredAudioTime() {
+  return readStoredNumber(STORAGE_KEYS.audioCurrentTime) / 1000;
+}
+
+function getSelectedAudioTrack() {
+  if (!audioState.tracks.length) return null;
+  const selectedTrackId = getStoredAudioTrackId() || audioState.tracks[0].id;
+  return audioState.tracks.find((track) => track.id === selectedTrackId) || audioState.tracks[0];
+}
+
+function getAudioSelectionValue() {
+  if (!audioState.enabled) return "off";
+  return getSelectedAudioTrack()?.id || "off";
+}
+
+function getAudioSelectionLabel() {
+  if (!audioState.enabled) return "Off";
+  return getSelectedAudioTrack()?.name || "Off";
+}
+
+function setAudioStatus(message = "") {
+  if (!audioState.status) return;
+  audioState.status.hidden = !message;
+  audioState.status.textContent = message;
+}
+
+function syncAudioControls() {
+  if (
+    !audioState.toggle ||
+    !audioState.panel ||
+    !audioState.modeOn ||
+    !audioState.modeOff ||
+    !audioState.trackRow ||
+    !audioState.trigger ||
+    !audioState.triggerLabel ||
+    !audioState.options
+  ) {
+    return;
+  }
+
+  audioState.toggle.classList.toggle("is-active", audioState.enabled);
+  audioState.toggle.classList.toggle("is-open", audioState.panelOpen);
+  audioState.toggle.setAttribute("aria-pressed", String(audioState.enabled));
+  audioState.toggle.setAttribute("aria-expanded", String(audioState.panelOpen));
+
+  audioState.panel.hidden = !audioState.panelOpen;
+  audioState.modeOn.classList.toggle("is-selected", audioState.enabled);
+  audioState.modeOff.classList.toggle("is-selected", !audioState.enabled);
+  audioState.trackRow.hidden = !audioState.enabled;
+  audioState.trigger.disabled = !audioState.ready && !audioState.tracks.length;
+  audioState.triggerLabel.textContent = getAudioSelectionLabel();
+  audioState.trigger.setAttribute("aria-expanded", String(audioState.optionsOpen));
+  audioState.options.hidden = !audioState.enabled || !audioState.optionsOpen;
+
+  const selectedValue = getAudioSelectionValue();
+  audioState.options.querySelectorAll("[data-audio-option]").forEach((button) => {
+    const isSelected = button.dataset.audioOption === selectedValue;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-selected", String(isSelected));
+  });
+}
+
+function syncAudioElementVolume() {
+  if (!audioState.audio) return;
+  audioState.audio.volume = Math.max(0, Math.min(audioState.pageVolume, 1));
+}
+
+function setAudioPanelOpen(nextOpen) {
+  audioState.panelOpen = Boolean(nextOpen);
+  if (!audioState.panelOpen) {
+    audioState.optionsOpen = false;
+  }
+  syncAudioControls();
+}
+
+function setAudioOptionsOpen(nextOpen) {
+  audioState.optionsOpen = Boolean(nextOpen) && audioState.panelOpen;
+  syncAudioControls();
+}
+
+function bindDeferredAudioUnlock() {
+  if (deferredAudioUnlockBound) return;
+  deferredAudioUnlockBound = true;
+
+  const replay = () => {
+    if (!audioState.pendingAutoplay || !audioState.enabled) return;
+    void attemptAudioPlayback();
+  };
+
+  document.addEventListener("pointerdown", replay, { passive: true });
+  document.addEventListener("keydown", replay);
+}
+
+function parseVolumeCandidateValue(element) {
+  if (!element) return null;
+
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
+    const rawValue = Number.parseFloat(element.value);
+    return Number.isFinite(rawValue) ? rawValue : null;
+  }
+
+  const text = element.textContent ? element.textContent.trim() : "";
+  if (!text) return null;
+
+  const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%/);
+  if (percentMatch) {
+    return Number.parseFloat(percentMatch[1]);
+  }
+
+  if (/^\d+(?:\.\d+)?$/.test(text)) {
+    return Number.parseFloat(text);
+  }
+
+  return null;
+}
+
+function resolvePageAudioVolume() {
+  if (
+    document.body.classList.contains("home-page") ||
+    document.body.classList.contains("collection-page")
+  ) {
+    return DEFAULT_PAGE_AUDIO_VOLUME;
+  }
+
+  const slug = getPageSlug();
+  const candidates = AUDIO_VOLUME_SELECTORS_BY_SLUG[slug] || [
+    "#volumeLabel",
+    "#volLabel",
+    "#volReadout",
+    "#volNum",
+    "#selectedVolume",
+    "#readout",
+    "#titleLabel",
+    "#percent",
+    "#volume",
+  ];
+
+  for (const selector of candidates) {
+    const element = document.querySelector(selector);
+    const value = parseVolumeCandidateValue(element);
+    if (value == null) continue;
+    if (value < 0 || value > 100) continue;
+    return value / 100;
+  }
+
+  return DEFAULT_PAGE_AUDIO_VOLUME;
+}
+
+function updateAudioPageVolume(nextVolume = resolvePageAudioVolume()) {
+  audioState.pageVolume = Math.max(0, Math.min(nextVolume, 1));
+  syncAudioElementVolume();
+}
+
+function initAudioVolumeSync() {
+  updateAudioPageVolume();
+
+  if (
+    document.body.classList.contains("home-page") ||
+    document.body.classList.contains("collection-page")
+  ) {
+    return;
+  }
+
+  const scheduleUpdate = () => {
+    window.requestAnimationFrame(() => updateAudioPageVolume());
+  };
+
+  document.addEventListener("input", scheduleUpdate, true);
+  document.addEventListener("change", scheduleUpdate, true);
+
+  const observer = new MutationObserver(scheduleUpdate);
+  observer.observe(document.body, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+
+  audioState.volumeObserver = observer;
+}
+
+function applyAudioResumeTime() {
+  if (!audioState.audio || !audioState.resumeTime) return;
+  if (!Number.isFinite(audioState.audio.duration) || audioState.audio.duration <= 0)
+    return;
+
+  const safeTime = Math.max(
+    0,
+    Math.min(audioState.resumeTime, Math.max(audioState.audio.duration - 0.35, 0)),
+  );
+  audioState.audio.currentTime = safeTime;
+  audioState.resumeTime = 0;
+}
+
+async function attemptAudioPlayback() {
+  if (!audioState.audio || !audioState.enabled) return;
+
+  try {
+    await audioState.audio.play();
+    audioState.pendingAutoplay = false;
+    setAudioStatus("");
+  } catch (_error) {
+    audioState.pendingAutoplay = true;
+    setAudioStatus("Tap anywhere to resume music.");
+    bindDeferredAudioUnlock();
+  }
+}
+
+function setAudioTrack(track, { resumeTime = 0, autoplay = false } = {}) {
+  if (!audioState.audio || !track) return;
+
+  const nextSrc = buildAudioTrackSrc(track);
+  const sameTrack = audioState.audio.dataset.trackId === track.id;
+
+  writeStoredString(STORAGE_KEYS.audioTrackId, track.id);
+  audioState.resumeTime = Math.max(0, resumeTime);
+
+  if (sameTrack && audioState.lastTrackSrc === nextSrc) {
+    applyAudioResumeTime();
+    if (autoplay) {
+      audioState.pendingAutoplay = true;
+      void attemptAudioPlayback();
+    }
+    return;
+  }
+
+  audioState.lastTrackSrc = nextSrc;
+  audioState.audio.pause();
+  audioState.audio.dataset.trackId = track.id;
+  audioState.audio.src = nextSrc;
+  audioState.audio.load();
+
+  if (autoplay) {
+    audioState.pendingAutoplay = true;
+  }
+}
+
+function setAudioEnabled(nextEnabled, { resumeTime } = {}) {
+  audioState.enabled = Boolean(nextEnabled) && audioState.tracks.length > 0;
+  writeStoredBoolean(STORAGE_KEYS.audioEnabled, audioState.enabled);
+  syncAudioControls();
+
+  if (!audioState.enabled) {
+    audioState.optionsOpen = false;
+    saveAudioPlaybackState(true);
+    audioState.pendingAutoplay = false;
+    audioState.audio?.pause();
+    setAudioStatus("");
+    return;
+  }
+
+  const selectedTrack = getSelectedAudioTrack();
+  if (!selectedTrack) {
+    setAudioStatus("No tracks available.");
+    return;
+  }
+
+  setAudioTrack(selectedTrack, {
+    resumeTime:
+      typeof resumeTime === "number" && Number.isFinite(resumeTime)
+        ? Math.max(0, resumeTime)
+        : getStoredAudioTime(),
+    autoplay: true,
+  });
+  syncAudioElementVolume();
+}
+
+function selectAudioOption(value) {
+  if (value === "off") {
+    setAudioEnabled(false);
+    setAudioPanelOpen(false);
+    return;
+  }
+
+  const nextTrack =
+    audioState.tracks.find((track) => track.id === value) || getSelectedAudioTrack();
+  if (!nextTrack) return;
+
+  writeStoredString(STORAGE_KEYS.audioTrackId, nextTrack.id);
+  writeStoredNumber(STORAGE_KEYS.audioCurrentTime, 0);
+  setAudioEnabled(true, { resumeTime: 0 });
+  setAudioStatus("");
+  setAudioPanelOpen(false);
+}
+
+function hydrateAudioTrackOptions() {
+  if (!audioState.options) return;
+
+  audioState.options.innerHTML = "";
+
+  const selections = audioState.tracks.map((track) => ({
+    id: track.id,
+    name: track.name,
+  }));
+
+  selections.forEach((selection) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "site-audio-option";
+    button.dataset.audioOption = selection.id;
+    button.setAttribute("role", "option");
+    button.textContent = selection.name;
+    button.addEventListener("click", () => {
+      selectAudioOption(selection.id);
+    });
+    audioState.options.appendChild(button);
+  });
+}
+
+async function loadAudioManifest() {
+  const response = await fetch(buildInternalHref(AUDIO_MANIFEST_PATH), {
+    cache: "no-cache",
+  });
+  if (!response.ok) {
+    throw new Error(`Audio manifest request failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const tracks = Array.isArray(payload?.tracks) ? payload.tracks : [];
+
+  return tracks
+    .filter((track) => track && track.id && track.name && track.file)
+    .map((track) => ({
+      id: String(track.id),
+      name: String(track.name),
+      file: String(track.file),
+      version: track.version ? String(track.version) : "",
+    }));
+}
+
+function initSiteAudio() {
+  audioState.toggle = document.querySelector("[data-audio-toggle]");
+  audioState.panel = document.querySelector("[data-audio-panel]");
+  audioState.modeOn = document.querySelector('[data-audio-mode="on"]');
+  audioState.modeOff = document.querySelector('[data-audio-mode="off"]');
+  audioState.trackRow = document.querySelector("[data-audio-track-row]");
+  audioState.trigger = document.querySelector("[data-audio-trigger]");
+  audioState.triggerLabel = document.querySelector("[data-audio-trigger-label]");
+  audioState.options = document.querySelector("[data-audio-options]");
+  audioState.status = document.querySelector("[data-audio-status]");
+
+  if (
+    !audioState.toggle ||
+    !audioState.panel ||
+    !audioState.modeOn ||
+    !audioState.modeOff ||
+    !audioState.trackRow ||
+    !audioState.trigger ||
+    !audioState.triggerLabel ||
+    !audioState.options
+  ) {
+    return;
+  }
+
+  audioState.audio = document.createElement("audio");
+  audioState.audio.loop = true;
+  audioState.audio.preload = "metadata";
+  audioState.audio.hidden = true;
+  audioState.audio.setAttribute("aria-hidden", "true");
+  document.body.appendChild(audioState.audio);
+
+  audioState.audio.addEventListener("loadedmetadata", () => {
+    applyAudioResumeTime();
+
+    if (audioState.pendingAutoplay && audioState.enabled) {
+      void attemptAudioPlayback();
+    }
+  });
+
+  audioState.audio.addEventListener("timeupdate", () => {
+    saveAudioPlaybackState();
+  });
+
+  audioState.audio.addEventListener("ended", () => {
+    saveAudioPlaybackState(true);
+  });
+
+  audioState.toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setAudioPanelOpen(!audioState.panelOpen);
+  });
+
+  audioState.trigger.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (audioState.trigger.disabled) return;
+    setAudioOptionsOpen(!audioState.optionsOpen);
+  });
+
+  audioState.modeOn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setAudioEnabled(true);
+  });
+
+  audioState.modeOff.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setAudioEnabled(false);
+    setAudioPanelOpen(false);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Node)) return;
+    if (event.target.closest(".site-audio")) return;
+    setAudioPanelOpen(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setAudioPanelOpen(false);
+    }
+  });
+
+  window.addEventListener("pagehide", () => {
+    saveAudioPlaybackState(true);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      saveAudioPlaybackState(true);
+    }
+  });
+
+  window.VolumeAudio = {
+    syncVolume(value) {
+      const nextValue = Number.parseFloat(String(value));
+      if (!Number.isFinite(nextValue)) return;
+      updateAudioPageVolume(Math.max(0, Math.min(nextValue, 100)) / 100);
+    },
+  };
+
+  updateAudioPageVolume();
+  syncAudioControls();
+  setAudioStatus("");
+
+  void loadAudioManifest()
+    .then((tracks) => {
+      audioState.tracks = tracks;
+      audioState.ready = true;
+      hydrateAudioTrackOptions();
+      syncAudioControls();
+
+      if (!tracks.length) {
+        setAudioStatus("No tracks available.");
+        return;
+      }
+
+      const initiallyEnabled = readStoredBoolean(STORAGE_KEYS.audioEnabled);
+      if (initiallyEnabled) {
+        setAudioEnabled(true);
+      }
+    })
+    .catch(() => {
+      audioState.tracks = [];
+      audioState.ready = false;
+      hydrateAudioTrackOptions();
+      syncAudioControls();
+      setAudioStatus("Music unavailable.");
+    });
 }
 
 function renderGrid() {
@@ -796,6 +1440,8 @@ function initAnimations() {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderSiteHeader();
+  initSiteAudio();
+  initAudioVolumeSync();
   renderGrid();
   mountHomePreviews();
   renderHomeSupport();
