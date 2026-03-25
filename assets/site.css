@@ -235,7 +235,6 @@ body.project-page {
 
 .site-audio-toggle,
 .site-audio-mode,
-.site-audio-trigger,
 .site-audio-option {
   min-height: 38px;
   border: 1px solid var(--line-strong);
@@ -267,23 +266,6 @@ body.project-page {
   height: 16px;
 }
 
-.site-audio-trigger {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0.7rem 0.9rem;
-  border-radius: 14px;
-  cursor: pointer;
-  transition:
-    transform 0.18s var(--ease-out),
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease;
-}
-
 .site-audio-mode {
   width: 100%;
   display: inline-flex;
@@ -301,15 +283,8 @@ body.project-page {
     opacity 0.18s ease;
 }
 
-.site-audio-trigger svg {
-  width: 14px;
-  height: 14px;
-  color: var(--muted);
-}
-
 .site-audio-toggle:hover:not(:disabled),
 .site-audio-mode:hover:not(:disabled),
-.site-audio-trigger:hover:not(:disabled),
 .site-audio-option:hover:not(:disabled) {
   transform: translateY(-1px);
   border-color: var(--line-hover);
@@ -324,7 +299,6 @@ body.project-page {
 
 .site-audio-toggle:disabled,
 .site-audio-mode:disabled,
-.site-audio-trigger:disabled,
 .site-audio-option:disabled {
   cursor: not-allowed;
   opacity: 0.55;
@@ -332,7 +306,6 @@ body.project-page {
 
 .site-audio-toggle:focus-visible,
 .site-audio-mode:focus-visible,
-.site-audio-trigger:focus-visible,
 .site-audio-option:focus-visible {
   outline: 2px solid rgba(95, 127, 255, 0.4);
   outline-offset: 2px;
@@ -353,15 +326,16 @@ body.project-page {
   z-index: 12;
 }
 
-.site-audio-options {
+.site-audio-panel[hidden],
+.site-audio-tracks[hidden] {
+  display: none !important;
+}
+
+.site-audio-tracks {
   display: grid;
   gap: 6px;
   max-height: 220px;
   overflow-y: auto;
-}
-
-.site-audio-track-row {
-  display: grid;
 }
 
 .site-audio-option {
@@ -922,7 +896,6 @@ body.project-page.has-bmc-widget {
   .site-nav-link,
   .pill-link,
   .site-audio-mode,
-  .site-audio-trigger,
   .site-audio-option {
     min-height: 36px;
     padding-inline: 0.85rem;

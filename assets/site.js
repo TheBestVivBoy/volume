@@ -59,16 +59,11 @@ const audioState = {
   panel: null,
   modeOn: null,
   modeOff: null,
-  trackRow: null,
-  trigger: null,
-  triggerLabel: null,
-  options: null,
-  status: null,
+  tracksWrap: null,
   tracks: [],
   enabled: false,
   ready: false,
   panelOpen: false,
-  optionsOpen: false,
   pendingAutoplay: false,
   resumeTime: 0,
   pageVolume: DEFAULT_PAGE_AUDIO_VOLUME,
@@ -498,37 +493,13 @@ function renderSiteHeader() {
               Off
             </button>
 
-            <div class="site-audio-track-row" data-audio-track-row hidden>
-            <button
-              type="button"
-              class="site-audio-trigger"
-              data-audio-trigger
-              aria-haspopup="listbox"
-              aria-expanded="false"
-              aria-controls="site-audio-options"
-            >
-              <span data-audio-trigger-label>Off</span>
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path
-                  d="M4 6.5 8 10l4-3.5"
-                  stroke="currentColor"
-                  stroke-width="1.4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-            </div>
-
             <div
-              class="site-audio-options"
-              id="site-audio-options"
-              data-audio-options
+              class="site-audio-tracks"
+              data-audio-tracks
               role="listbox"
               aria-label="Choose a music track"
               hidden
             ></div>
-            <p class="site-audio-status" data-audio-status hidden></p>
           </div>
         </div>
       </div>
@@ -587,15 +558,10 @@ function getAudioSelectionValue() {
   return getSelectedAudioTrack()?.id || "off";
 }
 
-function getAudioSelectionLabel() {
-  if (!audioState.enabled) return "Off";
-  return getSelectedAudioTrack()?.name || "Off";
-}
-
 function setAudioStatus(message = "") {
-  if (!audioState.status) return;
-  audioState.status.hidden = !message;
-  audioState.status.textContent = message;
+  if (audioState.toggle) {
+    audioState.toggle.title = message || "Toggle site music";
+  }
 }
 
 function syncAudioControls() {
@@ -604,10 +570,7 @@ function syncAudioControls() {
     !audioState.panel ||
     !audioState.modeOn ||
     !audioState.modeOff ||
-    !audioState.trackRow ||
-    !audioState.trigger ||
-    !audioState.triggerLabel ||
-    !audioState.options
+    !audioState.tracksWrap
   ) {
     return;
   }
@@ -620,14 +583,9 @@ function syncAudioControls() {
   audioState.panel.hidden = !audioState.panelOpen;
   audioState.modeOn.classList.toggle("is-selected", audioState.enabled);
   audioState.modeOff.classList.toggle("is-selected", !audioState.enabled);
-  audioState.trackRow.hidden = !audioState.enabled;
-  audioState.trigger.disabled = !audioState.ready && !audioState.tracks.length;
-  audioState.triggerLabel.textContent = getAudioSelectionLabel();
-  audioState.trigger.setAttribute("aria-expanded", String(audioState.optionsOpen));
-  audioState.options.hidden = !audioState.enabled || !audioState.optionsOpen;
-
+  audioState.tracksWrap.hidden = !audioState.enabled;
   const selectedValue = getAudioSelectionValue();
-  audioState.options.querySelectorAll("[data-audio-option]").forEach((button) => {
+  audioState.tracksWrap.querySelectorAll("[data-audio-option]").forEach((button) => {
     const isSelected = button.dataset.audioOption === selectedValue;
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-selected", String(isSelected));
@@ -641,12 +599,6 @@ function syncAudioElementVolume() {
 
 function setAudioPanelOpen(nextOpen) {
   audioState.panelOpen = Boolean(nextOpen);
-  audioState.optionsOpen = false;
-  syncAudioControls();
-}
-
-function setAudioOptionsOpen(nextOpen) {
-  audioState.optionsOpen = Boolean(nextOpen) && audioState.panelOpen;
   syncAudioControls();
 }
 
@@ -812,12 +764,10 @@ function setAudioTrack(track, { resumeTime = 0, autoplay = false } = {}) {
 
 function setAudioEnabled(nextEnabled, { resumeTime } = {}) {
   audioState.enabled = Boolean(nextEnabled) && audioState.tracks.length > 0;
-  audioState.optionsOpen = false;
   writeStoredBoolean(STORAGE_KEYS.audioEnabled, audioState.enabled);
   syncAudioControls();
 
   if (!audioState.enabled) {
-    audioState.optionsOpen = false;
     saveAudioPlaybackState(true);
     audioState.pendingAutoplay = false;
     audioState.audio?.pause();
@@ -842,12 +792,6 @@ function setAudioEnabled(nextEnabled, { resumeTime } = {}) {
 }
 
 function selectAudioOption(value) {
-  if (value === "off") {
-    setAudioEnabled(false);
-    setAudioPanelOpen(false);
-    return;
-  }
-
   const nextTrack =
     audioState.tracks.find((track) => track.id === value) || getSelectedAudioTrack();
   if (!nextTrack) return;
@@ -856,13 +800,12 @@ function selectAudioOption(value) {
   writeStoredNumber(STORAGE_KEYS.audioCurrentTime, 0);
   setAudioEnabled(true, { resumeTime: 0 });
   setAudioStatus("");
-  setAudioPanelOpen(false);
 }
 
 function hydrateAudioTrackOptions() {
-  if (!audioState.options) return;
+  if (!audioState.tracksWrap) return;
 
-  audioState.options.innerHTML = "";
+  audioState.tracksWrap.innerHTML = "";
 
   const selections = audioState.tracks.map((track) => ({
     id: track.id,
@@ -879,7 +822,7 @@ function hydrateAudioTrackOptions() {
     button.addEventListener("click", () => {
       selectAudioOption(selection.id);
     });
-    audioState.options.appendChild(button);
+    audioState.tracksWrap.appendChild(button);
   });
 }
 
@@ -909,21 +852,14 @@ function initSiteAudio() {
   audioState.panel = document.querySelector("[data-audio-panel]");
   audioState.modeOn = document.querySelector('[data-audio-mode="on"]');
   audioState.modeOff = document.querySelector('[data-audio-mode="off"]');
-  audioState.trackRow = document.querySelector("[data-audio-track-row]");
-  audioState.trigger = document.querySelector("[data-audio-trigger]");
-  audioState.triggerLabel = document.querySelector("[data-audio-trigger-label]");
-  audioState.options = document.querySelector("[data-audio-options]");
-  audioState.status = document.querySelector("[data-audio-status]");
+  audioState.tracksWrap = document.querySelector("[data-audio-tracks]");
 
   if (
     !audioState.toggle ||
     !audioState.panel ||
     !audioState.modeOn ||
     !audioState.modeOff ||
-    !audioState.trackRow ||
-    !audioState.trigger ||
-    !audioState.triggerLabel ||
-    !audioState.options
+    !audioState.tracksWrap
   ) {
     return;
   }
@@ -956,12 +892,6 @@ function initSiteAudio() {
     setAudioPanelOpen(!audioState.panelOpen);
   });
 
-  audioState.trigger.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (audioState.trigger.disabled) return;
-    setAudioOptionsOpen(!audioState.optionsOpen);
-  });
-
   audioState.modeOn.addEventListener("click", (event) => {
     event.stopPropagation();
     setAudioEnabled(true);
@@ -970,7 +900,6 @@ function initSiteAudio() {
   audioState.modeOff.addEventListener("click", (event) => {
     event.stopPropagation();
     setAudioEnabled(false);
-    setAudioPanelOpen(false);
   });
 
   document.addEventListener("click", (event) => {
