@@ -641,9 +641,7 @@ function syncAudioElementVolume() {
 
 function setAudioPanelOpen(nextOpen) {
   audioState.panelOpen = Boolean(nextOpen);
-  if (!audioState.panelOpen) {
-    audioState.optionsOpen = false;
-  }
+  audioState.optionsOpen = false;
   syncAudioControls();
 }
 
@@ -814,6 +812,7 @@ function setAudioTrack(track, { resumeTime = 0, autoplay = false } = {}) {
 
 function setAudioEnabled(nextEnabled, { resumeTime } = {}) {
   audioState.enabled = Boolean(nextEnabled) && audioState.tracks.length > 0;
+  audioState.optionsOpen = false;
   writeStoredBoolean(STORAGE_KEYS.audioEnabled, audioState.enabled);
   syncAudioControls();
 
