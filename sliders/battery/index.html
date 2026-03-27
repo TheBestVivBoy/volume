@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Battery | Volume</title>
+    <meta name="description" content="Plug in to charge. Unplug to drain." />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Battery | Volume" />
+    <meta
+      property="og:description"
+      content="Plug in to charge. Unplug to drain."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/battery/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Battery | Volume" />
+    <meta
+      name="twitter:description"
+      content="Plug in to charge. Unplug to drain."
+    />
+    <link
+      rel="canonical"
+      href="https://vivancodes.com/sliders/battery/"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../../assets/vivancodes_logo.png"
+    />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --ink: #161615;
+        --muted: #706e68;
+        --panel: rgba(255, 255, 255, 0.82);
+        --line: rgba(23, 23, 23, 0.1);
+        --track-bg: #d9d8d3;
+        --fill: #171717;
+        --wire: #1c1c1c;
+        --bolt: #39b85d;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(76vh, 860px);
+        width: 100%;
+      }
+
+      .app {
+        width: min(94vw, 560px);
+        display: grid;
+        gap: 16px;
+        justify-items: center;
+      }
+
+      .volume-readout {
+        margin: 0;
+        font-size: clamp(3rem, 10vw, 5rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.055em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .control-card {
+        width: 100%;
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .status-line {
+        min-height: 1.4em;
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .stage-frame {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(180deg, #fcfbf8 0%, #f4f2ec 100%);
+        height: 108px;
+        touch-action: none;
+      }
+
+      /* SVG wire — sized by JS to match actual pixels */
+      .wire-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: visible;
+      }
+
+      .wire-layer path {
+        stroke: var(--wire);
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      /* Tiny socket slot */
+      .socket {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 8px;
+        height: 14px;
+        transform: translateY(-50%);
+        background: rgba(23, 23, 23, 0.1);
+        border-radius: 0 3px 3px 0;
+      }
+
+      /* Track — left/right set by JS in actual px */
+      .track {
+        position: absolute;
+        top: 50%;
+        height: 4px;
+        transform: translateY(-50%);
+        border-radius: 999px;
+        background: var(--track-bg);
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .track-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: 999px;
+        background: var(--fill);
+      }
+
+      /* Small knob — positioned in actual px */
+      .knob {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid rgba(17, 17, 17, 0.14);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .knob-bolt {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+
+      .knob.is-charging .knob-bolt {
+        opacity: 1;
+      }
+
+      .knob-bolt svg {
+        width: 7px;
+        height: 7px;
+        fill: var(--bolt);
+      }
+
+      /* Simple plug: small pill, no complex sub-elements */
+      .plug {
+        position: absolute;
+        width: 18px;
+        height: 10px;
+        transform: translate(-50%, -50%);
+        background: #1a1a1a;
+        border-radius: 3px;
+        border: 0;
+        padding: 0;
+        cursor: grab;
+        touch-action: none;
+        z-index: 3;
+      }
+
+      /* Tiny prong at right end */
+      .plug::after {
+        content: "";
+        position: absolute;
+        right: -4px;
+        top: 50%;
+        width: 4px;
+        height: 6px;
+        transform: translateY(-50%);
+        background: #2a2a2a;
+        border-radius: 0 2px 2px 0;
+      }
+
+      .plug:active {
+        cursor: grabbing;
+      }
+
+      .plug:focus-visible {
+        outline: 2px solid #171717;
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+        .control-card {
+          padding: 16px;
+          border-radius: 22px;
+        }
+        .stage-frame {
+          height: 96px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .knob-bolt {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Battery</h1>
+          <p>Plug in to charge. Unplug to drain.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="app" aria-label="Battery volume control">
+          <p class="volume-readout" id="volumeLabel" aria-live="polite">0%</p>
+
+          <div class="control-card">
+            <div class="status-line" id="statusLine">Plug in to charge.</div>
+
+            <div class="stage-frame" id="stageFrame">
+              <svg class="wire-layer" id="wireLayer" aria-hidden="true">
+                <path id="wirePath"></path>
+              </svg>
+
+              <div class="socket" aria-hidden="true"></div>
+
+              <div class="track" id="trackEl" aria-hidden="true">
+                <div class="track-fill" id="trackFill"></div>
+              </div>
+
+              <div class="knob" id="knob" aria-hidden="true">
+                <div class="knob-bolt">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M13.3 2L6.8 12.1h4L9.9 22l7.3-10.4h-4.2L13.3 2Z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+
+              <button
+                class="plug"
+                id="plug"
+                type="button"
+                aria-describedby="statusLine"
+                aria-label="Charging cable"
+                aria-pressed="false"
+              ></button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const stageFrame = document.getElementById("stageFrame");
+      const wireLayer = document.getElementById("wireLayer");
+      const wirePath = document.getElementById("wirePath");
+      const trackEl = document.getElementById("trackEl");
+      const trackFill = document.getElementById("trackFill");
+      const knob = document.getElementById("knob");
+      const plug = document.getElementById("plug");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const statusLine = document.getElementById("statusLine");
+
+      const CHARGE_RATE = 100 / 10;
+      const DRAIN_RATE = 100 / 20;
+      const SNAP_DISTANCE = 14;
+      const DETACH_DISTANCE = 16;
+
+      // Plug geometry (matches CSS: 18px body + 4px prong)
+      const PLUG_BODY_HALF = 9; // half of 18px body — used for wire tail
+      const PLUG_TIP_REACH = 13; // body half + prong (9 + 4) — used for snap & attach
+
+      // Track insets in actual px from frame edges
+      const TRACK_L = 26;
+      const TRACK_R = 20;
+
+      const state = {
+        width: 0,
+        height: 0,
+        trackLeft: 0,
+        trackRight: 0,
+        trackWidth: 0,
+        trackY: 0,
+        charge: 0,
+        attached: false,
+        dragging: false,
+        pointerId: null,
+        dragOffsetX: 0,
+        dragOffsetY: 0,
+        dragStartX: 0,
+        dragStartY: 0,
+        freePlugX: 0,
+        freePlugY: 0,
+        lastTime: performance.now(),
+      };
+
+      function clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+      }
+
+      function knobX() {
+        return state.trackLeft + (state.charge / 100) * state.trackWidth;
+      }
+
+      // When attached, plug tip aligns with knob center
+      function attachedPlugCenter() {
+        return { x: knobX() - PLUG_TIP_REACH, y: state.trackY };
+      }
+
+      function plugCenter() {
+        if (state.attached && !state.dragging) return attachedPlugCenter();
+        return { x: state.freePlugX, y: state.freePlugY };
+      }
+
+      function setCharge(v) {
+        state.charge = clamp(v, 0, 100);
+      }
+
+      function plugClampX(x) {
+        return clamp(x, 16, state.width - 12);
+      }
+      function plugClampY(y) {
+        return clamp(y, 10, state.height - 10);
+      }
+
+      function updateStatus() {
+        if (state.dragging && !state.attached) {
+          statusLine.textContent = "Plug into the dot.";
+          return;
+        }
+        if (state.attached) {
+          statusLine.textContent =
+            state.charge >= 100 ? "Charged." : "Charging.";
+          return;
+        }
+        statusLine.textContent =
+          state.charge > 0 ? "Unplugged." : "Plug in to charge.";
+      }
+
+      function renderWire(cx, cy) {
+        // Wire runs from socket (~x:8, trackY) to the left tail of the plug
+        const tailX = cx - PLUG_BODY_HALF;
+        const ax = 8;
+        const ay = state.trackY;
+        const sag = clamp(cy - ay, 0, 18);
+        const c1x = ax + 28;
+        const c1y = ay;
+        const c2x = tailX - 22;
+        const c2y = cy - sag * 0.4;
+        wirePath.setAttribute(
+          "d",
+          `M ${ax} ${ay} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${tailX} ${cy}`,
+        );
+      }
+
+      function render() {
+        const kx = knobX();
+        const ky = state.trackY;
+        const pc = plugCenter();
+        const pct = Math.round(state.charge);
+
+        volumeLabel.textContent = `${pct}%`;
+        trackFill.style.width = `${state.charge}%`;
+
+        // Pixel-exact positioning — no logical-space scaling
+        knob.style.left = `${kx}px`;
+        knob.style.top = `${ky}px`;
+        knob.classList.toggle("is-charging", state.attached);
+
+        plug.style.left = `${pc.x}px`;
+        plug.style.top = `${pc.y}px`;
+        plug.setAttribute("aria-pressed", String(state.attached));
+        plug.setAttribute(
+          "aria-label",
+          state.attached
+            ? `Charging cable plugged in at ${pct} percent`
+            : `Charging cable unplugged at ${pct} percent`,
+        );
+
+        renderWire(pc.x, pc.y);
+        updateStatus();
+      }
+
+      function tryAttach() {
+        const pc = plugCenter();
+        const tipX = pc.x + PLUG_TIP_REACH;
+        const kx = knobX();
+        const dist = Math.hypot(tipX - kx, pc.y - state.trackY);
+        if (dist <= SNAP_DISTANCE) {
+          state.attached = true;
+          render();
+          return true;
+        }
+        return false;
+      }
+
+      function stagePoint(e) {
+        const r = stageFrame.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+
+      plug.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        const pt = stagePoint(e);
+        const cur = plugCenter();
+        state.dragging = true;
+        state.pointerId = e.pointerId;
+        state.dragOffsetX = pt.x - cur.x;
+        state.dragOffsetY = pt.y - cur.y;
+        state.dragStartX = pt.x;
+        state.dragStartY = pt.y;
+        plug.setPointerCapture(e.pointerId);
+      });
+
+      plug.addEventListener("pointermove", (e) => {
+        if (!state.dragging || e.pointerId !== state.pointerId) return;
+        const pt = stagePoint(e);
+
+        if (state.attached) {
+          if (
+            Math.hypot(pt.x - state.dragStartX, pt.y - state.dragStartY) >
+            DETACH_DISTANCE
+          ) {
+            state.attached = false;
+            state.freePlugX = plugClampX(pt.x - state.dragOffsetX);
+            state.freePlugY = plugClampY(pt.y - state.dragOffsetY);
+          }
+        } else {
+          state.freePlugX = plugClampX(pt.x - state.dragOffsetX);
+          state.freePlugY = plugClampY(pt.y - state.dragOffsetY);
+        }
+        render();
+      });
+
+      function endDrag(e) {
+        if (!state.dragging || e.pointerId !== state.pointerId) return;
+        state.dragging = false;
+        if (plug.hasPointerCapture(e.pointerId))
+          plug.releasePointerCapture(e.pointerId);
+        state.pointerId = null;
+        if (!state.attached) tryAttach();
+        render();
+      }
+
+      plug.addEventListener("pointerup", endDrag);
+      plug.addEventListener("pointercancel", endDrag);
+
+      plug.addEventListener("keydown", (e) => {
+        if (e.key !== " " && e.key !== "Enter") return;
+        e.preventDefault();
+        state.attached = !state.attached;
+        if (!state.attached) {
+          const cur = attachedPlugCenter();
+          state.freePlugX = plugClampX(cur.x);
+          state.freePlugY = plugClampY(state.trackY + 22);
+        }
+        render();
+      });
+
+      function updateLayout() {
+        const isFirst = state.width === 0;
+
+        state.width = stageFrame.clientWidth;
+        state.height = stageFrame.clientHeight;
+        state.trackLeft = TRACK_L;
+        state.trackRight = state.width - TRACK_R;
+        state.trackWidth = state.trackRight - state.trackLeft;
+        state.trackY = Math.round(state.height / 2);
+
+        // Apply track CSS in actual pixels so it matches knob positioning exactly
+        trackEl.style.left = `${TRACK_L}px`;
+        trackEl.style.right = `${TRACK_R}px`;
+
+        // SVG viewBox = actual pixel space; no coordinate scaling needed
+        wireLayer.setAttribute("viewBox", `0 0 ${state.width} ${state.height}`);
+        wireLayer.setAttribute("width", state.width);
+        wireLayer.setAttribute("height", state.height);
+
+        if (isFirst) {
+          // Start plug below the track, near the left
+          state.freePlugX = state.trackLeft + 20;
+          state.freePlugY = state.trackY + 26;
+        } else {
+          state.freePlugX = plugClampX(state.freePlugX);
+          state.freePlugY = plugClampY(state.freePlugY);
+        }
+
+        render();
+      }
+
+      function tick(now) {
+        const dt = Math.min((now - state.lastTime) / 1000, 0.05);
+        state.lastTime = now;
+        setCharge(
+          state.charge + (state.attached ? CHARGE_RATE : -DRAIN_RATE) * dt,
+        );
+        render();
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("resize", updateLayout, { passive: true });
+      updateLayout();
+      requestAnimationFrame(tick);
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

@@ -26,8 +26,10 @@ let deferredAudioUnlockBound = false;
 
 const AUDIO_VOLUME_SELECTORS_BY_SLUG = {
   alphabetical: ["#volumeLabel"],
+  battery: ["#volumeLabel"],
   cannon: ["#volLabel"],
   crank: ["#volumeLabel"],
+  dino: ["#volumeLabel"],
   curling: ["#titleLabel"],
   drag: ["#percent"],
   dropdown: ["#selectedVolume", "#volumeSelect"],
@@ -77,6 +79,20 @@ const sliders = [
     description: "Numbers organised by letters? Strange.",
     slug: "alphabetical",
     path: "sliders/alphabetical/",
+  },
+  {
+    title: "Battery",
+    description: "Plug in to charge. Unplug to drain.",
+    slug: "battery",
+    path: "sliders/battery/",
+    preview: false,
+  },
+  {
+    title: "Dino",
+    description: "The classic no-internet game!",
+    slug: "dino",
+    path: "sliders/dino/",
+    preview: false,
   },
   {
     title: "Cannon",
@@ -346,7 +362,10 @@ function readPreviewGifCacheMeta() {
 
 function writePreviewGifCacheMeta(meta) {
   if (!supportsStorage()) return;
-  window.localStorage.setItem(STORAGE_KEYS.previewGifCacheMeta, JSON.stringify(meta));
+  window.localStorage.setItem(
+    STORAGE_KEYS.previewGifCacheMeta,
+    JSON.stringify(meta),
+  );
 }
 
 function trimPreviewGifCacheMeta(meta, now) {
@@ -377,7 +396,10 @@ function bindPreviewGifCleanup() {
 async function loadGifSourceFromCache(gifSrc) {
   const now = Date.now();
   const cachedObjectUrl = previewGifObjectUrls.get(gifSrc);
-  if (cachedObjectUrl && now - cachedObjectUrl.fetchedAt < PREVIEW_GIF_CACHE_TTL_MS) {
+  if (
+    cachedObjectUrl &&
+    now - cachedObjectUrl.fetchedAt < PREVIEW_GIF_CACHE_TTL_MS
+  ) {
     return cachedObjectUrl.objectUrl;
   }
   if (cachedObjectUrl) {
@@ -520,7 +542,9 @@ function encodeAssetPath(path) {
 }
 
 function buildAudioTrackSrc(track) {
-  const version = track.version ? `?v=${encodeURIComponent(track.version)}` : "";
+  const version = track.version
+    ? `?v=${encodeURIComponent(track.version)}`
+    : "";
   return `${buildInternalHref(encodeAssetPath(`assets/audio/${track.file}`))}${version}`;
 }
 
@@ -550,7 +574,10 @@ function getStoredAudioTime() {
 function getSelectedAudioTrack() {
   if (!audioState.tracks.length) return null;
   const selectedTrackId = getStoredAudioTrackId() || audioState.tracks[0].id;
-  return audioState.tracks.find((track) => track.id === selectedTrackId) || audioState.tracks[0];
+  return (
+    audioState.tracks.find((track) => track.id === selectedTrackId) ||
+    audioState.tracks[0]
+  );
 }
 
 function getAudioSelectionValue() {
@@ -585,11 +612,13 @@ function syncAudioControls() {
   audioState.modeOff.classList.toggle("is-selected", !audioState.enabled);
   audioState.tracksWrap.hidden = !audioState.enabled;
   const selectedValue = getAudioSelectionValue();
-  audioState.tracksWrap.querySelectorAll("[data-audio-option]").forEach((button) => {
-    const isSelected = button.dataset.audioOption === selectedValue;
-    button.classList.toggle("is-selected", isSelected);
-    button.setAttribute("aria-selected", String(isSelected));
-  });
+  audioState.tracksWrap
+    .querySelectorAll("[data-audio-option]")
+    .forEach((button) => {
+      const isSelected = button.dataset.audioOption === selectedValue;
+      button.classList.toggle("is-selected", isSelected);
+      button.setAttribute("aria-selected", String(isSelected));
+    });
 }
 
 function syncAudioElementVolume() {
@@ -708,12 +737,18 @@ function initAudioVolumeSync() {
 
 function applyAudioResumeTime() {
   if (!audioState.audio || !audioState.resumeTime) return;
-  if (!Number.isFinite(audioState.audio.duration) || audioState.audio.duration <= 0)
+  if (
+    !Number.isFinite(audioState.audio.duration) ||
+    audioState.audio.duration <= 0
+  )
     return;
 
   const safeTime = Math.max(
     0,
-    Math.min(audioState.resumeTime, Math.max(audioState.audio.duration - 0.35, 0)),
+    Math.min(
+      audioState.resumeTime,
+      Math.max(audioState.audio.duration - 0.35, 0),
+    ),
   );
   audioState.audio.currentTime = safeTime;
   audioState.resumeTime = 0;
@@ -793,7 +828,8 @@ function setAudioEnabled(nextEnabled, { resumeTime } = {}) {
 
 function selectAudioOption(value) {
   const nextTrack =
-    audioState.tracks.find((track) => track.id === value) || getSelectedAudioTrack();
+    audioState.tracks.find((track) => track.id === value) ||
+    getSelectedAudioTrack();
   if (!nextTrack) return;
 
   writeStoredString(STORAGE_KEYS.audioTrackId, nextTrack.id);
@@ -998,7 +1034,9 @@ function renderGrid() {
 function mountHomePreviews() {
   if (!supportsCardPreviews()) return;
 
-  const cards = document.querySelectorAll(".collection-card[data-preview-poster-src]");
+  const cards = document.querySelectorAll(
+    ".collection-card[data-preview-poster-src]",
+  );
   if (!cards.length) return;
 
   const injectPreview = (card) => {

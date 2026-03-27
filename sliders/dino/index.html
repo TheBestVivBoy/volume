@@ -1,0 +1,1678 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dino | Volume</title>
+    <meta name="description" content="The classic no-internet game!" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Dino | Volume" />
+    <meta property="og:description" content="The classic no-internet game!" />
+    <meta property="og:url" content="https://vivancodes.com/sliders/dino/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dino | Volume" />
+    <meta name="twitter:description" content="The classic no-internet game!" />
+    <link rel="canonical" href="https://vivancodes.com/sliders/dino/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(74vh, 860px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      .wrap {
+        width: min(96vw, 640px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 1.18rem;
+        font-weight: 600;
+        color: #111;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(3.75rem, 12vw, 5.4rem);
+        font-weight: 300;
+        line-height: 0.94;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+        color: #111;
+      }
+
+      .shell {
+        background: #fff;
+        border: 1.5px solid #e5e1d9;
+        border-radius: 20px;
+        padding: 14px;
+        box-shadow: 0 10px 28px rgba(17, 17, 17, 0.05);
+      }
+
+      .playfield {
+        width: min(100%, 600px);
+        margin: 0 auto;
+        border: 1.5px solid #ece7dd;
+        border-radius: 16px;
+        background: #f7f7f7;
+        overflow: hidden;
+        outline: none;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .playfield:focus-visible {
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .runner-host {
+        width: 100%;
+        position: relative;
+      }
+
+      .runner-container {
+        height: 150px;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+      }
+
+      .runner-canvas {
+        display: block;
+        height: 150px;
+        image-rendering: pixelated;
+      }
+
+      .controller {
+        display: none;
+      }
+
+      .sprite-cache {
+        display: none;
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Dino</h1>
+          <p>The score is volume.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Dino volume control">
+          <div class="volume" id="volumeLabel">Volume: 0.00%</div>
+
+          <div class="shell">
+            <div
+              class="playfield"
+              id="playfield"
+              tabindex="0"
+              role="button"
+              aria-label="Chrome Dino game"
+            >
+              <div class="runner-host" id="runnerHost"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="sprite-cache" aria-hidden="true">
+      <img
+        id="1x-obstacle-large"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAyCAMAAACJUtIoAAAACVBMVEX////39/dTU1OabbyfAAAAAXRSTlMAQObYZgAAAXhJREFUeF7t2NGqAjEMANGM///RlwvaYQndULuFPJgHUYaEI6IPhgNAOA8HZ+3U6384F5y1U6YzAZTWG+dZamnFEstBFtCKJZSHWMADLJ18z+JqpQeLdKoDC8siC5iFCQs4znIxB5B1t6F3lQWkL4N0JsF+u6GXJdbI+FKW+yWr3lhgCZ2VSag3Nlk/FnRkIRbasLCO0oulikMsvmGpeiGLZ1jOMgtIP5bODivYYUXEIVbwFCt4khVssRgsgidZwQaLd2A8m7MYLGTl4KeQQs2y4kMAMGGlmQViDIb5O6xZnnLD485dIBzqDSE1yyFdL4Iqu4XJqUUWl/NVAFSZq1P6a5aqbAUM2epQbBioWflUBABiUyhYyZoCBev8XyMAObDNOhOAfiyxmHU0YNlldGAphGjFCjA3YkUn1o/1Y3EkZFZ5isCC6NUgwDBn1RuXH96doNfAhDXfsIyJ2AnolcCVhay0kcYbW0HvCO8OwIcJ3GzkORpkFuUP/1Ec8FW1qJkAAAAASUVORK5CYII="
+      />
+      <img
+        id="1x-obstacle-small"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAAAjCAMAAABRlI+PAAAADFBMVEX////////39/dTU1PhglcSAAAAAXRSTlMAQObYZgAAAPNJREFUeF7tlkEKwzAMBLXr//+5iQhU7gRRQkyhZI+DhwH74jhmO+oIJBVwURljuAXagG5QqkSgBLqg3JnxJ1Cb8SmQ3o6gpO85owGlOB4m2BNKJ11BSd01owGlOHkcIAuHkz6UNpPKgozPM54dADHjJuNhZiJxdQCQgZJeBczgCAAy3yhPJvcnmdC9mZwBIsQMFV5AkzHBNknFgcKM+oyDIFcfCAoy03m+jSMIcmoVZkKqSjr1fghyahRmoKRUHYLiSI1SMlCq5CDgX6BXmKkfn+oQ0KEyyrzoy8GbXJ9xrM/YjhUZgl9nnsyTCe9rgSRdV15CwRcIEu8GGQAAAABJRU5ErkJggg=="
+      />
+      <img
+        id="1x-cloud"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAOCAQAAAD6HOaKAAAAU0lEQVR4XrWSsQkAQAgD3X9El/ELixQpJHCfdApnUCtXz7o49cgagaGPaq4rIwAP9s/C7R7UX3inJ0BDb6qWDC7ScOR/QWjRlFizuPwLtTLj+qkH6DjD2wLtikUAAAAASUVORK5CYII="
+      />
+      <img
+        id="1x-text"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL8AAAAYAgMAAADWncTDAAAABlBMVEX///9TU1NYzE1OAAAAAXRSTlMAQObYZgAAAO1JREFUeF690TFqxUAQA1BNoRtk7jMu3E9Auv9Vgr/5A863Y9zEhVhkHmhZsEGkw4Lppmllh1tcLHx+aRj2YnEDuQFvcQW+EoZY0TQLCZbEVxRxAvY+i8ikW0C0bwFdbictG2zvu/4EcCuBF0B23IBsQHZBYgm1n86BN+BmyV5rQFyCJAiDJSTfgBV9BbjvXdzIcKchpMOYd3gO/jvCeuUGFALg95J0/SrtQlrzz+sAjDwCIQsbWAdgbqrQpKYRjmPuAfU5dMC+c0rxOTiO+T6ZlK4pbcDLI1DIRaf3GxDGALkQHnD+cGhMKeox+AEOL3mLO7TQZgAAAABJRU5ErkJggg=="
+      />
+      <img
+        id="1x-horizon"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABLAAAAAMAgMAAAAPCKxBAAAABlBMVEX///9TU1NYzE1OAAAAAXRSTlMAQObYZgAAALJJREFUeF7t1EEKAyEMhtEvMNm7sPfJEVyY+1+ltLgYAsrQCtWhbxEhQvgxIJtSZypxa/WGshgzKdbq/UihMFMlt3o/CspEYoihIMaAb6mCvM6C+BTAeyo+wN4yykV/6pVfkdLpVyI1hh7GJ6QunUoLEQlQglNP2nkQkeF8+ei9cLxMue1qxVRfk1Ej0s6AEGWfVOk0QUtnK5Xo0Lac6wpdtnQqB6VxomPaz+dgF1PaqqmeWJlz1jYUaSIAAAAASUVORK5CYII="
+      />
+      <img
+        id="1x-trex"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAAvAgMAAABiRrxWAAAADFBMVEX///9TU1P39/f///+TS9URAAAAAXRSTlMAQObYZgAAAPpJREFUeF7d0jFKRkEMhdGLMM307itNLALyVmHvJuzTDMjdn72E95PGFEZSmeoU4YMMgxhskvQec8YSVFX1NhGcS5ywtbmC8khcZeKq+ZWJ4F8Sr2+ZCErjkJFEfcjAc/6/BMlfcz6xHdhRthYzIZhIHMcTVY1scUUiAphK8CMSPUbieTBhvD9Lj0vyV4wklEGzHpciKGOJoBp7XDcFs4kWxxM7Ey3iZ8JbzASAvMS7XLOJHTTvEkEZSeQl7DMuwVyCasqK5+XzQRYLUJlMbPXjFcn3m8eKBSjWZMJwvGIOvViAzCbUj1VEDoqFOEQGE3SyInJQLOQMJL4B7enP1UbLXJQAAAAASUVORK5CYII="
+      />
+      <img
+        id="1x-restart"
+        alt=""
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAgCAQAAADQmBIFAAAAZklEQVR4Xu3WMQoAIAxDUe/Y+58jYwV1CwQJWQT5o/DAoaWjV2i/LRym/A5FjEsR41LPQchByEHwIVAEC4gZpghmSDP8egXpr/hQZaAKQFQe+pBOQAblDC336qrlPpSg0MEjInbWTLFFmwc8TpTAAAAAAElFTkSuQmCC"
+      />
+    </div>
+
+    <script src="../../assets/site.js" defer></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const volumeLabelEl = document.getElementById("volumeLabel");
+        const hostEl = document.getElementById("runnerHost");
+        const playfieldEl = document.getElementById("playfield");
+
+        function formatVolume(score) {
+          const safeScore = Number.isFinite(score) ? Math.max(0, score) : 0;
+          return `Volume: ${(safeScore / 100).toFixed(2)}%`;
+        }
+
+        function syncVolume(value) {
+          volumeLabelEl.textContent = formatVolume(value);
+        }
+
+        function getRandomNum(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getTimeStamp() {
+          return performance.now();
+        }
+
+        function createCanvas(container, width, height, className) {
+          const canvas = document.createElement("canvas");
+          canvas.className = className || "runner-canvas";
+          canvas.width = width;
+          canvas.height = height;
+          container.appendChild(canvas);
+          return canvas;
+        }
+
+        const DEFAULT_WIDTH = 600;
+        const FPS = 60;
+        const IS_HIDPI = false;
+        const IS_IOS =
+          window.navigator.userAgent.indexOf("UIWebViewForStaticFileContent") >
+          -1;
+        const IS_MOBILE =
+          window.navigator.userAgent.indexOf("Mobi") > -1 || IS_IOS;
+        const IS_TOUCH_ENABLED = "ontouchstart" in window;
+
+        function Runner(outerContainerSelector, opt_config) {
+          if (Runner.instance_) {
+            return Runner.instance_;
+          }
+
+          Runner.instance_ = this;
+          this.outerContainerEl = document.querySelector(
+            outerContainerSelector,
+          );
+          this.containerEl = null;
+          this.config = opt_config || Runner.config;
+          this.dimensions = {
+            WIDTH: Runner.defaultDimensions.WIDTH,
+            HEIGHT: Runner.defaultDimensions.HEIGHT,
+          };
+          this.canvas = null;
+          this.canvasCtx = null;
+          this.tRex = null;
+          this.distanceMeter = null;
+          this.horizon = null;
+          this.distanceRan = 0;
+          this.highestScore = 0;
+          this.time = 0;
+          this.runningTime = 0;
+          this.msPerFrame = 1000 / FPS;
+          this.currentSpeed = this.config.SPEED;
+          this.activated = false;
+          this.crashed = false;
+          this.paused = false;
+          this.resizeTimerId_ = null;
+          this.raqId = 0;
+          this.images = {};
+          this.loadImages();
+        }
+
+        Runner.config = {
+          ACCELERATION: 0.001,
+          BG_CLOUD_SPEED: 0.2,
+          BOTTOM_PAD: 10,
+          CLEAR_TIME: 3000,
+          CLOUD_FREQUENCY: 0.5,
+          GAMEOVER_CLEAR_TIME: 750,
+          GAP_COEFFICIENT: 0.6,
+          GRAVITY: 0.6,
+          INITIAL_JUMP_VELOCITY: 12,
+          MAX_CLOUDS: 6,
+          MAX_OBSTACLE_LENGTH: 3,
+          MAX_SPEED: 12,
+          MIN_JUMP_HEIGHT: 35,
+          MOBILE_SPEED_COEFFICIENT: 1.2,
+          SPEED: 6,
+          SPEED_DROP_COEFFICIENT: 3,
+        };
+
+        Runner.defaultDimensions = {
+          WIDTH: DEFAULT_WIDTH,
+          HEIGHT: 150,
+        };
+
+        Runner.classes = {
+          CANVAS: "runner-canvas",
+          CONTAINER: "runner-container",
+          CRASHED: "crashed",
+          TOUCH_CONTROLLER: "controller",
+        };
+
+        Runner.imageSources = [
+          { name: "CACTUS_LARGE", id: "1x-obstacle-large" },
+          { name: "CACTUS_SMALL", id: "1x-obstacle-small" },
+          { name: "CLOUD", id: "1x-cloud" },
+          { name: "HORIZON", id: "1x-horizon" },
+          { name: "RESTART", id: "1x-restart" },
+          { name: "TEXT_SPRITE", id: "1x-text" },
+          { name: "TREX", id: "1x-trex" },
+        ];
+
+        Runner.keycodes = {
+          JUMP: { 38: 1, 32: 1 },
+          DUCK: { 40: 1 },
+          RESTART: { 13: 1 },
+        };
+
+        Runner.events = {
+          KEYDOWN: "keydown",
+          KEYUP: "keyup",
+          RESIZE: "resize",
+          TOUCHEND: "touchend",
+          TOUCHSTART: "touchstart",
+          MOUSEDOWN: "mousedown",
+          MOUSEUP: "mouseup",
+          VISIBILITY: "visibilitychange",
+          BLUR: "blur",
+          FOCUS: "focus",
+        };
+
+        Runner.prototype = {
+          loadImages: function () {
+            for (let i = 0; i < Runner.imageSources.length; i += 1) {
+              const imgSource = Runner.imageSources[i];
+              this.images[imgSource.name] = document.getElementById(
+                imgSource.id,
+              );
+            }
+            this.init();
+          },
+
+          setSpeed: function (opt_speed) {
+            const speed = opt_speed || this.currentSpeed;
+            if (this.dimensions.WIDTH < DEFAULT_WIDTH) {
+              const mobileSpeed =
+                ((speed * this.dimensions.WIDTH) / DEFAULT_WIDTH) *
+                this.config.MOBILE_SPEED_COEFFICIENT;
+              this.currentSpeed = mobileSpeed > speed ? speed : mobileSpeed;
+            } else if (opt_speed) {
+              this.currentSpeed = opt_speed;
+            }
+          },
+
+          init: function () {
+            this.adjustDimensions();
+            this.setSpeed();
+
+            this.containerEl = document.createElement("div");
+            this.containerEl.className = Runner.classes.CONTAINER;
+            this.containerEl.style.width = `${this.dimensions.WIDTH}px`;
+            this.containerEl.style.height = `${this.dimensions.HEIGHT}px`;
+
+            this.canvas = createCanvas(
+              this.containerEl,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+              Runner.classes.CANVAS,
+            );
+            this.canvasCtx = this.canvas.getContext("2d");
+            this.canvasCtx.fillStyle = "#f7f7f7";
+            this.canvasCtx.fillRect(
+              0,
+              0,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+            );
+
+            this.horizon = new Horizon(
+              this.canvas,
+              this.images,
+              this.dimensions,
+              this.config.GAP_COEFFICIENT,
+            );
+            this.distanceMeter = new DistanceMeter(
+              this.canvas,
+              this.images.TEXT_SPRITE,
+              this.dimensions.WIDTH,
+            );
+            this.tRex = new Trex(this.canvas, this.images.TREX);
+
+            this.outerContainerEl.appendChild(this.containerEl);
+
+            if (IS_MOBILE && IS_TOUCH_ENABLED) {
+              this.createTouchController();
+            }
+
+            this.startListening();
+            syncVolume(0);
+            this.update();
+
+            window.addEventListener(
+              Runner.events.RESIZE,
+              this.debounceResize.bind(this),
+              { passive: true },
+            );
+            window.addEventListener(
+              Runner.events.VISIBILITY,
+              this.onVisibilityChange.bind(this),
+            );
+            window.addEventListener(
+              Runner.events.BLUR,
+              this.onVisibilityChange.bind(this),
+            );
+            window.addEventListener(
+              Runner.events.FOCUS,
+              this.onVisibilityChange.bind(this),
+            );
+          },
+
+          createTouchController: function () {
+            this.touchController = document.createElement("div");
+            this.touchController.className = Runner.classes.TOUCH_CONTROLLER;
+            this.outerContainerEl.appendChild(this.touchController);
+          },
+
+          debounceResize: function () {
+            clearTimeout(this.resizeTimerId_);
+            this.resizeTimerId_ = setTimeout(
+              this.adjustDimensions.bind(this),
+              120,
+            );
+          },
+
+          adjustDimensions: function () {
+            const width = Math.min(
+              DEFAULT_WIDTH,
+              Math.max(320, this.outerContainerEl.offsetWidth || DEFAULT_WIDTH),
+            );
+            this.dimensions.WIDTH = width;
+            this.dimensions.HEIGHT = Runner.defaultDimensions.HEIGHT;
+
+            if (this.canvas) {
+              this.containerEl.style.width = `${this.dimensions.WIDTH}px`;
+              this.containerEl.style.height = `${this.dimensions.HEIGHT}px`;
+              this.canvas.width = this.dimensions.WIDTH;
+              this.canvas.height = this.dimensions.HEIGHT;
+              this.distanceMeter.calcXPos(this.dimensions.WIDTH);
+              this.clearCanvas();
+              this.horizon.resize(
+                this.dimensions.WIDTH,
+                this.dimensions.HEIGHT,
+              );
+              this.horizon.reset();
+              this.horizon.update(0, this.currentSpeed, false);
+              this.tRex.draw(0, 0);
+
+              if (this.gameOverPanel) {
+                this.gameOverPanel.updateDimensions(this.dimensions.WIDTH);
+                this.gameOverPanel.draw();
+              }
+            }
+          },
+
+          clearCanvas: function () {
+            this.canvasCtx.clearRect(
+              0,
+              0,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+            );
+            this.canvasCtx.fillStyle = "#f7f7f7";
+            this.canvasCtx.fillRect(
+              0,
+              0,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+            );
+          },
+
+          update: function () {
+            this.drawPending = false;
+            const now = getTimeStamp();
+            let deltaTime = now - (this.time || now);
+            this.time = now;
+
+            if (this.activated) {
+              this.clearCanvas();
+
+              if (this.tRex.jumping) {
+                this.tRex.updateJump(deltaTime);
+              }
+
+              this.runningTime += deltaTime;
+              const hasObstacles = this.runningTime > this.config.CLEAR_TIME;
+
+              this.horizon.update(deltaTime, this.currentSpeed, hasObstacles);
+
+              const collision =
+                hasObstacles &&
+                this.horizon.obstacles.length &&
+                checkForCollision(this.horizon.obstacles[0], this.tRex);
+
+              if (!collision) {
+                this.distanceRan +=
+                  (this.currentSpeed * deltaTime) / this.msPerFrame;
+                if (this.currentSpeed < this.config.MAX_SPEED) {
+                  this.currentSpeed += this.config.ACCELERATION;
+                }
+              } else {
+                this.gameOver();
+              }
+
+              if (
+                this.distanceMeter.getActualDistance(this.distanceRan) >
+                this.distanceMeter.maxScore
+              ) {
+                this.distanceRan = 0;
+              }
+
+              this.distanceMeter.update(deltaTime, Math.ceil(this.distanceRan));
+              syncVolume(
+                this.distanceMeter.getActualDistance(this.distanceRan),
+              );
+            }
+
+            if (!this.crashed) {
+              this.tRex.update(deltaTime);
+              this.raq();
+            }
+          },
+
+          handleEvent: function (e) {
+            switch (e.type) {
+              case Runner.events.KEYDOWN:
+              case Runner.events.TOUCHSTART:
+              case Runner.events.MOUSEDOWN:
+                this.onKeyDown(e);
+                break;
+              case Runner.events.KEYUP:
+              case Runner.events.TOUCHEND:
+              case Runner.events.MOUSEUP:
+                this.onKeyUp(e);
+                break;
+            }
+          },
+
+          startListening: function () {
+            document.addEventListener(Runner.events.KEYDOWN, this);
+            document.addEventListener(Runner.events.KEYUP, this);
+
+            if (IS_MOBILE && this.touchController) {
+              this.touchController.addEventListener(
+                Runner.events.TOUCHSTART,
+                this,
+                {
+                  passive: false,
+                },
+              );
+              this.touchController.addEventListener(
+                Runner.events.TOUCHEND,
+                this,
+                {
+                  passive: false,
+                },
+              );
+              this.outerContainerEl.addEventListener(
+                Runner.events.TOUCHSTART,
+                this,
+                {
+                  passive: false,
+                },
+              );
+            } else {
+              this.outerContainerEl.addEventListener(
+                Runner.events.MOUSEDOWN,
+                this,
+              );
+              this.outerContainerEl.addEventListener(
+                Runner.events.MOUSEUP,
+                this,
+              );
+            }
+          },
+
+          onKeyDown: function (e) {
+            const keyCode = String(e.keyCode || 0);
+            const isJumpInput =
+              Runner.keycodes.JUMP[keyCode] ||
+              e.type === Runner.events.TOUCHSTART ||
+              e.type === Runner.events.MOUSEDOWN;
+
+            if (isJumpInput) {
+              e.preventDefault();
+            }
+
+            if (!this.crashed && isJumpInput) {
+              if (!this.activated) {
+                this.activated = true;
+                this.paused = false;
+                this.runningTime = 0;
+                this.time = getTimeStamp();
+              }
+
+              if (!this.tRex.jumping) {
+                this.tRex.startJump();
+              }
+            }
+
+            if (Runner.keycodes.DUCK[keyCode] && this.tRex.jumping) {
+              e.preventDefault();
+              this.tRex.setSpeedDrop();
+            }
+          },
+
+          onKeyUp: function (e) {
+            const keyCode = String(e.keyCode || 0);
+            const isJumpKey =
+              Runner.keycodes.JUMP[keyCode] ||
+              e.type === Runner.events.TOUCHEND ||
+              e.type === Runner.events.MOUSEUP;
+
+            if (this.isRunning() && isJumpKey) {
+              this.tRex.endJump();
+            } else if (Runner.keycodes.DUCK[keyCode]) {
+              this.tRex.speedDrop = false;
+            } else if (this.crashed) {
+              const deltaTime = getTimeStamp() - this.time;
+              if (
+                Runner.keycodes.RESTART[keyCode] ||
+                (e.type === Runner.events.MOUSEUP &&
+                  e.target === this.canvas) ||
+                (deltaTime >= this.config.GAMEOVER_CLEAR_TIME &&
+                  Runner.keycodes.JUMP[keyCode])
+              ) {
+                this.restart();
+              }
+            } else if (this.paused && isJumpKey) {
+              this.play();
+            }
+          },
+
+          raq: function () {
+            if (!this.drawPending) {
+              this.drawPending = true;
+              this.raqId = requestAnimationFrame(this.update.bind(this));
+            }
+          },
+
+          isRunning: function () {
+            return !!this.raqId;
+          },
+
+          gameOver: function () {
+            this.stop();
+            this.crashed = true;
+            this.distanceMeter.acheivement = false;
+            this.tRex.update(100, Trex.status.CRASHED);
+
+            if (!this.gameOverPanel) {
+              this.gameOverPanel = new GameOverPanel(
+                this.canvas,
+                this.images.TEXT_SPRITE,
+                this.images.RESTART,
+                this.dimensions,
+              );
+            } else {
+              this.gameOverPanel.draw();
+            }
+
+            if (this.distanceRan > this.highestScore) {
+              this.highestScore = Math.ceil(this.distanceRan);
+              this.distanceMeter.setHighScore(this.highestScore);
+            }
+
+            this.time = getTimeStamp();
+          },
+
+          stop: function () {
+            this.activated = false;
+            this.paused = true;
+            cancelAnimationFrame(this.raqId);
+            this.raqId = 0;
+          },
+
+          play: function () {
+            if (!this.crashed) {
+              this.activated = true;
+              this.paused = false;
+              this.tRex.update(0, Trex.status.RUNNING);
+              this.time = getTimeStamp();
+              this.update();
+            }
+          },
+
+          restart: function () {
+            if (!this.raqId) {
+              this.runningTime = 0;
+              this.activated = true;
+              this.crashed = false;
+              this.paused = false;
+              this.distanceRan = 0;
+              this.setSpeed(this.config.SPEED);
+              this.time = getTimeStamp();
+              this.clearCanvas();
+              this.distanceMeter.reset();
+              this.horizon.reset();
+              this.tRex.reset();
+              this.gameOverPanel = null;
+              syncVolume(0);
+              this.update();
+            }
+          },
+
+          onVisibilityChange: function (e) {
+            if (document.hidden || e.type === "blur") {
+              this.stop();
+            } else if (!this.crashed) {
+              this.play();
+            }
+          },
+        };
+
+        function GameOverPanel(canvas, textSprite, restartImg, dimensions) {
+          this.canvas = canvas;
+          this.canvasCtx = canvas.getContext("2d");
+          this.canvasDimensions = dimensions;
+          this.textSprite = textSprite;
+          this.restartImg = restartImg;
+          this.draw();
+        }
+
+        GameOverPanel.dimensions = {
+          TEXT_X: 0,
+          TEXT_Y: 13,
+          TEXT_WIDTH: 191,
+          TEXT_HEIGHT: 11,
+          RESTART_WIDTH: 36,
+          RESTART_HEIGHT: 32,
+        };
+
+        GameOverPanel.prototype = {
+          updateDimensions: function (width, opt_height) {
+            this.canvasDimensions.WIDTH = width;
+            if (opt_height) {
+              this.canvasDimensions.HEIGHT = opt_height;
+            }
+          },
+
+          draw: function () {
+            const dimensions = GameOverPanel.dimensions;
+            const centerX = this.canvasDimensions.WIDTH / 2;
+
+            const textTargetX = Math.round(centerX - dimensions.TEXT_WIDTH / 2);
+            const textTargetY = Math.round(
+              (this.canvasDimensions.HEIGHT - 25) / 3,
+            );
+            const restartTargetX = Math.round(
+              centerX - dimensions.RESTART_WIDTH / 2,
+            );
+            const restartTargetY = Math.round(this.canvasDimensions.HEIGHT / 2);
+
+            this.canvasCtx.drawImage(
+              this.textSprite,
+              dimensions.TEXT_X,
+              dimensions.TEXT_Y,
+              dimensions.TEXT_WIDTH,
+              dimensions.TEXT_HEIGHT,
+              textTargetX,
+              textTargetY,
+              dimensions.TEXT_WIDTH,
+              dimensions.TEXT_HEIGHT,
+            );
+
+            this.canvasCtx.drawImage(
+              this.restartImg,
+              0,
+              0,
+              dimensions.RESTART_WIDTH,
+              dimensions.RESTART_HEIGHT,
+              restartTargetX,
+              restartTargetY,
+              dimensions.RESTART_WIDTH,
+              dimensions.RESTART_HEIGHT,
+            );
+          },
+        };
+
+        function CollisionBox(x, y, width, height) {
+          this.x = x;
+          this.y = y;
+          this.width = width;
+          this.height = height;
+        }
+
+        function boxCompare(a, b) {
+          return (
+            a.x < b.x + b.width &&
+            a.x + a.width > b.x &&
+            a.y < b.y + b.height &&
+            a.y + a.height > b.y
+          );
+        }
+
+        function createAdjustedCollisionBox(box, adjustment) {
+          return new CollisionBox(
+            box.x + adjustment.x,
+            box.y + adjustment.y,
+            box.width,
+            box.height,
+          );
+        }
+
+        function checkForCollision(obstacle, tRex) {
+          if (!obstacle) {
+            return false;
+          }
+
+          const tRexBox = new CollisionBox(
+            tRex.xPos + 1,
+            tRex.yPos + 1,
+            tRex.config.WIDTH - 2,
+            tRex.config.HEIGHT - 2,
+          );
+
+          const obstacleBox = new CollisionBox(
+            obstacle.xPos + 1,
+            obstacle.yPos + 1,
+            obstacle.typeConfig.width * obstacle.size - 2,
+            obstacle.typeConfig.height - 2,
+          );
+
+          if (boxCompare(tRexBox, obstacleBox)) {
+            const collisionBoxes = obstacle.collisionBoxes;
+            const tRexCollisionBoxes = Trex.collisionBoxes;
+
+            for (let t = 0; t < tRexCollisionBoxes.length; t += 1) {
+              for (let i = 0; i < collisionBoxes.length; i += 1) {
+                const adjTrexBox = createAdjustedCollisionBox(
+                  tRexCollisionBoxes[t],
+                  tRexBox,
+                );
+                const adjObstacleBox = createAdjustedCollisionBox(
+                  collisionBoxes[i],
+                  obstacleBox,
+                );
+
+                if (boxCompare(adjTrexBox, adjObstacleBox)) {
+                  return [adjTrexBox, adjObstacleBox];
+                }
+              }
+            }
+          }
+
+          return false;
+        }
+
+        function Obstacle(
+          canvasCtx,
+          type,
+          obstacleImg,
+          dimensions,
+          gapCoefficient,
+          speed,
+        ) {
+          this.canvasCtx = canvasCtx;
+          this.image = obstacleImg;
+          this.typeConfig = type;
+          this.gapCoefficient = gapCoefficient;
+          this.size = getRandomNum(1, Obstacle.MAX_OBSTACLE_LENGTH);
+          this.dimensions = dimensions;
+          this.remove = false;
+          this.xPos = 0;
+          this.yPos = this.typeConfig.yPos;
+          this.width = 0;
+          this.collisionBoxes = [];
+          this.gap = 0;
+          this.init(speed);
+        }
+
+        Obstacle.MAX_GAP_COEFFICIENT = 1.5;
+        Obstacle.MAX_OBSTACLE_LENGTH = 3;
+
+        Obstacle.types = [
+          {
+            type: "CACTUS_SMALL",
+            width: 17,
+            height: 35,
+            yPos: 105,
+            multipleSpeed: 3,
+            minGap: 120,
+            collisionBoxes: [
+              new CollisionBox(0, 7, 5, 27),
+              new CollisionBox(4, 0, 6, 34),
+              new CollisionBox(10, 4, 7, 14),
+            ],
+          },
+          {
+            type: "CACTUS_LARGE",
+            width: 25,
+            height: 50,
+            yPos: 90,
+            multipleSpeed: 6,
+            minGap: 120,
+            collisionBoxes: [
+              new CollisionBox(0, 12, 7, 38),
+              new CollisionBox(8, 0, 7, 49),
+              new CollisionBox(13, 10, 10, 38),
+            ],
+          },
+        ];
+
+        Obstacle.prototype = {
+          init: function (speed) {
+            this.cloneCollisionBoxes();
+
+            if (this.size > 1 && this.typeConfig.multipleSpeed > speed) {
+              this.size = 1;
+            }
+
+            this.width = this.typeConfig.width * this.size;
+            this.xPos = this.dimensions.WIDTH - this.width;
+            this.draw();
+
+            if (this.size > 1) {
+              this.collisionBoxes[1].width =
+                this.width -
+                this.collisionBoxes[0].width -
+                this.collisionBoxes[2].width;
+              this.collisionBoxes[2].x =
+                this.width - this.collisionBoxes[2].width;
+            }
+
+            this.gap = this.getGap(this.gapCoefficient, speed);
+          },
+
+          draw: function () {
+            const sourceWidth = this.typeConfig.width;
+            const sourceHeight = this.typeConfig.height;
+            const sourceX = sourceWidth * this.size * (0.5 * (this.size - 1));
+
+            this.canvasCtx.drawImage(
+              this.image,
+              sourceX,
+              0,
+              sourceWidth * this.size,
+              sourceHeight,
+              this.xPos,
+              this.yPos,
+              this.typeConfig.width * this.size,
+              this.typeConfig.height,
+            );
+          },
+
+          update: function (deltaTime, speed) {
+            if (!this.remove) {
+              this.xPos -= Math.floor(((speed * FPS) / 1000) * deltaTime);
+              this.draw();
+
+              if (!this.isVisible()) {
+                this.remove = true;
+              }
+            }
+          },
+
+          getGap: function (gapCoefficient, speed) {
+            const minGap = Math.round(
+              this.width * speed + this.typeConfig.minGap * gapCoefficient,
+            );
+            const maxGap = Math.round(minGap * Obstacle.MAX_GAP_COEFFICIENT);
+            return getRandomNum(minGap, maxGap);
+          },
+
+          isVisible: function () {
+            return this.xPos + this.width > 0;
+          },
+
+          cloneCollisionBoxes: function () {
+            const collisionBoxes = this.typeConfig.collisionBoxes;
+            for (let i = collisionBoxes.length - 1; i >= 0; i -= 1) {
+              this.collisionBoxes[i] = new CollisionBox(
+                collisionBoxes[i].x,
+                collisionBoxes[i].y,
+                collisionBoxes[i].width,
+                collisionBoxes[i].height,
+              );
+            }
+          },
+        };
+
+        function Trex(canvas, image) {
+          this.canvas = canvas;
+          this.canvasCtx = canvas.getContext("2d");
+          this.image = image;
+          this.xPos = 0;
+          this.yPos = 0;
+          this.groundYPos = 0;
+          this.currentFrame = 0;
+          this.currentAnimFrames = [];
+          this.blinkDelay = 0;
+          this.animStartTime = 0;
+          this.timer = 0;
+          this.msPerFrame = 1000 / FPS;
+          this.config = Trex.config;
+          this.status = Trex.status.WAITING;
+          this.jumping = false;
+          this.jumpVelocity = 0;
+          this.reachedMinHeight = false;
+          this.speedDrop = false;
+          this.init();
+        }
+
+        Trex.config = {
+          DROP_VELOCITY: -5,
+          GRAVITY: 0.6,
+          HEIGHT: 47,
+          INIITAL_JUMP_VELOCITY: -10,
+          MAX_JUMP_HEIGHT: 30,
+          MIN_JUMP_HEIGHT: 30,
+          SPEED_DROP_COEFFICIENT: 3,
+          START_X_POS: 50,
+          WIDTH: 44,
+        };
+
+        Trex.collisionBoxes = [
+          new CollisionBox(1, -1, 30, 26),
+          new CollisionBox(32, 0, 8, 16),
+          new CollisionBox(10, 35, 14, 8),
+          new CollisionBox(1, 24, 29, 5),
+          new CollisionBox(5, 30, 21, 4),
+          new CollisionBox(9, 34, 15, 4),
+        ];
+
+        Trex.status = {
+          CRASHED: "CRASHED",
+          JUMPING: "JUMPING",
+          RUNNING: "RUNNING",
+          WAITING: "WAITING",
+        };
+
+        Trex.BLINK_TIMING = 7000;
+
+        Trex.animFrames = {
+          WAITING: {
+            frames: [44, 0],
+            msPerFrame: 1000 / 3,
+          },
+          RUNNING: {
+            frames: [88, 132],
+            msPerFrame: 1000 / 12,
+          },
+          CRASHED: {
+            frames: [220],
+            msPerFrame: 1000 / 60,
+          },
+          JUMPING: {
+            frames: [0],
+            msPerFrame: 1000 / 60,
+          },
+        };
+
+        Trex.prototype = {
+          init: function () {
+            this.groundYPos =
+              Runner.defaultDimensions.HEIGHT -
+              this.config.HEIGHT -
+              Runner.config.BOTTOM_PAD;
+            this.yPos = this.groundYPos;
+            this.minJumpHeight = this.groundYPos - this.config.MIN_JUMP_HEIGHT;
+            this.draw(0, 0);
+            this.update(0, Trex.status.WAITING);
+          },
+
+          update: function (deltaTime, opt_status) {
+            this.timer += deltaTime;
+
+            if (opt_status) {
+              this.status = opt_status;
+              this.currentFrame = 0;
+              this.msPerFrame = Trex.animFrames[opt_status].msPerFrame;
+              this.currentAnimFrames = Trex.animFrames[opt_status].frames;
+
+              if (opt_status === Trex.status.WAITING) {
+                this.animStartTime = getTimeStamp();
+                this.setBlinkDelay();
+              }
+            }
+
+            if (this.status === Trex.status.WAITING) {
+              this.blink(getTimeStamp());
+            } else {
+              this.draw(this.currentAnimFrames[this.currentFrame], 0);
+            }
+
+            if (this.timer >= this.msPerFrame) {
+              this.currentFrame =
+                this.currentFrame === this.currentAnimFrames.length - 1
+                  ? 0
+                  : this.currentFrame + 1;
+              this.timer = 0;
+            }
+          },
+
+          draw: function (x, y) {
+            this.canvasCtx.drawImage(
+              this.image,
+              x,
+              y,
+              this.config.WIDTH,
+              this.config.HEIGHT,
+              this.xPos,
+              this.yPos,
+              this.config.WIDTH,
+              this.config.HEIGHT,
+            );
+          },
+
+          setBlinkDelay: function () {
+            this.blinkDelay = Math.ceil(Math.random() * Trex.BLINK_TIMING);
+          },
+
+          blink: function (time) {
+            const deltaTime = time - this.animStartTime;
+            if (deltaTime >= this.blinkDelay) {
+              this.draw(this.currentAnimFrames[this.currentFrame], 0);
+              if (this.currentFrame === 1) {
+                this.setBlinkDelay();
+                this.animStartTime = time;
+              }
+            }
+          },
+
+          startJump: function () {
+            if (!this.jumping) {
+              this.update(0, Trex.status.JUMPING);
+              this.jumpVelocity = this.config.INIITAL_JUMP_VELOCITY;
+              this.jumping = true;
+              this.reachedMinHeight = false;
+              this.speedDrop = false;
+            }
+          },
+
+          endJump: function () {
+            if (
+              this.reachedMinHeight &&
+              this.jumpVelocity < this.config.DROP_VELOCITY
+            ) {
+              this.jumpVelocity = this.config.DROP_VELOCITY;
+            }
+          },
+
+          updateJump: function (deltaTime) {
+            const msPerFrame = Trex.animFrames[this.status].msPerFrame;
+            const framesElapsed = deltaTime / msPerFrame;
+
+            if (this.speedDrop) {
+              this.yPos += Math.round(
+                this.jumpVelocity *
+                  this.config.SPEED_DROP_COEFFICIENT *
+                  framesElapsed,
+              );
+            } else {
+              this.yPos += Math.round(this.jumpVelocity * framesElapsed);
+            }
+
+            this.jumpVelocity += this.config.GRAVITY * framesElapsed;
+
+            if (this.yPos < this.minJumpHeight || this.speedDrop) {
+              this.reachedMinHeight = true;
+            }
+
+            if (this.yPos < this.config.MAX_JUMP_HEIGHT || this.speedDrop) {
+              this.endJump();
+            }
+
+            if (this.yPos > this.groundYPos) {
+              this.reset();
+            }
+
+            this.update(deltaTime);
+          },
+
+          setSpeedDrop: function () {
+            this.speedDrop = true;
+            this.jumpVelocity = 1;
+          },
+
+          reset: function () {
+            this.yPos = this.groundYPos;
+            this.jumpVelocity = 0;
+            this.jumping = false;
+            this.update(0, Trex.status.RUNNING);
+            this.speedDrop = false;
+          },
+        };
+
+        function DistanceMeter(canvas, spriteSheet, canvasWidth) {
+          this.canvas = canvas;
+          this.canvasCtx = canvas.getContext("2d");
+          this.image = spriteSheet;
+          this.x = 0;
+          this.y = 5;
+          this.currentDistance = 0;
+          this.maxScore = 0;
+          this.highScore = 0;
+          this.digits = [];
+          this.acheivement = false;
+          this.defaultString = "";
+          this.flashTimer = 0;
+          this.flashIterations = 0;
+          this.config = DistanceMeter.config;
+          this.init(canvasWidth);
+        }
+
+        DistanceMeter.dimensions = {
+          WIDTH: 10,
+          HEIGHT: 13,
+          DEST_WIDTH: 11,
+        };
+
+        DistanceMeter.config = {
+          MAX_DISTANCE_UNITS: 5,
+          ACHIEVEMENT_DISTANCE: 100,
+          COEFFICIENT: 0.025,
+          FLASH_DURATION: 1000 / 4,
+          FLASH_ITERATIONS: 3,
+        };
+
+        DistanceMeter.prototype = {
+          init: function (width) {
+            let maxDistanceStr = "";
+            this.calcXPos(width);
+            this.maxScore = this.config.MAX_DISTANCE_UNITS;
+
+            for (let i = 0; i < this.config.MAX_DISTANCE_UNITS; i += 1) {
+              this.draw(i, 0);
+              this.defaultString += "0";
+              maxDistanceStr += "9";
+            }
+
+            this.maxScore = parseInt(maxDistanceStr, 10);
+          },
+
+          calcXPos: function (canvasWidth) {
+            this.x =
+              canvasWidth -
+              DistanceMeter.dimensions.DEST_WIDTH *
+                (this.config.MAX_DISTANCE_UNITS + 1);
+          },
+
+          draw: function (digitPos, value, opt_highScore) {
+            const sourceWidth = DistanceMeter.dimensions.WIDTH;
+            const sourceHeight = DistanceMeter.dimensions.HEIGHT;
+            const sourceX = DistanceMeter.dimensions.WIDTH * value;
+            const targetX = digitPos * DistanceMeter.dimensions.DEST_WIDTH;
+            const targetY = this.y;
+            const targetWidth = DistanceMeter.dimensions.WIDTH;
+            const targetHeight = DistanceMeter.dimensions.HEIGHT;
+
+            this.canvasCtx.save();
+
+            if (opt_highScore) {
+              const highScoreX =
+                this.x -
+                this.config.MAX_DISTANCE_UNITS *
+                  2 *
+                  DistanceMeter.dimensions.WIDTH;
+              this.canvasCtx.translate(highScoreX, this.y);
+            } else {
+              this.canvasCtx.translate(this.x, this.y);
+            }
+
+            this.canvasCtx.drawImage(
+              this.image,
+              sourceX,
+              0,
+              sourceWidth,
+              sourceHeight,
+              targetX,
+              targetY,
+              targetWidth,
+              targetHeight,
+            );
+
+            this.canvasCtx.restore();
+          },
+
+          getActualDistance: function (distance) {
+            return distance
+              ? Math.round(distance * this.config.COEFFICIENT)
+              : 0;
+          },
+
+          update: function (deltaTime, distance) {
+            let paint = true;
+
+            if (!this.acheivement) {
+              distance = this.getActualDistance(distance);
+
+              if (distance > 0) {
+                if (distance % this.config.ACHIEVEMENT_DISTANCE === 0) {
+                  this.acheivement = true;
+                  this.flashTimer = 0;
+                }
+
+                const distanceStr = (this.defaultString + distance).substr(
+                  -this.config.MAX_DISTANCE_UNITS,
+                );
+                this.digits = distanceStr.split("");
+              } else {
+                this.digits = this.defaultString.split("");
+              }
+            } else {
+              if (this.flashIterations <= this.config.FLASH_ITERATIONS) {
+                this.flashTimer += deltaTime;
+
+                if (this.flashTimer < this.config.FLASH_DURATION) {
+                  paint = false;
+                } else if (this.flashTimer > this.config.FLASH_DURATION * 2) {
+                  this.flashTimer = 0;
+                  this.flashIterations += 1;
+                }
+              } else {
+                this.acheivement = false;
+                this.flashIterations = 0;
+                this.flashTimer = 0;
+              }
+            }
+
+            if (paint) {
+              for (let i = this.digits.length - 1; i >= 0; i -= 1) {
+                this.draw(i, parseInt(this.digits[i], 10));
+              }
+            }
+
+            this.drawHighScore();
+          },
+
+          drawHighScore: function () {
+            this.canvasCtx.save();
+            this.canvasCtx.globalAlpha = 0.8;
+
+            for (let i = this.highScore.length - 1; i >= 0; i -= 1) {
+              this.draw(i, parseInt(this.highScore[i], 10), true);
+            }
+
+            this.canvasCtx.restore();
+          },
+
+          setHighScore: function (distance) {
+            distance = this.getActualDistance(distance);
+            const highScoreStr = (this.defaultString + distance).substr(
+              -this.config.MAX_DISTANCE_UNITS,
+            );
+            this.highScore = ["10", "11", ""].concat(highScoreStr.split(""));
+          },
+
+          reset: function () {
+            this.update(0);
+            this.acheivement = false;
+          },
+        };
+
+        function Cloud(canvas, cloudImg, containerWidth) {
+          this.canvas = canvas;
+          this.canvasCtx = this.canvas.getContext("2d");
+          this.image = cloudImg;
+          this.containerWidth = containerWidth;
+          this.xPos = containerWidth;
+          this.yPos = 0;
+          this.remove = false;
+          this.cloudGap = getRandomNum(
+            Cloud.config.MIN_CLOUD_GAP,
+            Cloud.config.MAX_CLOUD_GAP,
+          );
+          this.init();
+        }
+
+        Cloud.config = {
+          HEIGHT: 14,
+          MAX_CLOUD_GAP: 400,
+          MAX_SKY_LEVEL: 30,
+          MIN_CLOUD_GAP: 100,
+          MIN_SKY_LEVEL: 71,
+          WIDTH: 46,
+        };
+
+        Cloud.prototype = {
+          init: function () {
+            this.yPos = getRandomNum(
+              Cloud.config.MAX_SKY_LEVEL,
+              Cloud.config.MIN_SKY_LEVEL,
+            );
+            this.draw();
+          },
+
+          draw: function () {
+            this.canvasCtx.save();
+            this.canvasCtx.drawImage(
+              this.image,
+              0,
+              0,
+              Cloud.config.WIDTH,
+              Cloud.config.HEIGHT,
+              this.xPos,
+              this.yPos,
+              Cloud.config.WIDTH,
+              Cloud.config.HEIGHT,
+            );
+            this.canvasCtx.restore();
+          },
+
+          update: function (speed) {
+            if (!this.remove) {
+              this.xPos -= Math.ceil(speed);
+              this.draw();
+
+              if (!this.isVisible()) {
+                this.remove = true;
+              }
+            }
+          },
+
+          isVisible: function () {
+            return this.xPos + Cloud.config.WIDTH > 0;
+          },
+        };
+
+        function HorizonLine(canvas, bgImg, dimensions) {
+          this.image = bgImg;
+          this.canvas = canvas;
+          this.canvasCtx = canvas.getContext("2d");
+          this.sourceDimensions = {};
+          this.dimensions = {
+            WIDTH: dimensions.WIDTH,
+            HEIGHT: HorizonLine.dimensions.HEIGHT,
+            YPOS: HorizonLine.dimensions.YPOS,
+          };
+          this.sourceXPos = [0, HorizonLine.sourceWidth];
+          this.xPos = [0, dimensions.WIDTH];
+          this.yPos = HorizonLine.dimensions.YPOS;
+          this.bumpThreshold = 0.5;
+          this.setSourceDimensions();
+          this.draw();
+        }
+
+        HorizonLine.dimensions = {
+          HEIGHT: 12,
+          YPOS: 127,
+        };
+
+        HorizonLine.sourceWidth = 600;
+
+        HorizonLine.prototype = {
+          setSourceDimensions: function () {
+            this.sourceDimensions.WIDTH = HorizonLine.sourceWidth;
+            this.sourceDimensions.HEIGHT = HorizonLine.dimensions.HEIGHT;
+            this.xPos = [0, this.dimensions.WIDTH];
+            this.yPos = HorizonLine.dimensions.YPOS;
+          },
+
+          getRandomType: function () {
+            return Math.random() > this.bumpThreshold
+              ? HorizonLine.sourceWidth
+              : 0;
+          },
+
+          draw: function () {
+            this.canvasCtx.drawImage(
+              this.image,
+              this.sourceXPos[0],
+              0,
+              this.sourceDimensions.WIDTH,
+              this.sourceDimensions.HEIGHT,
+              this.xPos[0],
+              this.yPos,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+            );
+
+            this.canvasCtx.drawImage(
+              this.image,
+              this.sourceXPos[1],
+              0,
+              this.sourceDimensions.WIDTH,
+              this.sourceDimensions.HEIGHT,
+              this.xPos[1],
+              this.yPos,
+              this.dimensions.WIDTH,
+              this.dimensions.HEIGHT,
+            );
+          },
+
+          updateXPos: function (pos, increment) {
+            const line1 = pos;
+            const line2 = pos === 0 ? 1 : 0;
+
+            this.xPos[line1] -= increment;
+            this.xPos[line2] = this.xPos[line1] + this.dimensions.WIDTH;
+
+            if (this.xPos[line1] <= -this.dimensions.WIDTH) {
+              this.xPos[line1] += this.dimensions.WIDTH * 2;
+              this.xPos[line2] = this.xPos[line1] - this.dimensions.WIDTH;
+              this.sourceXPos[line1] = this.getRandomType();
+            }
+          },
+
+          update: function (deltaTime, speed) {
+            const increment = Math.floor(speed * (FPS / 1000) * deltaTime);
+
+            if (this.xPos[0] <= 0) {
+              this.updateXPos(0, increment);
+            } else {
+              this.updateXPos(1, increment);
+            }
+
+            this.draw();
+          },
+
+          reset: function () {
+            this.xPos[0] = 0;
+            this.xPos[1] = this.dimensions.WIDTH;
+          },
+        };
+
+        function Horizon(canvas, images, dimensions, gapCoefficient) {
+          this.canvas = canvas;
+          this.canvasCtx = this.canvas.getContext("2d");
+          this.dimensions = dimensions;
+          this.gapCoefficient = gapCoefficient;
+          this.obstacles = [];
+          this.clouds = [];
+          this.cloudImg = images.CLOUD;
+          this.cloudSpeed = Runner.config.BG_CLOUD_SPEED;
+          this.horizonImg = images.HORIZON;
+          this.horizonLine = null;
+          this.obstacleImgs = {
+            CACTUS_SMALL: images.CACTUS_SMALL,
+            CACTUS_LARGE: images.CACTUS_LARGE,
+          };
+          this.init();
+        }
+
+        Horizon.config = {
+          CLOUD_FREQUENCY: 0.5,
+          MAX_CLOUDS: 6,
+        };
+
+        Horizon.prototype = {
+          init: function () {
+            this.addCloud();
+            this.horizonLine = new HorizonLine(
+              this.canvas,
+              this.horizonImg,
+              this.dimensions,
+            );
+          },
+
+          update: function (deltaTime, currentSpeed, updateObstacles) {
+            this.horizonLine.update(deltaTime, currentSpeed);
+            this.updateClouds(deltaTime, currentSpeed);
+
+            if (updateObstacles) {
+              this.updateObstacles(deltaTime, currentSpeed);
+            }
+          },
+
+          updateClouds: function (deltaTime, speed) {
+            const cloudSpeed = (this.cloudSpeed / 1000) * deltaTime * speed;
+            const numClouds = this.clouds.length;
+
+            if (numClouds) {
+              for (let i = numClouds - 1; i >= 0; i -= 1) {
+                this.clouds[i].update(cloudSpeed);
+              }
+
+              const lastCloud = this.clouds[numClouds - 1];
+
+              if (
+                numClouds < Horizon.config.MAX_CLOUDS &&
+                this.dimensions.WIDTH - lastCloud.xPos > lastCloud.cloudGap &&
+                Math.random() < Horizon.config.CLOUD_FREQUENCY
+              ) {
+                this.addCloud();
+              }
+
+              this.clouds = this.clouds.filter(function (obj) {
+                return !obj.remove;
+              });
+            }
+          },
+
+          updateObstacles: function (deltaTime, currentSpeed) {
+            const updatedObstacles = this.obstacles.slice(0);
+
+            for (let i = 0; i < this.obstacles.length; i += 1) {
+              const obstacle = this.obstacles[i];
+              obstacle.update(deltaTime, currentSpeed);
+
+              if (obstacle.remove) {
+                updatedObstacles.shift();
+              }
+            }
+
+            this.obstacles = updatedObstacles;
+
+            if (this.obstacles.length > 0) {
+              const lastObstacle = this.obstacles[this.obstacles.length - 1];
+
+              if (
+                lastObstacle &&
+                !lastObstacle.followingObstacleCreated &&
+                lastObstacle.isVisible() &&
+                lastObstacle.xPos + lastObstacle.width + lastObstacle.gap <
+                  this.dimensions.WIDTH
+              ) {
+                this.addNewObstacle(currentSpeed);
+                lastObstacle.followingObstacleCreated = true;
+              }
+            } else {
+              this.addNewObstacle(currentSpeed);
+            }
+          },
+
+          addNewObstacle: function (currentSpeed) {
+            const obstacleTypeIndex = getRandomNum(
+              0,
+              Obstacle.types.length - 1,
+            );
+            const obstacleType = Obstacle.types[obstacleTypeIndex];
+            const obstacleImg = this.obstacleImgs[obstacleType.type];
+
+            this.obstacles.push(
+              new Obstacle(
+                this.canvasCtx,
+                obstacleType,
+                obstacleImg,
+                this.dimensions,
+                this.gapCoefficient,
+                currentSpeed,
+              ),
+            );
+          },
+
+          reset: function () {
+            this.obstacles = [];
+            this.clouds = [];
+            this.addCloud();
+            this.horizonLine = new HorizonLine(
+              this.canvas,
+              this.horizonImg,
+              this.dimensions,
+            );
+          },
+
+          resize: function (width, height) {
+            this.dimensions.WIDTH = width;
+            this.dimensions.HEIGHT = height;
+            this.canvas.width = width;
+            this.canvas.height = height;
+            this.horizonLine = new HorizonLine(
+              this.canvas,
+              this.horizonImg,
+              this.dimensions,
+            );
+          },
+
+          addCloud: function () {
+            this.clouds.push(
+              new Cloud(this.canvas, this.cloudImg, this.dimensions.WIDTH),
+            );
+          },
+        };
+
+        window.addEventListener("load", function () {
+          new Runner("#runnerHost");
+          playfieldEl.addEventListener("pointerdown", function () {
+            playfieldEl.focus({ preventScroll: true });
+          });
+          syncVolume(0);
+        });
+      })();
+    </script>
+  </body>
+</html>
