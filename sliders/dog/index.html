@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dog | Volume</title>
+    <meta
+      name="description"
+      content="Maintain the dog. The volume depends on it."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Dog | Volume" />
+    <meta
+      property="og:description"
+      content="Maintain the dog. The volume depends on it."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/dog/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dog | Volume" />
+    <meta
+      name="twitter:description"
+      content="Maintain the dog. The volume depends on it."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/dog/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      .project-stage {
+        min-height: min(72vh, 820px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      .wrap {
+        width: min(92vw, 540px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(3.6rem, 12vw, 5.4rem);
+        font-weight: 300;
+        line-height: 0.92;
+        letter-spacing: -0.075em;
+        font-variant-numeric: tabular-nums;
+        color: #111;
+      }
+
+      .shell {
+        background: #fff;
+        border: 1.5px solid rgba(23, 23, 23, 0.1);
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.045);
+      }
+
+      .dog-layout {
+        display: grid;
+        gap: 18px;
+      }
+
+      .meter-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .meter-row {
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr) 46px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .meter-label,
+      .meter-value {
+        font-size: 0.82rem;
+        color: #767676;
+        letter-spacing: -0.01em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .meter-value {
+        text-align: right;
+      }
+
+      .meter-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #eceae4;
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        height: 100%;
+        width: 100%;
+        border-radius: inherit;
+        background: #111;
+        transition: width 100ms linear;
+      }
+
+      .dog-panel {
+        display: grid;
+        justify-items: center;
+      }
+
+      .dog-figure {
+        position: relative;
+        width: min(180px, 42vw);
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .dog-figure:focus-visible {
+        outline: 2px solid rgba(17, 17, 17, 0.9);
+        outline-offset: 8px;
+        border-radius: 18px;
+      }
+
+      .dog-image {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.08));
+      }
+
+      .hearts-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: visible;
+      }
+
+      .heart {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        animation: float-heart 500ms ease-out forwards;
+      }
+
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 15px;
+        background: #d95c69;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .heart::before {
+        left: 8px;
+        transform: rotate(-45deg);
+        transform-origin: 0 100%;
+      }
+
+      .heart::after {
+        left: 0;
+        transform: rotate(45deg);
+        transform-origin: 100% 100%;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .control-button {
+        appearance: none;
+        border: 1.5px solid #dddddd;
+        border-radius: 16px;
+        background: #fff;
+        color: #111;
+        padding: 12px 10px;
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        font: inherit;
+        cursor: pointer;
+        touch-action: none;
+        transition:
+          border-color 140ms ease,
+          background 140ms ease,
+          box-shadow 140ms ease,
+          transform 140ms ease;
+      }
+
+      .control-button:hover {
+        background: #fafaf9;
+        border-color: #cfcfcf;
+      }
+
+      .control-button:active,
+      .control-button.is-dragging {
+        transform: scale(0.985);
+        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.03);
+      }
+
+      .control-button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .control-button img {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+      }
+
+      .control-label {
+        font-size: 0.9rem;
+        letter-spacing: -0.01em;
+      }
+
+      .drag-clone {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 88px;
+        height: 88px;
+        border: 1.5px solid #dddddd;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.1);
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+        z-index: 30;
+        transform: translate(-50%, -50%);
+      }
+
+      .drag-clone img {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+      }
+
+      @keyframes float-heart {
+        0% {
+          opacity: 0.9;
+          transform: translate(-50%, -50%) scale(0.75);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, calc(-50% - 26px)) scale(1);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .shell {
+          padding: 18px;
+        }
+
+        .meter-row {
+          grid-template-columns: 58px minmax(0, 1fr) 42px;
+          gap: 10px;
+        }
+
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .control-button {
+          grid-template-columns: 38px 1fr;
+          justify-items: start;
+          align-items: center;
+          gap: 12px;
+          padding: 11px 12px;
+        }
+
+        .control-button img {
+          width: 34px;
+          height: 34px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Dog</h1>
+          <p>Maintain the dog. The volume depends on it.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="wrap" aria-label="Dog volume control">
+          <p class="volume" id="volumeLabel">Volume: 0%</p>
+
+          <div class="shell">
+            <div class="dog-layout">
+              <div class="meter-list" aria-label="Dog status">
+                <div class="meter-row">
+                  <span class="meter-label">Food</span>
+                  <div class="meter-track" aria-hidden="true">
+                    <div class="meter-fill" id="foodFill"></div>
+                  </div>
+                  <span class="meter-value" id="foodValue">100</span>
+                </div>
+
+                <div class="meter-row">
+                  <span class="meter-label">Water</span>
+                  <div class="meter-track" aria-hidden="true">
+                    <div class="meter-fill" id="waterFill"></div>
+                  </div>
+                  <span class="meter-value" id="waterValue">100</span>
+                </div>
+
+                <div class="meter-row">
+                  <span class="meter-label">Love</span>
+                  <div class="meter-track" aria-hidden="true">
+                    <div class="meter-fill" id="loveFill"></div>
+                  </div>
+                  <span class="meter-value" id="loveValue">100</span>
+                </div>
+              </div>
+
+              <div class="dog-panel">
+                <div
+                  class="dog-figure"
+                  id="dogFigure"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Pet the dog"
+                >
+                  <img
+                    class="dog-image"
+                    src="../../assets/dog/dog.webp"
+                    alt=""
+                    width="248"
+                    height="389"
+                  />
+                  <div class="hearts-layer" id="heartsLayer"></div>
+                </div>
+              </div>
+
+              <div class="controls">
+                <button class="control-button" data-action="food" type="button">
+                  <img
+                    src="../../assets/dog/food.webp"
+                    alt=""
+                    width="1796"
+                    height="1197"
+                  />
+                  <span class="control-label">Feed</span>
+                </button>
+
+                <button
+                  class="control-button"
+                  data-action="water"
+                  type="button"
+                >
+                  <img
+                    src="../../assets/dog/water.webp"
+                    alt=""
+                    width="651"
+                    height="383"
+                  />
+                  <span class="control-label">Water</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const state = {
+        food: 100,
+        water: 100,
+        love: 100,
+        volume: 0,
+        lastTick: performance.now(),
+      };
+
+      const DRAIN_PER_SECOND = 7;
+      const VOLUME_UP_PER_SECOND = 4;
+      const VOLUME_DOWN_PER_SECOND = 8;
+      const BOOSTS = {
+        food: 20,
+        water: 20,
+        love: 5,
+      };
+
+      const els = {
+        volumeLabel: document.getElementById("volumeLabel"),
+        foodFill: document.getElementById("foodFill"),
+        waterFill: document.getElementById("waterFill"),
+        loveFill: document.getElementById("loveFill"),
+        foodValue: document.getElementById("foodValue"),
+        waterValue: document.getElementById("waterValue"),
+        loveValue: document.getElementById("loveValue"),
+        dogFigure: document.getElementById("dogFigure"),
+        heartsLayer: document.getElementById("heartsLayer"),
+        buttons: Array.from(document.querySelectorAll(".control-button")),
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function render() {
+        els.foodFill.style.width = `${state.food}%`;
+        els.waterFill.style.width = `${state.water}%`;
+        els.loveFill.style.width = `${state.love}%`;
+
+        els.foodValue.textContent = String(Math.round(state.food));
+        els.waterValue.textContent = String(Math.round(state.water));
+        els.loveValue.textContent = String(Math.round(state.love));
+        els.volumeLabel.textContent = `Volume: ${Math.round(state.volume)}%`;
+      }
+
+      function spawnHeart(clientX, clientY) {
+        const rect = els.dogFigure.getBoundingClientRect();
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        const y = ((clientY - rect.top) / rect.height) * 100;
+
+        const heart = document.createElement("span");
+        heart.className = "heart";
+        heart.style.left = `${x}%`;
+        heart.style.top = `${y}%`;
+        els.heartsLayer.appendChild(heart);
+
+        window.setTimeout(() => {
+          heart.remove();
+        }, 520);
+      }
+
+      function applyAction(action) {
+        if (action === "food") {
+          state.food = clamp(state.food + BOOSTS.food, 0, 100);
+        } else if (action === "water") {
+          state.water = clamp(state.water + BOOSTS.water, 0, 100);
+        } else if (action === "love") {
+          state.love = clamp(state.love + BOOSTS.love, 0, 100);
+        }
+
+        render();
+      }
+
+      function bindControl(button) {
+        let dragClone = null;
+        let pointerId = null;
+        let lastPoint = null;
+
+        function moveClone(clientX, clientY) {
+          lastPoint = { x: clientX, y: clientY };
+          if (!dragClone) return;
+          dragClone.style.left = `${clientX}px`;
+          dragClone.style.top = `${clientY}px`;
+        }
+
+        function cleanupDrag() {
+          button.classList.remove("is-dragging");
+
+          if (dragClone) {
+            dragClone.remove();
+            dragClone = null;
+          }
+
+          lastPoint = null;
+          pointerId = null;
+        }
+
+        function start(event) {
+          event.preventDefault();
+          pointerId = event.pointerId;
+          button.classList.add("is-dragging");
+          button.setPointerCapture(pointerId);
+
+          dragClone = button.cloneNode(true);
+          dragClone.classList.add("drag-clone");
+          dragClone.classList.remove("is-dragging");
+          dragClone.setAttribute("aria-hidden", "true");
+          document.body.appendChild(dragClone);
+          moveClone(event.clientX, event.clientY);
+        }
+
+        function stop(event) {
+          if (pointerId !== event.pointerId) return;
+
+          if (!lastPoint) {
+            lastPoint = { x: event.clientX, y: event.clientY };
+          }
+
+          const dogRect = els.dogFigure.getBoundingClientRect();
+          const droppedOnDog =
+            lastPoint.x >= dogRect.left &&
+            lastPoint.x <= dogRect.right &&
+            lastPoint.y >= dogRect.top &&
+            lastPoint.y <= dogRect.bottom;
+
+          button.releasePointerCapture?.(pointerId);
+          cleanupDrag();
+
+          if (droppedOnDog) {
+            applyAction(button.dataset.action);
+          }
+        }
+
+        button.addEventListener("pointerdown", start);
+        button.addEventListener("pointermove", (event) => {
+          if (pointerId !== event.pointerId) return;
+          moveClone(event.clientX, event.clientY);
+        });
+        button.addEventListener("pointerup", stop);
+        button.addEventListener("pointercancel", stop);
+        button.addEventListener("lostpointercapture", cleanupDrag);
+      }
+
+      function tick(now) {
+        const dt = Math.min((now - state.lastTick) / 1000, 0.05);
+        state.lastTick = now;
+
+        state.food = clamp(state.food - DRAIN_PER_SECOND * dt, 0, 100);
+        state.water = clamp(state.water - DRAIN_PER_SECOND * dt, 0, 100);
+        state.love = clamp(state.love - DRAIN_PER_SECOND * dt, 0, 100);
+
+        const stable = state.food > 0 && state.water > 0 && state.love > 0;
+
+        if (stable) {
+          state.volume = clamp(state.volume + VOLUME_UP_PER_SECOND * dt, 0, 100);
+        } else {
+          state.volume = clamp(
+            state.volume - VOLUME_DOWN_PER_SECOND * dt,
+            0,
+            100,
+          );
+        }
+
+        render();
+        requestAnimationFrame(tick);
+      }
+
+      els.buttons.forEach(bindControl);
+      els.dogFigure.addEventListener("click", (event) => {
+        applyAction("love");
+        spawnHeart(event.clientX, event.clientY);
+      });
+      els.dogFigure.addEventListener("keydown", (event) => {
+        if (event.key !== " " && event.key !== "Enter") return;
+        event.preventDefault();
+        applyAction("love");
+        const rect = els.dogFigure.getBoundingClientRect();
+        spawnHeart(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      });
+      render();
+      requestAnimationFrame(tick);
+    </script>
+    <script src="../../assets/site.js" defer></script>
+  </body>
+</html>

@@ -28,8 +28,10 @@ const AUDIO_VOLUME_SELECTORS_BY_SLUG = {
   alphabetical: ["#volumeLabel"],
   battery: ["#volumeLabel"],
   cannon: ["#volLabel"],
+  chess: ["#volumeLabel"],
   crank: ["#volumeLabel"],
   dino: ["#volumeLabel"],
+  dog: ["#volumeLabel"],
   curling: ["#titleLabel"],
   drag: ["#percent"],
   dropdown: ["#selectedVolume", "#volumeSelect"],
@@ -95,10 +97,23 @@ const sliders = [
     preview: false,
   },
   {
+    title: "Dog",
+    description: "Keep the dog maintained.",
+    slug: "dog",
+    path: "sliders/dog/",
+  },
+  {
     title: "Cannon",
     description: "Aim the speaker. Release.",
     slug: "cannon",
     path: "sliders/cannon/",
+    preview: false,
+  },
+  {
+    title: "Chess",
+    description: "Play a move. Let it judge the volume.",
+    slug: "chess",
+    path: "sliders/chess/",
     preview: false,
   },
   {
@@ -530,7 +545,7 @@ function renderSiteHeader() {
 }
 
 function getPageSlug() {
-  const match = window.location.pathname.match(/\/sliders\/([^/]+)\/?$/);
+  const match = window.location.pathname.match(/\/sliders\/([^/]+?)(?:\/|\.html)?$/);
   return match ? match[1] : "";
 }
 
