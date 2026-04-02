@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Morse | Volume</title>
+    <meta
+      name="description"
+      content="Tap and hold to enter volume in Morse code."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Morse | Volume" />
+    <meta
+      property="og:description"
+      content="Tap and hold to enter volume in Morse code."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/morse/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Morse | Volume" />
+    <meta
+      name="twitter:description"
+      content="Tap and hold to enter volume in Morse code."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/morse/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        margin-bottom: 6px;
+        color: #111;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .volume {
+        margin-bottom: 22px;
+        color: #111;
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        padding: 24px 22px;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .press-bar {
+        position: relative;
+        width: 100%;
+        height: 58px;
+        padding: 0;
+        border: 1px solid #dddddd;
+        border-radius: 16px;
+        background: #fbfbfb;
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      .press-bar:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 3px;
+      }
+
+      .press-bar.is-pressing {
+        background: #f5f5f5;
+      }
+
+      .track {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        top: 50%;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e9e9;
+        transform: translateY(-50%);
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .track-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      .thumb {
+        position: absolute;
+        top: 50%;
+        left: 18px;
+        width: 26px;
+        height: 26px;
+        border: 1.5px solid #d8d8d8;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .hold-line {
+        position: absolute;
+        left: 18px;
+        bottom: 10px;
+        height: 2px;
+        width: 0%;
+        border-radius: 999px;
+        background: #b8b8b8;
+        pointer-events: none;
+      }
+
+      .readout-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        margin-top: 16px;
+        color: #111;
+        font-size: 0.96rem;
+      }
+
+      .digits,
+      .signal {
+        min-height: 1.3em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .signal {
+        color: #6f6f6f;
+        letter-spacing: 0.1em;
+        text-align: right;
+      }
+
+      .reset {
+        margin-top: 14px;
+        min-height: 40px;
+        padding: 0.55rem 0.95rem;
+        border: 1px solid #d7d7d7;
+        border-radius: 10px;
+        background: #fff;
+        color: #111;
+        font: inherit;
+      }
+
+      .reset:hover {
+        background: #f7f7f7;
+      }
+
+      .reset:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 2px;
+      }
+
+      .tutorial {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 18px;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid #ececec;
+        font-size: 0.8rem;
+        color: #666;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tutorial-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .tutorial-item code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.78rem;
+        color: #444;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 20px 18px;
+        }
+
+        .press-bar {
+          height: 54px;
+        }
+
+        .tutorial {
+          gap: 8px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Morse</h1>
+          <p>Tap. Hold. It translates.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">0%</div>
+
+          <div class="slider-shell">
+            <button
+              class="press-bar"
+              id="pressBar"
+              type="button"
+              aria-label="Morse input bar"
+            >
+              <div class="track" aria-hidden="true">
+                <div class="track-fill" id="trackFill"></div>
+              </div>
+              <div class="thumb" id="thumb" aria-hidden="true"></div>
+              <div class="hold-line" id="holdLine" aria-hidden="true"></div>
+            </button>
+
+            <div class="readout-row" aria-live="polite">
+              <div class="digits" id="digitsLabel">0</div>
+              <div class="signal" id="signalLabel"></div>
+            </div>
+
+            <button class="reset" id="resetButton" type="button">Reset</button>
+
+            <div class="tutorial" aria-label="Morse numbers">
+              <div class="tutorial-item"><span>1</span><code>.----</code></div>
+              <div class="tutorial-item"><span>6</span><code>-....</code></div>
+              <div class="tutorial-item"><span>2</span><code>..---</code></div>
+              <div class="tutorial-item"><span>7</span><code>--...</code></div>
+              <div class="tutorial-item"><span>3</span><code>...--</code></div>
+              <div class="tutorial-item"><span>8</span><code>---..</code></div>
+              <div class="tutorial-item"><span>4</span><code>....-</code></div>
+              <div class="tutorial-item"><span>9</span><code>----.</code></div>
+              <div class="tutorial-item"><span>5</span><code>.....</code></div>
+              <div class="tutorial-item"><span>0</span><code>-----</code></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const MORSE_DIGITS = {
+        ".----": "1",
+        "..---": "2",
+        "...--": "3",
+        "....-": "4",
+        ".....": "5",
+        "-....": "6",
+        "--...": "7",
+        "---..": "8",
+        "----.": "9",
+        "-----": "0",
+      };
+
+      const HOLD_THRESHOLD_MS = 260;
+
+      const pressBar = document.getElementById("pressBar");
+      const trackFill = document.getElementById("trackFill");
+      const thumb = document.getElementById("thumb");
+      const holdLine = document.getElementById("holdLine");
+      const digitsLabel = document.getElementById("digitsLabel");
+      const signalLabel = document.getElementById("signalLabel");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const resetButton = document.getElementById("resetButton");
+
+      const state = {
+        enteredDigits: "0",
+        currentToken: "",
+        pressStart: 0,
+        pointerId: null,
+        pressing: false,
+        rafId: 0,
+      };
+
+      function getVolume() {
+        return Math.max(0, Math.min(100, Number(state.enteredDigits) || 0));
+      }
+
+      function render() {
+        const volume = getVolume();
+        const inset = 18;
+        const width = Math.max(pressBar.clientWidth - inset * 2, 1);
+        const left = inset + (width * volume) / 100;
+
+        volumeLabel.textContent = `${volume}%`;
+        digitsLabel.textContent = state.enteredDigits;
+        signalLabel.textContent = state.currentToken;
+        trackFill.style.width = `${volume}%`;
+        thumb.style.left = `${left}px`;
+      }
+
+      function updateHoldLine() {
+        if (!state.pressing) {
+          holdLine.style.width = "0%";
+          return;
+        }
+
+        const elapsed = performance.now() - state.pressStart;
+        const progress = Math.min(elapsed / HOLD_THRESHOLD_MS, 1);
+        holdLine.style.width = `${progress * 100}%`;
+        state.rafId = requestAnimationFrame(updateHoldLine);
+      }
+
+      function appendDecodedDigit(digit) {
+        const nextRaw =
+          state.enteredDigits === "0"
+            ? digit
+            : `${state.enteredDigits}${digit}`;
+
+        if (Number(nextRaw) <= 100) {
+          state.enteredDigits = String(Number(nextRaw));
+        } else {
+          state.enteredDigits = digit;
+        }
+      }
+
+      function commitSymbol(symbol) {
+        if (state.currentToken.length >= 5) {
+          state.currentToken = "";
+        }
+
+        state.currentToken += symbol;
+
+        if (state.currentToken.length === 5) {
+          const digit = MORSE_DIGITS[state.currentToken];
+
+          if (digit) {
+            appendDecodedDigit(digit);
+          }
+
+          state.currentToken = "";
+        }
+
+        render();
+      }
+
+      function startPress(event) {
+        event.preventDefault();
+        pressBar.focus({ preventScroll: true });
+        state.pressing = true;
+        state.pointerId = event.pointerId;
+        state.pressStart = performance.now();
+        pressBar.classList.add("is-pressing");
+        pressBar.setPointerCapture(event.pointerId);
+        cancelAnimationFrame(state.rafId);
+        updateHoldLine();
+      }
+
+      function endPress(event) {
+        if (!state.pressing || event.pointerId !== state.pointerId) {
+          return;
+        }
+
+        const duration = performance.now() - state.pressStart;
+        state.pressing = false;
+        state.pointerId = null;
+        pressBar.classList.remove("is-pressing");
+        cancelAnimationFrame(state.rafId);
+        holdLine.style.width = "0%";
+        commitSymbol(duration >= HOLD_THRESHOLD_MS ? "-" : ".");
+      }
+
+      function resetAll() {
+        state.enteredDigits = "0";
+        state.currentToken = "";
+        state.pressing = false;
+        state.pointerId = null;
+        pressBar.classList.remove("is-pressing");
+        cancelAnimationFrame(state.rafId);
+        holdLine.style.width = "0%";
+        render();
+      }
+
+      pressBar.addEventListener("pointerdown", startPress);
+      pressBar.addEventListener("pointerup", endPress);
+      pressBar.addEventListener("pointercancel", endPress);
+      resetButton.addEventListener("click", resetAll);
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key.toLowerCase() === "r") {
+          event.preventDefault();
+          resetAll();
+        }
+      });
+
+      render();
+      window.addEventListener("resize", render, { passive: true });
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

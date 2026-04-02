@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Irrational | Volume</title>
+    <meta
+      name="description"
+      content="Use a slider with an irrational scale."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Irrational | Volume" />
+    <meta
+      property="og:description"
+      content="Use a slider with an irrational scale."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/irrational.html"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Irrational | Volume" />
+    <meta
+      name="twitter:description"
+      content="Use a slider with an irrational scale."
+    />
+    <link
+      rel="canonical"
+      href="https://vivancodes.com/sliders/irrational.html"
+    />
+    <link rel="icon" type="image/png" href="../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        margin-bottom: 6px;
+        color: #111;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .volume {
+        margin-bottom: 20px;
+        color: #111;
+        font-size: clamp(2.1rem, 7vw, 2.8rem);
+        font-weight: 300;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        padding: 24px 22px;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        color: #999;
+      }
+
+      .track-wrap {
+        position: relative;
+        flex: 1;
+        height: 34px;
+        display: flex;
+        align-items: center;
+      }
+
+      .track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e9e9;
+        overflow: hidden;
+      }
+
+      .track-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      .thumb {
+        position: absolute;
+        top: 50%;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #d8d8d8;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translate(-50%, -50%);
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .thumb:active {
+        cursor: grabbing;
+      }
+
+      .thumb:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 4px;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 20px 18px;
+        }
+
+        .slider-row {
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Irrational</h1>
+          <p>The scale does not land cleanly.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">Volume = 16pi</div>
+
+          <div class="slider-shell">
+            <div class="slider-row">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+
+              <div class="track-wrap" id="trackWrap">
+                <div class="track">
+                  <div class="track-fill" id="trackFill"></div>
+                </div>
+                <div
+                  class="thumb"
+                  id="thumb"
+                  tabindex="0"
+                  role="slider"
+                  aria-label="Irrational volume slider"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="50"
+                  aria-valuetext="50%"
+                ></div>
+              </div>
+
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const trackWrap = document.getElementById("trackWrap");
+      const thumb = document.getElementById("thumb");
+      const trackFill = document.getElementById("trackFill");
+      const volumeLabel = document.getElementById("volumeLabel");
+
+      const STEP_COUNT = 76;
+      const PHI = (1 + Math.sqrt(5)) / 2;
+      const DELTA_S = 1 + Math.sqrt(2);
+      const LN2 = Math.log(2);
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function isPerfectSquare(value) {
+        const root = Math.round(Math.sqrt(value));
+        return root * root === value;
+      }
+
+      function isPerfectCube(value) {
+        const root = Math.round(Math.cbrt(value));
+        return root * root * root === value;
+      }
+
+      function makePiStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / Math.PI));
+        let value = multiplier * Math.PI;
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * Math.PI;
+        }
+
+        return { label: `${multiplier}pi`, value };
+      }
+
+      function makeEStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / Math.E));
+        let value = multiplier * Math.E;
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * Math.E;
+        }
+
+        return { label: `${multiplier}e`, value };
+      }
+
+      function makePhiStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / PHI));
+        let value = multiplier * PHI;
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * PHI;
+        }
+
+        return { label: `${multiplier}phi`, value };
+      }
+
+      function makeRootStep(target, previousValue) {
+        let radicand = Math.max(2, Math.round(target * target));
+        let value = Math.sqrt(radicand);
+
+        while (isPerfectSquare(radicand) || value <= previousValue) {
+          radicand += 1;
+          value = Math.sqrt(radicand);
+        }
+
+        return { label: `sqrt(${radicand})`, value };
+      }
+
+      function makeRootTwoStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / Math.sqrt(2)));
+        let value = multiplier * Math.sqrt(2);
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * Math.sqrt(2);
+        }
+
+        return { label: `${multiplier}sqrt(2)`, value };
+      }
+
+      function makeCubeRootStep(target, previousValue) {
+        let radicand = Math.max(2, Math.round(target ** 3));
+        let value = Math.cbrt(radicand);
+
+        while (isPerfectCube(radicand) || value <= previousValue) {
+          radicand += 1;
+          value = Math.cbrt(radicand);
+        }
+
+        return { label: `cbrt(${radicand})`, value };
+      }
+
+      function makeDeltaSStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / DELTA_S));
+        let value = multiplier * DELTA_S;
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * DELTA_S;
+        }
+
+        return { label: `${multiplier}(1+sqrt(2))`, value };
+      }
+
+      function makeLn2Step(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / LN2));
+        let value = multiplier * LN2;
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * LN2;
+        }
+
+        return { label: `${multiplier}ln(2)`, value };
+      }
+
+      function makeRootThreeStep(target, previousValue) {
+        let multiplier = Math.max(1, Math.round(target / Math.sqrt(3)));
+        let value = multiplier * Math.sqrt(3);
+
+        while (value <= previousValue) {
+          multiplier += 1;
+          value = multiplier * Math.sqrt(3);
+        }
+
+        return { label: `${multiplier}sqrt(3)`, value };
+      }
+
+      function makeSteps() {
+        const builders = [
+          makePiStep,
+          makeEStep,
+          makePhiStep,
+          makeRootStep,
+          makeRootTwoStep,
+          makeCubeRootStep,
+          makeDeltaSStep,
+          makeLn2Step,
+          makeRootThreeStep,
+        ];
+        const steps = [];
+        let previousValue = 0;
+
+        for (let step = 0; step < STEP_COUNT; step += 1) {
+          const target = 0.75 + (98.5 * step) / (STEP_COUNT - 1);
+          const builder = builders[step % builders.length];
+          let nextStep = builder(target, previousValue);
+
+          while (nextStep.value >= 99.95) {
+            nextStep = makeRootStep(target - 0.4, previousValue);
+          }
+
+          previousValue = nextStep.value;
+          steps.push(nextStep);
+        }
+
+        return steps;
+      }
+
+      const steps = makeSteps();
+      let trackWidth = 1;
+
+      const state = {
+        index: Math.floor(steps.length / 2),
+        dragging: false,
+        pointerId: null,
+      };
+
+      function render() {
+        const current = steps[state.index];
+        const px = (current.value / 100) * trackWidth;
+
+        thumb.style.left = `${px}px`;
+        trackFill.style.width = `${current.value}%`;
+        volumeLabel.textContent = `Volume = ${current.label}`;
+        thumb.setAttribute("aria-valuenow", String(Math.round(current.value)));
+        thumb.setAttribute("aria-valuetext", `Volume = ${current.label}`);
+      }
+
+      function updateBounds() {
+        trackWidth = Math.max(trackWrap.clientWidth, 1);
+        render();
+      }
+
+      function findNearestIndexFromEvent(event) {
+        const rect = trackWrap.getBoundingClientRect();
+        const x = clamp(event.clientX - rect.left, 0, trackWidth);
+        const targetValue = (x / trackWidth) * 100;
+        let bestIndex = 0;
+        let bestDistance = Infinity;
+
+        steps.forEach((step, index) => {
+          const distance = Math.abs(step.value - targetValue);
+
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = index;
+          }
+        });
+
+        return bestIndex;
+      }
+
+      thumb.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        thumb.focus({ preventScroll: true });
+        state.dragging = true;
+        state.pointerId = event.pointerId;
+        state.index = findNearestIndexFromEvent(event);
+        render();
+        thumb.setPointerCapture(event.pointerId);
+      });
+
+      window.addEventListener("pointermove", (event) => {
+        if (!state.dragging || event.pointerId !== state.pointerId) {
+          return;
+        }
+
+        state.index = findNearestIndexFromEvent(event);
+        render();
+      });
+
+      function stopDrag(event) {
+        if (!state.dragging || event.pointerId !== state.pointerId) {
+          return;
+        }
+
+        state.dragging = false;
+        state.pointerId = null;
+      }
+
+      thumb.addEventListener("keydown", (event) => {
+        let nextIndex = null;
+
+        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+          nextIndex = state.index - 1;
+        } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+          nextIndex = state.index + 1;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = steps.length - 1;
+        }
+
+        if (nextIndex === null) {
+          return;
+        }
+
+        event.preventDefault();
+        state.index = clamp(nextIndex, 0, steps.length - 1);
+        render();
+      });
+
+      window.addEventListener("pointerup", stopDrag);
+      window.addEventListener("pointercancel", stopDrag);
+      window.addEventListener("resize", updateBounds, { passive: true });
+
+      updateBounds();
+    </script>
+    <script src="../assets/site.js"></script>
+  </body>
+</html>

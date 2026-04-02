@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pi | Volume</title>
+    <meta
+      name="description"
+      content="Type digits of pi to raise the volume one point at a time."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Pi | Volume" />
+    <meta
+      property="og:description"
+      content="Type digits of pi to raise the volume one point at a time."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/pi/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Pi | Volume" />
+    <meta
+      name="twitter:description"
+      content="Type digits of pi to raise the volume one point at a time."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/pi/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        margin-bottom: 6px;
+        color: #111;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .volume {
+        margin-bottom: 22px;
+        color: #111;
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        padding: 24px 22px;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        color: #999;
+      }
+
+      .track-wrap {
+        position: relative;
+        flex: 1;
+        height: 34px;
+        display: flex;
+        align-items: center;
+      }
+
+      .track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e9e9;
+        overflow: hidden;
+      }
+
+      .track-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      .thumb {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 26px;
+        height: 26px;
+        border: 1.5px solid #d8d8d8;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+
+      .pi-entry {
+        margin-top: 22px;
+        padding: 0 2px 12px;
+        border-bottom: 1px solid #e6e6e6;
+        color: #111;
+        font-size: clamp(1.6rem, 5vw, 1.9rem);
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .pi-entry::-webkit-scrollbar {
+        display: none;
+      }
+
+      .keypad {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .digit-button,
+      .backspace-button {
+        min-height: 50px;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        background: #fff;
+        color: #111;
+        font: inherit;
+        font-size: 1rem;
+        transition:
+          border-color 0.16s ease,
+          background-color 0.16s ease;
+      }
+
+      .digit-button:hover,
+      .backspace-button:hover {
+        border-color: #c9c9c9;
+        background: #f7f7f7;
+      }
+
+      .digit-button:active,
+      .backspace-button:active {
+        background: #f0f0f0;
+      }
+
+      .digit-button:focus-visible,
+      .backspace-button:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 2px;
+      }
+
+      .digit-button.zero {
+        grid-column: span 2;
+      }
+
+      .hint {
+        margin-top: 14px;
+        color: #969696;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 20px 18px;
+        }
+
+        .slider-row {
+          gap: 10px;
+        }
+
+        .keypad {
+          gap: 8px;
+        }
+
+        .digit-button,
+        .backspace-button {
+          min-height: 46px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Pi</h1>
+          <p>Type digits. The slider follows.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">0%</div>
+
+          <div class="slider-shell">
+            <div class="slider-row">
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+
+              <div
+                class="track-wrap"
+                role="slider"
+                aria-label="Pi volume slider"
+                aria-disabled="true"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+                aria-valuetext="0%"
+              >
+                <div class="track" aria-hidden="true">
+                  <div class="track-fill" id="trackFill"></div>
+                </div>
+                <div class="thumb" id="thumb" aria-hidden="true"></div>
+              </div>
+
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                <path
+                  d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+            <div class="pi-entry" id="piEntry" aria-live="polite">3.</div>
+
+            <div class="keypad" aria-label="Pi keypad">
+              <button class="digit-button" type="button" data-digit="1">
+                1
+              </button>
+              <button class="digit-button" type="button" data-digit="2">
+                2
+              </button>
+              <button class="digit-button" type="button" data-digit="3">
+                3
+              </button>
+              <button class="digit-button" type="button" data-digit="4">
+                4
+              </button>
+              <button class="digit-button" type="button" data-digit="5">
+                5
+              </button>
+              <button class="digit-button" type="button" data-digit="6">
+                6
+              </button>
+              <button class="digit-button" type="button" data-digit="7">
+                7
+              </button>
+              <button class="digit-button" type="button" data-digit="8">
+                8
+              </button>
+              <button class="digit-button" type="button" data-digit="9">
+                9
+              </button>
+              <button class="digit-button zero" type="button" data-digit="0">
+                0
+              </button>
+              <button
+                class="backspace-button"
+                type="button"
+                id="backspaceButton"
+              >
+                Backspace
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const PI_DIGITS =
+        "14159265358979323846264338327950288419716939937510" +
+        "58209749445923078164062862089986280348253421170679" +
+        "82148086513282306647";
+
+      const piEntry = document.getElementById("piEntry");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const trackFill = document.getElementById("trackFill");
+      const thumb = document.getElementById("thumb");
+      const slider = document.querySelector('[role="slider"]');
+      const backspaceButton = document.getElementById("backspaceButton");
+      const digitButtons = Array.from(
+        document.querySelectorAll("[data-digit]"),
+      );
+
+      let enteredDigits = "";
+
+      function getVolume() {
+        if (!enteredDigits) {
+          return 0;
+        }
+
+        if (!PI_DIGITS.startsWith(enteredDigits)) {
+          return 0;
+        }
+
+        return Math.min(enteredDigits.length, 100);
+      }
+
+      function render() {
+        const volume = getVolume();
+        piEntry.textContent = `3.${enteredDigits}`;
+        volumeLabel.textContent = `${volume}%`;
+        trackFill.style.width = `${volume}%`;
+        thumb.style.left = `${volume}%`;
+        slider.setAttribute("aria-valuenow", String(volume));
+        slider.setAttribute("aria-valuetext", `${volume}%`);
+      }
+
+      function appendDigit(digit) {
+        if (enteredDigits.length >= 100) {
+          return;
+        }
+
+        enteredDigits += digit;
+        render();
+      }
+
+      function removeDigit() {
+        if (!enteredDigits) {
+          return;
+        }
+
+        enteredDigits = enteredDigits.slice(0, -1);
+        render();
+      }
+
+      digitButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          appendDigit(button.dataset.digit || "");
+        });
+      });
+
+      backspaceButton.addEventListener("click", removeDigit);
+
+      window.addEventListener("keydown", (event) => {
+        if (/^[0-9]$/.test(event.key)) {
+          event.preventDefault();
+          appendDigit(event.key);
+          return;
+        }
+
+        if (event.key === "Backspace" || event.key === "Delete") {
+          event.preventDefault();
+          removeDigit();
+        }
+      });
+
+      render();
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

@@ -41,9 +41,11 @@ const AUDIO_VOLUME_SELECTORS_BY_SLUG = {
   horse_race: ["#volumeLabel"],
   hundred_sliders: ["#volumeLabel"],
   inertia: ["#volumeLabel"],
+  irrational: ["#thumb"],
   lock: ["#volumeReadout"],
   memory: ["#volLabel"],
   personality: ["#volume", "#liveVolume"],
+  pi: ["#volumeLabel"],
   plinko: ["#volNum"],
   pump: ["#volumeLabel"],
   slots: ["#volumeLabel"],
@@ -198,6 +200,20 @@ const sliders = [
     description: "Answer honestly.",
     slug: "personality",
     path: "sliders/personality/",
+  },
+  {
+    title: "Pi",
+    description: "Type digits. Lose the thread.",
+    slug: "pi",
+    path: "sliders/pi/",
+    preview: false,
+  },
+  {
+    title: "Irrational",
+    description: "The scale does not land cleanly.",
+    slug: "irrational",
+    path: "sliders/irrational.html",
+    preview: false,
   },
   {
     title: "Pump",
@@ -669,6 +685,18 @@ function parseVolumeCandidateValue(element) {
   ) {
     const rawValue = Number.parseFloat(element.value);
     return Number.isFinite(rawValue) ? rawValue : null;
+  }
+
+  const dataVolume = element.getAttribute("data-volume");
+  if (dataVolume != null) {
+    const parsedDataVolume = Number.parseFloat(dataVolume);
+    if (Number.isFinite(parsedDataVolume)) return parsedDataVolume;
+  }
+
+  const ariaValueNow = element.getAttribute("aria-valuenow");
+  if (ariaValueNow != null) {
+    const parsedAriaValueNow = Number.parseFloat(ariaValueNow);
+    if (Number.isFinite(parsedAriaValueNow)) return parsedAriaValueNow;
   }
 
   const text = element.textContent ? element.textContent.trim() : "";
