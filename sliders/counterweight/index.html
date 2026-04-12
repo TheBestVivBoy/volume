@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counterweight | Volume</title>
+    <meta name="description" content="Set the volume by loading the beam." />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Counterweight | Volume" />
+    <meta
+      property="og:description"
+      content="Set the volume by loading the beam."
+    />
+    <meta
+      property="og:url"
+      content="https://vivancodes.com/sliders/counterweight/"
+    />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Counterweight | Volume" />
+    <meta
+      name="twitter:description"
+      content="Set the volume by loading the beam."
+    />
+
+    <link
+      rel="canonical"
+      href="https://vivancodes.com/sliders/counterweight/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+
+    <style>
+      body {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(72vh, 760px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      .wrap {
+        width: min(92vw, 520px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume-readout {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(4.1rem, 16vw, 6.2rem);
+        font-weight: 250;
+        line-height: 0.88;
+        letter-spacing: -0.09em;
+        font-variant-numeric: tabular-nums;
+        color: #111;
+      }
+
+      .slider-shell {
+        background: #fff;
+        border: 1.5px solid #e6e1d8;
+        border-radius: 24px;
+        padding: 22px 22px 18px;
+        box-shadow: 0 10px 28px rgba(17, 17, 17, 0.05);
+        display: grid;
+        gap: 18px;
+      }
+
+      .scale-stage {
+        position: relative;
+        height: 146px;
+      }
+
+      .scale-drop-area {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 48px;
+        height: 34px;
+        border-radius: 999px;
+      }
+
+      .scale-stage[data-drag-over="true"] .beam-track {
+        background: #d8d3ca;
+      }
+
+      .scale-stage[data-drag-over="true"] .beam-thumb {
+        box-shadow:
+          0 2px 8px rgba(17, 17, 17, 0.08),
+          0 0 0 4px rgba(17, 17, 17, 0.04);
+      }
+
+      .scale-wrap {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 18px;
+        height: 112px;
+        transform-origin: 50% 46px;
+      }
+
+      .beam-track,
+      .beam-fill {
+        position: absolute;
+        left: 0;
+        top: 42px;
+        height: 8px;
+        border-radius: 999px;
+      }
+
+      .beam-track {
+        right: 0;
+        background: #ddd8cf;
+      }
+
+      .beam-fill {
+        background: #111;
+        width: 50%;
+      }
+
+      .beam-thumb {
+        position: absolute;
+        left: 50%;
+        top: 46px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid #111;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(17, 17, 17, 0.08);
+        transform: translate(-50%, -50%);
+      }
+
+      .pivot-dot {
+        position: absolute;
+        left: 50%;
+        top: 46px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #cfc9bf;
+        transform: translate(-50%, -50%);
+      }
+
+      .pivot-line {
+        position: absolute;
+        left: 50%;
+        top: 50px;
+        width: 2px;
+        height: 42px;
+        border-radius: 999px;
+        background: #d2ccc2;
+        transform: translateX(-50%);
+      }
+
+      .placed-layer {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+      }
+
+      .placed-weight,
+      .weight-chip,
+      .drag-ghost {
+        min-width: 48px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1.5px solid #d8d1c6;
+        background: #fff;
+        color: #111;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font: inherit;
+        font-size: 0.94rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        touch-action: none;
+      }
+
+      .placed-weight {
+        position: absolute;
+        top: 8px;
+        transform: translateX(-50%);
+        box-shadow: 0 4px 12px rgba(17, 17, 17, 0.06);
+        cursor: grab;
+      }
+
+      .placed-weight[data-hidden="true"] {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .weight-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .weight-chip {
+        cursor: grab;
+        transition:
+          background 120ms ease,
+          border-color 120ms ease,
+          opacity 120ms ease;
+      }
+
+      .weight-chip:hover {
+        background: #f8f6f1;
+      }
+
+      .weight-chip[data-used="true"] {
+        opacity: 0.25;
+        cursor: default;
+      }
+
+      .controls-row {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .action-button {
+        min-height: 34px;
+        padding: 0 14px;
+        border: 1.5px solid #ddd8cf;
+        border-radius: 12px;
+        background: #fff;
+        color: #111;
+        font: inherit;
+        font-size: 0.84rem;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+        transition:
+          background 120ms ease,
+          border-color 120ms ease;
+      }
+
+      .action-button:hover {
+        background: #f8f6f1;
+      }
+
+      .weight-chip:focus-visible,
+      .placed-weight:focus-visible,
+      .action-button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.08);
+      }
+
+      .drag-ghost {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 9999;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 10px 24px rgba(17, 17, 17, 0.12);
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 18px 18px 16px;
+          border-radius: 20px;
+        }
+
+        .scale-stage {
+          height: 136px;
+        }
+
+        .scale-drop-area {
+          left: 18px;
+          right: 18px;
+        }
+
+        .scale-wrap {
+          left: 18px;
+          right: 18px;
+        }
+
+        .placed-weight,
+        .weight-chip,
+        .drag-ghost {
+          min-width: 44px;
+          height: 32px;
+          padding: 0 12px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Counterweight</h1>
+          <p>Make sure to balance it.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <p class="volume-readout" id="volumeLabel">50%</p>
+
+          <div class="slider-shell">
+            <div class="scale-stage" id="scaleStage" data-drag-over="false">
+              <div class="scale-drop-area" id="scaleDropArea"></div>
+
+              <div class="scale-wrap" id="scaleWrap" aria-hidden="true">
+                <div class="beam-track"></div>
+                <div class="beam-fill" id="beamFill"></div>
+                <div class="pivot-line"></div>
+                <div class="pivot-dot"></div>
+                <div class="beam-thumb" id="beamThumb"></div>
+                <div class="placed-layer" id="placedLayer"></div>
+              </div>
+            </div>
+
+            <div
+              class="weight-row"
+              id="weightsTray"
+              aria-label="Available weights"
+            ></div>
+
+            <div class="controls-row">
+              <button class="action-button" id="actionButton" type="button">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const WEIGHTS = Object.freeze([
+        { id: "w1", value: 1, label: "1" },
+        { id: "w2", value: 2, label: "2" },
+        { id: "w5", value: 5, label: "5" },
+        { id: "w10", value: 10, label: "10" },
+      ]);
+
+      const SLOT_MIN = -6;
+      const SLOT_MAX = 6;
+      const TOTAL_WEIGHT = WEIGHTS.reduce(
+        (sum, weight) => sum + weight.value,
+        0,
+      );
+      const MAX_MOMENT = TOTAL_WEIGHT * SLOT_MAX;
+      const MAX_ANGLE = 10;
+
+      const volumeLabel = document.getElementById("volumeLabel");
+      const scaleStage = document.getElementById("scaleStage");
+      const scaleDropArea = document.getElementById("scaleDropArea");
+      const scaleWrap = document.getElementById("scaleWrap");
+      const beamFill = document.getElementById("beamFill");
+      const beamThumb = document.getElementById("beamThumb");
+      const placedLayer = document.getElementById("placedLayer");
+      const weightsTray = document.getElementById("weightsTray");
+      const actionButton = document.getElementById("actionButton");
+
+      const trayButtons = new Map();
+
+      const state = {
+        placements: Object.fromEntries(
+          WEIGHTS.map((weight) => [weight.id, null]),
+        ),
+        currentVolume: 50,
+        displayVolume: 50,
+        currentAngle: 0,
+        displayAngle: 0,
+        drag: {
+          pointerId: null,
+          weightId: null,
+          fromScale: false,
+          startX: 0,
+          startY: 0,
+          started: false,
+          ghost: null,
+          hoverScale: false,
+          originEl: null,
+        },
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function isPlaced(weightId) {
+        return typeof state.placements[weightId] === "number";
+      }
+
+      function getWeightById(weightId) {
+        return WEIGHTS.find((weight) => weight.id === weightId) || null;
+      }
+
+      function slotToPercent(slot) {
+        return ((slot - SLOT_MIN) / (SLOT_MAX - SLOT_MIN)) * 100;
+      }
+
+      function getMoment() {
+        let total = 0;
+
+        for (const weight of WEIGHTS) {
+          const slot = state.placements[weight.id];
+          if (typeof slot !== "number") continue;
+          total += weight.value * slot;
+        }
+
+        return total;
+      }
+
+      function syncDerivedState() {
+        const moment = getMoment();
+        state.currentVolume = clamp(50 + (moment / MAX_MOMENT) * 50, 0, 100);
+        state.currentAngle = (moment / MAX_MOMENT) * MAX_ANGLE;
+        renderStatic();
+      }
+
+      function buildTray() {
+        for (const weight of WEIGHTS) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "weight-chip";
+          button.dataset.weightId = weight.id;
+          button.dataset.used = "false";
+          button.textContent = weight.label;
+          button.setAttribute("aria-label", `Weight ${weight.value}`);
+          weightsTray.appendChild(button);
+          trayButtons.set(weight.id, button);
+        }
+      }
+
+      function renderPlacedWeights() {
+        placedLayer.innerHTML = "";
+
+        const placedWeights = WEIGHTS.filter((weight) =>
+          isPlaced(weight.id),
+        ).sort((a, b) => state.placements[a.id] - state.placements[b.id]);
+
+        const laneEnds = [];
+
+        for (const weight of placedWeights) {
+          const slot = state.placements[weight.id];
+          let lane = 0;
+
+          while (
+            laneEnds[lane] !== undefined &&
+            Math.abs(slot - laneEnds[lane]) <= 1
+          ) {
+            lane += 1;
+          }
+
+          laneEnds[lane] = slot;
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "placed-weight";
+          button.dataset.weightId = weight.id;
+          button.dataset.hidden =
+            state.drag.started &&
+            state.drag.fromScale &&
+            state.drag.weightId === weight.id
+              ? "true"
+              : "false";
+
+          button.style.left = `${slotToPercent(slot)}%`;
+          button.style.top = `${8 - lane * 10}px`;
+          button.textContent = weight.label;
+          button.setAttribute(
+            "aria-label",
+            `Weight ${weight.value}. Drag to move.`,
+          );
+
+          placedLayer.appendChild(button);
+        }
+      }
+
+      function renderStatic() {
+        for (const weight of WEIGHTS) {
+          const button = trayButtons.get(weight.id);
+          if (!button) continue;
+          button.dataset.used = isPlaced(weight.id) ? "true" : "false";
+        }
+
+        scaleStage.dataset.dragOver = state.drag.hoverScale ? "true" : "false";
+        renderPlacedWeights();
+      }
+
+      function renderAnimated() {
+        state.displayVolume +=
+          (state.currentVolume - state.displayVolume) * 0.18;
+        state.displayAngle += (state.currentAngle - state.displayAngle) * 0.16;
+
+        if (Math.abs(state.currentVolume - state.displayVolume) < 0.03) {
+          state.displayVolume = state.currentVolume;
+        }
+
+        if (Math.abs(state.currentAngle - state.displayAngle) < 0.02) {
+          state.displayAngle = state.currentAngle;
+        }
+
+        const displayValue = clamp(state.displayVolume, 0, 100);
+        volumeLabel.textContent = `${Math.round(displayValue)}%`;
+        beamFill.style.width = `${displayValue}%`;
+        beamThumb.style.left = `${displayValue}%`;
+        scaleWrap.style.transform = `rotate(${state.displayAngle}deg)`;
+      }
+
+      function tick() {
+        renderAnimated();
+        requestAnimationFrame(tick);
+      }
+
+      function buildGhost(weightId) {
+        const weight = getWeightById(weightId);
+        const ghost = document.createElement("div");
+        ghost.className = "drag-ghost";
+        ghost.textContent = weight ? weight.label : "";
+        document.body.appendChild(ghost);
+        return ghost;
+      }
+
+      function positionGhost(ghost, clientX, clientY) {
+        ghost.style.left = `${clientX}px`;
+        ghost.style.top = `${clientY}px`;
+      }
+
+      function pointInRect(clientX, clientY, rect) {
+        return (
+          clientX >= rect.left &&
+          clientX <= rect.right &&
+          clientY >= rect.top &&
+          clientY <= rect.bottom
+        );
+      }
+
+      function getDropSlot(clientX) {
+        const rect = scaleDropArea.getBoundingClientRect();
+        const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
+        const rawSlot = SLOT_MIN + Math.round(ratio * (SLOT_MAX - SLOT_MIN));
+        return clamp(rawSlot, SLOT_MIN, SLOT_MAX);
+      }
+
+      function placeWeight(weightId, slot) {
+        state.placements[weightId] = clamp(slot, SLOT_MIN, SLOT_MAX);
+        syncDerivedState();
+      }
+
+      function removeWeight(weightId) {
+        state.placements[weightId] = null;
+        syncDerivedState();
+      }
+
+      function cleanupDrag() {
+        const drag = state.drag;
+
+        if (drag.originEl && drag.pointerId !== null) {
+          if (drag.originEl.hasPointerCapture?.(drag.pointerId)) {
+            drag.originEl.releasePointerCapture(drag.pointerId);
+          }
+        }
+
+        if (drag.ghost) drag.ghost.remove();
+
+        Object.assign(state.drag, {
+          pointerId: null,
+          weightId: null,
+          fromScale: false,
+          startX: 0,
+          startY: 0,
+          started: false,
+          ghost: null,
+          hoverScale: false,
+          originEl: null,
+        });
+
+        renderStatic();
+      }
+
+      document.addEventListener("pointerdown", (event) => {
+        const trayWeight = event.target.closest(".weight-chip");
+        const placedWeight = event.target.closest(".placed-weight");
+
+        let weightId = null;
+        let fromScale = false;
+        let originEl = null;
+
+        if (trayWeight) {
+          weightId = trayWeight.dataset.weightId;
+          if (isPlaced(weightId)) return;
+          originEl = trayWeight;
+        } else if (placedWeight) {
+          weightId = placedWeight.dataset.weightId;
+          fromScale = true;
+          originEl = placedWeight;
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+
+        Object.assign(state.drag, {
+          pointerId: event.pointerId,
+          weightId,
+          fromScale,
+          startX: event.clientX,
+          startY: event.clientY,
+          started: false,
+          ghost: null,
+          hoverScale: pointInRect(
+            event.clientX,
+            event.clientY,
+            scaleDropArea.getBoundingClientRect(),
+          ),
+          originEl,
+        });
+
+        originEl.setPointerCapture?.(event.pointerId);
+        renderStatic();
+      });
+
+      window.addEventListener("pointermove", (event) => {
+        const drag = state.drag;
+        if (event.pointerId !== drag.pointerId || !drag.weightId) return;
+
+        const distance = Math.hypot(
+          event.clientX - drag.startX,
+          event.clientY - drag.startY,
+        );
+
+        if (!drag.started && distance > 4) {
+          drag.started = true;
+          drag.ghost = buildGhost(drag.weightId);
+        }
+
+        drag.hoverScale = pointInRect(
+          event.clientX,
+          event.clientY,
+          scaleDropArea.getBoundingClientRect(),
+        );
+
+        if (drag.ghost) {
+          positionGhost(drag.ghost, event.clientX, event.clientY);
+        }
+
+        renderStatic();
+      });
+
+      function finishDrag(event) {
+        const drag = state.drag;
+        if (event.pointerId !== drag.pointerId || !drag.weightId) return;
+
+        if (!drag.started) {
+          cleanupDrag();
+          return;
+        }
+
+        const overScale = pointInRect(
+          event.clientX,
+          event.clientY,
+          scaleDropArea.getBoundingClientRect(),
+        );
+
+        if (overScale) {
+          placeWeight(drag.weightId, getDropSlot(event.clientX));
+        } else if (drag.fromScale) {
+          removeWeight(drag.weightId);
+        }
+
+        cleanupDrag();
+      }
+
+      window.addEventListener("pointerup", finishDrag);
+      window.addEventListener("pointercancel", finishDrag);
+
+      actionButton.addEventListener("click", () => {
+        for (const weight of WEIGHTS) {
+          state.placements[weight.id] = null;
+        }
+        syncDerivedState();
+      });
+
+      buildTray();
+      syncDerivedState();
+      renderAnimated();
+      requestAnimationFrame(tick);
+    </script>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="\U0001f50a"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

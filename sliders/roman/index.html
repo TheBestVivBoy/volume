@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roman | Volume</title>
+    <meta
+      name="description"
+      content="Build a Roman numeral from little sticks and let the machine guess the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Roman | Volume" />
+    <meta
+      property="og:description"
+      content="Build a Roman numeral from little sticks and let the machine guess the volume."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/roman/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Roman | Volume" />
+    <meta
+      name="twitter:description"
+      content="Build a Roman numeral from little sticks and let the machine guess the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/roman/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .title {
+        margin-bottom: 6px;
+        color: #111;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .volume {
+        margin-bottom: 22px;
+        color: #111;
+        font-size: clamp(3rem, 10vw, 3.5rem);
+        font-weight: 200;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        padding: 24px 22px;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .build-stage {
+        position: relative;
+        height: 232px;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 14px;
+        background: #fafaf8;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      .build-stage.is-empty::after {
+        content: "Add a few sticks.";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: #a2a2a2;
+        font-size: 0.86rem;
+        pointer-events: none;
+      }
+
+      .stick {
+        position: absolute;
+        width: 16px;
+        height: 74px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        transform: translate(-50%, -50%);
+        touch-action: none;
+        cursor: grab;
+      }
+
+      .stick::before {
+        content: "";
+        position: absolute;
+        inset: 0 4px;
+        border-radius: 2px;
+        background: #161616;
+      }
+
+      .stick.is-selected::after {
+        content: "";
+        position: absolute;
+        inset: -6px 0;
+        border: 1.5px solid #cfcfcf;
+        border-radius: 10px;
+      }
+
+      .stick.is-dragging {
+        cursor: grabbing;
+      }
+
+      .stick:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 4px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .control {
+        flex: 1;
+        min-height: 42px;
+        padding: 0.7rem 0.95rem;
+        border: 1.5px solid #dcdcdc;
+        border-radius: 10px;
+        background: #fff;
+        color: #111;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .control:hover {
+        background: #f8f8f8;
+      }
+
+      .control:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 2px;
+      }
+
+      .control:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .status {
+        margin-top: 14px;
+        min-height: 1.25em;
+        color: #868686;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .slider-shell {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Roman</h1>
+          <p>Build the numeral. It guesses the number.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="title">Adjust Volume</div>
+          <div class="volume" id="volumeLabel">0%</div>
+
+          <div class="slider-shell">
+            <div class="build-stage is-empty" id="buildStage" aria-label="Roman numeral build area"></div>
+
+            <div class="controls">
+              <button class="control" id="addStickButton" type="button">
+                Add stick
+              </button>
+              <button class="control" id="rotateButton" type="button">
+                Rotate
+              </button>
+              <button class="control" id="resetButton" type="button">
+                Clear
+              </button>
+            </div>
+
+            <div class="status" id="statusLine">
+              Click to select. Press R to rotate.
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const buildStage = document.getElementById("buildStage");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const statusLine = document.getElementById("statusLine");
+      const addStickButton = document.getElementById("addStickButton");
+      const rotateButton = document.getElementById("rotateButton");
+      const resetButton = document.getElementById("resetButton");
+
+      const STICK_HEIGHT = 74;
+      const MAX_STICKS = 18;
+      const CLUSTER_GAP = 4;
+      const SNAP_SIZE = 4;
+      const ORIENTATIONS = ["vertical", "slash", "backslash", "horizontal"];
+      const ANGLES = {
+        vertical: 0,
+        slash: 45,
+        backslash: -45,
+        horizontal: 90,
+      };
+
+      const sticks = [];
+      let nextStickId = 1;
+      let highestZ = 1;
+      let selectedStickId = null;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function snap(value) {
+        return Math.round(value / SNAP_SIZE) * SNAP_SIZE;
+      }
+
+      function getStageRect() {
+        return buildStage.getBoundingClientRect();
+      }
+
+      function getStickEndpoints(stick) {
+        const half = STICK_HEIGHT / 2;
+        if (stick.orientation === "vertical") {
+          return [
+            { x: stick.x, y: stick.y - half },
+            { x: stick.x, y: stick.y + half },
+          ];
+        }
+        if (stick.orientation === "horizontal") {
+          return [
+            { x: stick.x - half, y: stick.y },
+            { x: stick.x + half, y: stick.y },
+          ];
+        }
+        const diagonal = half / Math.sqrt(2);
+        if (stick.orientation === "slash") {
+          return [
+            { x: stick.x - diagonal, y: stick.y + diagonal },
+            { x: stick.x + diagonal, y: stick.y - diagonal },
+          ];
+        }
+        return [
+          { x: stick.x - diagonal, y: stick.y - diagonal },
+          { x: stick.x + diagonal, y: stick.y + diagonal },
+        ];
+      }
+
+      function getStickBounds(stick) {
+        const endpoints = getStickEndpoints(stick);
+        const padding = 8;
+        return {
+          minX: Math.min(...endpoints.map((point) => point.x)) - padding,
+          maxX: Math.max(...endpoints.map((point) => point.x)) + padding,
+        };
+      }
+
+      function renderStick(stick) {
+        stick.element.style.left = `${stick.x}px`;
+        stick.element.style.top = `${stick.y}px`;
+        stick.element.style.transform = `translate(-50%, -50%) rotate(${ANGLES[stick.orientation]}deg)`;
+        stick.element.style.zIndex = String(stick.z);
+        stick.element.classList.toggle("is-selected", stick.id === selectedStickId);
+        stick.element.setAttribute(
+          "aria-label",
+          `Stick ${stick.id}, ${stick.orientation}`,
+        );
+      }
+
+      function getSelectedStick() {
+        return sticks.find((stick) => stick.id === selectedStickId) || null;
+      }
+
+      function selectStick(stick) {
+        selectedStickId = stick ? stick.id : null;
+        for (const item of sticks) {
+          renderStick(item);
+        }
+        updateButtons();
+      }
+
+      function updateButtons() {
+        addStickButton.disabled = sticks.length >= MAX_STICKS;
+        rotateButton.disabled = !getSelectedStick();
+        resetButton.disabled = sticks.length === 0;
+      }
+
+      function toRoman(value) {
+        const numerals = [
+          ["C", 100],
+          ["XC", 90],
+          ["L", 50],
+          ["XL", 40],
+          ["X", 10],
+          ["IX", 9],
+          ["V", 5],
+          ["IV", 4],
+          ["I", 1],
+        ];
+
+        let remainder = value;
+        let result = "";
+
+        for (const [symbol, amount] of numerals) {
+          while (remainder >= amount) {
+            result += symbol;
+            remainder -= amount;
+          }
+        }
+
+        return result;
+      }
+
+      function parseRoman(numeral) {
+        if (!numeral) return 0;
+
+        const values = { I: 1, V: 5, X: 10, L: 50, C: 100 };
+        let total = 0;
+
+        for (let index = 0; index < numeral.length; index += 1) {
+          const current = values[numeral[index]];
+          const next = values[numeral[index + 1]] || 0;
+          total += current < next ? -current : current;
+        }
+
+        if (total < 1 || total > 100) return null;
+        return toRoman(total) === numeral ? total : null;
+      }
+
+      function distance(pointA, pointB) {
+        return Math.hypot(pointA.x - pointB.x, pointA.y - pointB.y);
+      }
+
+      function classifyCluster(cluster) {
+        const verticals = cluster.filter((stick) => stick.orientation === "vertical");
+        const horizontals = cluster.filter(
+          (stick) => stick.orientation === "horizontal",
+        );
+        const slashes = cluster.filter((stick) => stick.orientation === "slash");
+        const backslashes = cluster.filter(
+          (stick) => stick.orientation === "backslash",
+        );
+
+        if (cluster.length === 1 && verticals.length === 1) {
+          return "I";
+        }
+
+        if (
+          cluster.length === 2 &&
+          slashes.length === 1 &&
+          backslashes.length === 1
+        ) {
+          const [slashLower] = getStickEndpoints(slashes[0]).sort((a, b) => b.y - a.y);
+          const [backslashLower] = getStickEndpoints(backslashes[0]).sort(
+            (a, b) => b.y - a.y,
+          );
+          const centerDistance = distance(
+            { x: slashes[0].x, y: slashes[0].y },
+            { x: backslashes[0].x, y: backslashes[0].y },
+          );
+          const lowerDistance = distance(slashLower, backslashLower);
+
+          return lowerDistance < 18 && centerDistance > 16 ? "V" : "X";
+        }
+
+        if (
+          cluster.length === 2 &&
+          verticals.length === 1 &&
+          horizontals.length === 1
+        ) {
+          const vertical = verticals[0];
+          const horizontal = horizontals[0];
+          if (horizontal.y > vertical.y + 12) {
+            return "L";
+          }
+        }
+
+        if (
+          cluster.length === 3 &&
+          verticals.length === 1 &&
+          horizontals.length === 2
+        ) {
+          const sortedHorizontals = horizontals.slice().sort((a, b) => a.y - b.y);
+          if (
+            sortedHorizontals[0].y < verticals[0].y - 10 &&
+            sortedHorizontals[1].y > verticals[0].y + 10
+          ) {
+            return "C";
+          }
+        }
+
+        return "";
+      }
+
+      function buildGuess() {
+        if (!sticks.length) return "";
+
+        const ordered = sticks.slice().sort(
+          (a, b) => getStickBounds(a).minX - getStickBounds(b).minX,
+        );
+        const clusters = [];
+        let current = [];
+        let currentMaxX = -Infinity;
+
+        for (const stick of ordered) {
+          const bounds = getStickBounds(stick);
+
+          if (!current.length) {
+            current.push(stick);
+            currentMaxX = bounds.maxX;
+            continue;
+          }
+
+          if (bounds.minX - currentMaxX > CLUSTER_GAP) {
+            clusters.push(current);
+            current = [stick];
+            currentMaxX = bounds.maxX;
+            continue;
+          }
+
+          current.push(stick);
+          currentMaxX = Math.max(currentMaxX, bounds.maxX);
+        }
+
+        if (current.length) {
+          clusters.push(current);
+        }
+
+        return clusters.map(classifyCluster).join("");
+      }
+
+      function setStatus(guess, value) {
+        if (!sticks.length) {
+          statusLine.textContent = "Click to select. Press R to rotate.";
+          return;
+        }
+
+        if (!guess) {
+          statusLine.textContent = "Not Roman yet.";
+          return;
+        }
+
+        if (value == null) {
+          statusLine.textContent = `${guess}. Invalid.`;
+          return;
+        }
+
+        statusLine.textContent = `${guess} = ${value}.`;
+      }
+
+      function render() {
+        const guess = buildGuess();
+        const value = parseRoman(guess);
+        const safeVolume = value == null ? 0 : value;
+
+        buildStage.classList.toggle("is-empty", sticks.length === 0);
+        volumeLabel.textContent = `${safeVolume}%`;
+        for (const stick of sticks) {
+          renderStick(stick);
+        }
+        setStatus(guess, value);
+        updateButtons();
+      }
+
+      function removeAllSticks() {
+        while (sticks.length) {
+          const stick = sticks.pop();
+          stick.element.remove();
+        }
+        selectedStickId = null;
+        render();
+      }
+
+      function cycleOrientation(stick) {
+        if (!stick) return;
+        const currentIndex = ORIENTATIONS.indexOf(stick.orientation);
+        stick.orientation =
+          ORIENTATIONS[(currentIndex + 1) % ORIENTATIONS.length];
+        renderStick(stick);
+        render();
+      }
+
+      function removeSelectedStick() {
+        const selectedStick = getSelectedStick();
+        if (!selectedStick) return;
+
+        const index = sticks.indexOf(selectedStick);
+        if (index >= 0) {
+          sticks.splice(index, 1);
+        }
+        selectedStick.element.remove();
+        selectedStickId = null;
+        render();
+      }
+
+      function constrainStick(stick) {
+        const rect = getStageRect();
+        stick.x = clamp(snap(stick.x), 18, rect.width - 18);
+        stick.y = clamp(snap(stick.y), 24, rect.height - 24);
+      }
+
+      function addStick() {
+        if (sticks.length >= MAX_STICKS) return;
+
+        const rect = getStageRect();
+        const offset = (sticks.length % 6) * 18;
+        const stick = {
+          id: nextStickId,
+          x: rect.width / 2 + offset - 40,
+          y: rect.height / 2 + (sticks.length % 2 === 0 ? -12 : 12),
+          orientation: "vertical",
+          z: ++highestZ,
+          element: document.createElement("button"),
+        };
+
+        nextStickId += 1;
+        constrainStick(stick);
+
+        const element = stick.element;
+        element.className = "stick";
+        element.type = "button";
+        element.setAttribute("aria-roledescription", "draggable stick");
+
+        let pointerId = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let moved = false;
+
+        element.addEventListener("pointerdown", (event) => {
+          pointerId = event.pointerId;
+          moved = false;
+          selectStick(stick);
+          stick.z = ++highestZ;
+          renderStick(stick);
+
+          const rectNow = getStageRect();
+          dragOffsetX = event.clientX - rectNow.left - stick.x;
+          dragOffsetY = event.clientY - rectNow.top - stick.y;
+
+          element.classList.add("is-dragging");
+          element.setPointerCapture(pointerId);
+        });
+
+        element.addEventListener("pointermove", (event) => {
+          if (pointerId !== event.pointerId) return;
+
+          const rectNow = getStageRect();
+          const nextX = event.clientX - rectNow.left - dragOffsetX;
+          const nextY = event.clientY - rectNow.top - dragOffsetY;
+          if (Math.abs(nextX - stick.x) > 3 || Math.abs(nextY - stick.y) > 3) {
+            moved = true;
+          }
+
+          stick.x = clamp(nextX, 18, rectNow.width - 18);
+          stick.y = clamp(nextY, 24, rectNow.height - 24);
+          renderStick(stick);
+        });
+
+        function release(event) {
+          if (pointerId !== event.pointerId) return;
+
+          element.classList.remove("is-dragging");
+          element.releasePointerCapture(pointerId);
+          pointerId = null;
+
+          if (moved) {
+            constrainStick(stick);
+            renderStick(stick);
+            render();
+            return;
+          }
+        }
+
+        element.addEventListener("pointerup", release);
+        element.addEventListener("pointercancel", release);
+
+        element.addEventListener("keydown", (event) => {
+          if (event.key === "Delete" || event.key === "Backspace") {
+            event.preventDefault();
+            selectStick(stick);
+            removeSelectedStick();
+            return;
+          }
+
+          if (event.key === " " || event.key === "Enter") {
+            event.preventDefault();
+            selectStick(stick);
+          }
+        });
+
+        sticks.push(stick);
+        buildStage.appendChild(element);
+        selectStick(stick);
+        renderStick(stick);
+        render();
+      }
+
+      addStickButton.addEventListener("click", addStick);
+      rotateButton.addEventListener("click", () => {
+        cycleOrientation(getSelectedStick());
+      });
+      resetButton.addEventListener("click", removeAllSticks);
+      buildStage.addEventListener("pointerdown", (event) => {
+        if (event.target === buildStage) {
+          selectStick(null);
+          render();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        const targetTag = event.target && event.target.tagName;
+        if (
+          typeof targetTag === "string" &&
+          ["INPUT", "TEXTAREA", "SELECT"].includes(targetTag)
+        ) {
+          return;
+        }
+
+        if (event.key === "r" || event.key === "R") {
+          event.preventDefault();
+          cycleOrientation(getSelectedStick());
+          return;
+        }
+
+        if (event.key === "Delete" || event.key === "Backspace") {
+          if (!getSelectedStick()) return;
+          event.preventDefault();
+          removeSelectedStick();
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        for (const stick of sticks) {
+          constrainStick(stick);
+          renderStick(stick);
+        }
+      });
+
+      render();
+    </script>
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+      data-name="bmc-button"
+      data-slug="vivancodes"
+      data-color="#FFDD00"
+      data-emoji="🔊"
+      data-font="Cookie"
+      data-text="Buy me volume"
+      data-outline-color="#000000"
+      data-font-color="#000000"
+      data-coffee-color="#ffffff"></script>
+    </div>
+
+    <script data-name="BMC-Widget"
+    data-cfasync="false"
+    src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+    data-id="vivancodes"
+    data-description="Support me on Buy me a coffee!"
+    data-message="Your volume. Higher."
+    data-color="#5F7FFF"
+    data-position="Right"
+    data-x_margin="18"
+    data-y_margin="18"></script>
+
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

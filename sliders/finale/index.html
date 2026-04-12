@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finale | Volume</title>
+    <style>
+      :root {
+        /* colour palette and sizing */
+        --page: #f3f0e8;
+        --card: rgba(255, 252, 247, 0.95);
+        --card-edge: rgba(84, 72, 53, 0.14);
+        --ink: #191712;
+        --muted: #726858;
+        --track: #d9d2c6;
+        --thumb: #fffdfa;
+        --fill: #171511;
+
+        /* star‑field and crawl colours */
+        --space: #030406;
+        --space-soft: #080a11;
+        --star-colour: rgba(255, 255, 255, 0.92);
+        --crawl-colour: #ffe81f;
+
+        /* timings */
+        --open-ms: 1400ms;
+        --fade-ms: 700ms;
+        --close-ms: 1300ms;
+        --crawl-ms: 50000ms; /* 50 s crawl */
+
+        /* perspective settings */
+        --tilt: 22deg;
+        --persp: 500px;
+
+        /* fonts */
+        --ui-font:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        --crawl-font: "News Cycle", "Times New Roman", serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --page: #111216;
+          --card: rgba(26, 28, 34, 0.92);
+          --card-edge: rgba(255, 255, 255, 0.09);
+          --ink: #f5f2eb;
+          --muted: #b3ab9e;
+          --track: #434851;
+          --thumb: #f7f2e7;
+          --fill: #f2eadd;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(255, 255, 255, 0.42),
+            transparent 34%
+          ),
+          var(--page);
+        color: var(--ink);
+        font-family: var(--ui-font);
+        user-select: none;
+      }
+
+      .stage {
+        width: min(92vw, 470px);
+      }
+
+      /* slider container */
+      .volume-box {
+        position: relative;
+        min-height: 148px;
+        overflow: hidden;
+        border: 1px solid var(--card-edge);
+        border-radius: 22px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 42%),
+          var(--card);
+        box-shadow: 0 22px 60px rgba(20, 15, 8, 0.12);
+        transition:
+          min-height var(--open-ms) cubic-bezier(0.22, 1, 0.36, 1),
+          transform var(--open-ms) cubic-bezier(0.22, 1, 0.36, 1),
+          background-color var(--open-ms) ease,
+          border-color var(--open-ms) ease,
+          box-shadow var(--open-ms) ease;
+      }
+
+      /* expand and darken when playing the crawl */
+      .volume-box.is-opening,
+      .volume-box.is-returning {
+        min-height: min(78vh, 600px);
+        transform: scale(1.018);
+        background: var(--space);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.44);
+      }
+
+      .slider-ui {
+        position: relative;
+        z-index: 2;
+        padding: 28px;
+        opacity: 1;
+        transition:
+          opacity 700ms ease,
+          transform 700ms ease,
+          filter 700ms ease;
+      }
+
+      .volume-box.is-opening .slider-ui,
+      .volume-box.is-returning .slider-ui {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+        filter: blur(1.5px);
+      }
+
+      .volume-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .volume-title {
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .volume-value {
+        min-width: 64px;
+        text-align: right;
+        color: var(--muted);
+        font-size: 0.98rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-row {
+        display: grid;
+        grid-template-columns: 18px 1fr 18px;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .speaker {
+        width: 18px;
+        height: 18px;
+        color: color-mix(in srgb, var(--muted) 88%, var(--ink) 12%);
+      }
+
+      .slider {
+        width: 100%;
+        height: 24px;
+        margin: 0;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        --value: 50%;
+      }
+
+      .slider:disabled {
+        cursor: default;
+      }
+
+      .slider:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 6px;
+      }
+
+      .slider::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(
+          to right,
+          var(--fill) 0 var(--value),
+          var(--track) var(--value) 100%
+        );
+      }
+
+      .slider::-moz-range-track {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      .slider::-moz-range-progress {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--fill);
+      }
+
+      .slider::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+        margin-top: -6px;
+        appearance: none;
+        border: 1px solid rgba(88, 75, 58, 0.2);
+        border-radius: 50%;
+        background: var(--thumb);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+      }
+
+      .slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border: 1px solid rgba(88, 75, 58, 0.2);
+        border-radius: 50%;
+        background: var(--thumb);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+      }
+
+      /* cinema overlay */
+      .cinema {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+        transition: opacity var(--fade-ms) ease;
+        background: linear-gradient(
+          180deg,
+          var(--space-soft) 0%,
+          var(--space) 100%
+        );
+        perspective: var(--persp);
+      }
+
+      .volume-box.is-cinema .cinema {
+        opacity: 1;
+      }
+
+      .volume-box.is-returning .cinema {
+        opacity: 0;
+      }
+
+      /* star field layers */
+      .stars,
+      .stars::before,
+      .stars::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        display: block;
+        background-repeat: repeat;
+      }
+
+      .stars {
+        opacity: 0.82;
+        background-size: 320px 320px;
+        background-image:
+          radial-gradient(
+            circle at 24px 28px,
+            var(--star-colour) 0 1px,
+            transparent 1.7px
+          ),
+          radial-gradient(
+            circle at 112px 72px,
+            rgba(255, 255, 255, 0.62) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 196px 42px,
+            rgba(255, 255, 255, 0.76) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 262px 124px,
+            rgba(255, 255, 255, 0.44) 0 1px,
+            transparent 1.5px
+          ),
+          radial-gradient(
+            circle at 52px 214px,
+            rgba(255, 255, 255, 0.46) 0 1px,
+            transparent 1.5px
+          ),
+          radial-gradient(
+            circle at 148px 244px,
+            rgba(255, 255, 255, 0.72) 0 1px,
+            transparent 1.5px
+          ),
+          radial-gradient(
+            circle at 252px 270px,
+            rgba(255, 255, 255, 0.36) 0 1px,
+            transparent 1.5px
+          );
+        animation: star-drift 70s linear infinite;
+      }
+
+      .stars::before {
+        opacity: 0.26;
+        background-size: 420px 420px;
+        background-image:
+          radial-gradient(
+            circle at 62px 50px,
+            rgba(255, 255, 255, 0.64) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 148px 140px,
+            rgba(255, 255, 255, 0.55) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 314px 78px,
+            rgba(255, 255, 255, 0.7) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 244px 278px,
+            rgba(255, 255, 255, 0.44) 0 1px,
+            transparent 1.6px
+          );
+        animation: star-drift 100s linear infinite reverse;
+      }
+
+      .stars::after {
+        opacity: 0.18;
+        background-size: 520px 520px;
+        background-image:
+          radial-gradient(
+            circle at 96px 44px,
+            rgba(255, 255, 255, 0.72) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 228px 162px,
+            rgba(255, 255, 255, 0.46) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 46px 304px,
+            rgba(255, 255, 255, 0.42) 0 1px,
+            transparent 1.6px
+          ),
+          radial-gradient(
+            circle at 342px 350px,
+            rgba(255, 255, 255, 0.46) 0 1px,
+            transparent 1.6px
+          );
+        animation: star-drift 130s linear infinite;
+      }
+
+      @keyframes star-drift {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-20px);
+        }
+      }
+
+      /* gradient fades for top/bottom */
+      .fade-top,
+      .fade-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      .fade-top {
+        top: 0;
+        height: 44%;
+        background: linear-gradient(
+          to bottom,
+          rgba(3, 4, 6, 1),
+          rgba(3, 4, 6, 0)
+        );
+      }
+
+      .fade-bottom {
+        bottom: 0;
+        height: 24%;
+        background: linear-gradient(to top, rgba(3, 4, 6, 1), rgba(3, 4, 6, 0));
+      }
+
+      /* crawl base styling */
+      .crawl {
+        position: absolute;
+        left: 50%;
+        bottom: -80vh;
+        width: 80%;
+        transform: translateX(-50%) rotateX(var(--tilt)) translateY(100vh);
+        transform-origin: 50% 100%;
+        color: var(--crawl-colour);
+        font-family: var(--crawl-font);
+        letter-spacing: 0.04em;
+        line-height: 1.82;
+        text-align: justify;
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+        opacity: 0;
+      }
+
+      .crawl .episode {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.28em;
+        margin: 0 0 0.4em;
+        text-transform: uppercase;
+      }
+
+      .crawl .subtitle {
+        text-align: center;
+        font-weight: 700;
+        font-size: 2rem;
+        letter-spacing: 0.08em;
+        margin: 0 0 1.2em;
+        text-transform: uppercase;
+      }
+
+      .crawl p {
+        margin: 0 0 1.6em;
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .crawl p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* animate when playing */
+      .cinema.phase-crawl .crawl {
+        animation: crawl-rise var(--crawl-ms) linear forwards;
+        opacity: 1;
+      }
+
+      @keyframes crawl-rise {
+        0% {
+          transform: translateX(-50%) rotateX(var(--tilt)) translateY(100vh);
+        }
+        100% {
+          transform: translateX(-50%) rotateX(var(--tilt)) translateY(-200vh);
+        }
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 18px;
+        }
+        .stage {
+          width: min(95vw, 430px);
+        }
+        .slider-ui {
+          padding: 22px 18px;
+        }
+        .volume-box.is-opening,
+        .volume-box.is-returning {
+          min-height: min(74vh, 520px);
+        }
+        .crawl {
+          width: 86%;
+          bottom: -110vh;
+        }
+        .crawl p {
+          margin-bottom: 1.4em;
+          line-height: 1.7;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        :root {
+          --open-ms: 300ms;
+          --fade-ms: 220ms;
+          --close-ms: 320ms;
+          --crawl-ms: 2600ms;
+        }
+        .stars,
+        .stars::before,
+        .stars::after {
+          animation: none;
+        }
+      }
+
+      /* off‑screen live region for announcements */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <section
+        class="volume-box"
+        id="volumeBox"
+        aria-label="Volume finale slider"
+      >
+        <div class="slider-ui">
+          <div class="volume-head">
+            <div class="volume-title">Volume</div>
+            <div class="volume-value" id="volumeValue">50%</div>
+          </div>
+          <div class="slider-row">
+            <svg
+              class="speaker"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor"></path>
+              <path
+                d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              ></path>
+            </svg>
+            <input
+              class="slider"
+              id="slider"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Volume"
+            />
+            <svg
+              class="speaker"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H2v6h4l5 4V5Z" fill="currentColor"></path>
+              <path
+                d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              ></path>
+              <path
+                d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              ></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- cinema overlay -->
+        <div class="cinema" id="cinema" aria-hidden="true">
+          <div class="stars"></div>
+          <div class="space-shade"></div>
+          <div class="fade-top"></div>
+          <div class="fade-bottom"></div>
+          <div class="crawl" id="crawl">
+            <p class="episode">Episode 67</p>
+            <h2 class="subtitle">All for now</h2>
+            <p>
+              A long, long time ago, a creator named vivancodes set out to
+              revive one of the internet's most pointless competitions: creating
+              the worst possible way to change your volume.
+            </p>
+            <p>
+              Encouraged by a friend to try and make one, the first slider
+              appeared and unexpectedly took off.
+            </p>
+
+            <p>
+              One ridiculous video quickly led to another, and suddenly a series
+              formed around a single line on a page. Now, I have over 70 million
+              total views, 35k+ followers and almost 5 million likes.
+            </p>
+            <p>
+              Over time, the sliders drifted far beyond the regular line and
+              into games, locks, batteries, pumps, dogs, chess boards, Minecraft
+              mods, and into all sorts of strange corners of the internet.
+            </p>
+            <p>
+              From the 2017 Reddit contest to this 67th episode, each video was
+              a small joke designed to make you, the audience, have a laugh
+            </p>
+            <p>
+              I couldn't have done it without you guys. All these ideas and
+              inspiration for future projects were fuelled by your comments on
+              my videos.
+            </p>
+            <p>
+              This doesn't mean I am going to stop making videos. I'm just going
+              to stop uploading daily and switch to a “when inspiration strikes"
+              style of creating.
+            </p>
+            <p>
+              The sliders will still be accessible on my website,
+              https://vivancodes.com/, it's all free but if you have enjoyed the
+              series then please consider leaving a donation to support it and
+              future content!
+            </p>
+            <p>Thank you for being part of this journey.</p>
+          </div>
+        </div>
+
+        <div class="sr-only" id="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script>
+      const INITIAL_VOLUME = 50;
+      const OPEN_MS = 1400;
+      const FADE_MS = 700;
+      const CLOSE_MS = 300;
+
+      const volumeBox = document.getElementById("volumeBox");
+      const cinema = document.getElementById("cinema");
+      const crawl = document.getElementById("crawl");
+      const slider = document.getElementById("slider");
+      const volumeValue = document.getElementById("volumeValue");
+      const status = document.getElementById("status");
+
+      const state = {
+        active: false,
+        pointerArmed: false,
+        timers: [],
+      };
+
+      function setVolume(value) {
+        const safe = Math.max(0, Math.min(100, Math.round(value)));
+        slider.value = String(safe);
+        slider.style.setProperty("--value", `${safe}%`);
+        slider.setAttribute("aria-valuetext", `${safe}%`);
+        volumeValue.textContent = `${safe}%`;
+      }
+
+      function queue(callback, delay) {
+        const timer = window.setTimeout(callback, delay);
+        state.timers.push(timer);
+      }
+
+      function clearTimers() {
+        state.timers.forEach((timer) => window.clearTimeout(timer));
+        state.timers = [];
+      }
+
+      function setPhase(phase) {
+        cinema.classList.remove("phase-crawl");
+        if (phase) cinema.classList.add(`phase-${phase}`);
+      }
+
+      function fullyResetScene() {
+        clearTimers();
+        setPhase("");
+        volumeBox.classList.remove("is-opening", "is-cinema", "is-returning");
+        slider.disabled = false;
+        state.active = false;
+        state.pointerArmed = false;
+      }
+
+      function finishSequence() {
+        setPhase("");
+        volumeBox.classList.remove("is-opening");
+        volumeBox.classList.add("is-returning");
+        status.textContent = "Returning to the volume slider.";
+        queue(() => {
+          volumeBox.classList.remove("is-cinema");
+        }, FADE_MS);
+        queue(() => {
+          fullyResetScene();
+          status.textContent = "Volume slider restored.";
+        }, FADE_MS + CLOSE_MS);
+      }
+
+      function beginSequence() {
+        if (state.active) return;
+        clearTimers();
+        state.active = true;
+        state.pointerArmed = false;
+        slider.disabled = true;
+        status.textContent = "Finale started.";
+
+        volumeBox.classList.add("is-opening");
+        setPhase("");
+        queue(() => {
+          volumeBox.classList.add("is-cinema");
+          void cinema.offsetWidth; // reflow
+          setPhase("crawl");
+          status.textContent = "Opening crawl in progress.";
+        }, OPEN_MS);
+      }
+
+      crawl.addEventListener("animationend", (event) => {
+        if (event.animationName !== "crawl-rise") return;
+        if (!state.active || !cinema.classList.contains("phase-crawl")) return;
+        finishSequence();
+      });
+
+      slider.addEventListener("input", () => {
+        if (state.active) return;
+        setVolume(Number(slider.value));
+      });
+
+      slider.addEventListener("pointerdown", () => {
+        if (state.active) return;
+        state.pointerArmed = true;
+      });
+
+      window.addEventListener("pointerup", () => {
+        if (!state.pointerArmed || state.active) return;
+        beginSequence();
+      });
+
+      slider.addEventListener("change", () => {
+        if (state.active || state.pointerArmed) return;
+        beginSequence();
+      });
+
+      window.addEventListener("pagehide", clearTimers);
+
+      setVolume(INITIAL_VOLUME);
+    </script>
+  </body>
+</html>

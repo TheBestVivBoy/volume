@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fill In | Volume</title>
+    <meta
+      name="description"
+      content="Fill the area yourself to set the volume."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Fill In | Volume" />
+    <meta
+      property="og:description"
+      content="Fill the area yourself to set the volume."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/fill_in/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Fill In | Volume" />
+    <meta
+      name="twitter:description"
+      content="Fill the area yourself to set the volume."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/fill_in/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .wrap {
+        width: min(92vw, 560px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .volume {
+        margin: 0 0 20px;
+        color: #111;
+        font-size: clamp(3rem, 10vw, 3.6rem);
+        font-weight: 200;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider-shell {
+        width: 100%;
+        padding: 24px 22px 18px;
+        border: 1.5px solid #e6e6e6;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+      }
+
+      .display-slider {
+        position: relative;
+        margin-bottom: 18px;
+        pointer-events: none;
+      }
+
+      .display-track {
+        position: relative;
+        height: 14px;
+        border-radius: 999px;
+        background: #efefef;
+        overflow: visible;
+      }
+
+      .display-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        border-radius: 999px;
+        background: #111;
+      }
+
+      .display-thumb {
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        width: 22px;
+        height: 22px;
+        border: 1.5px solid #d8d8d8;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        transform: translate(-50%, -50%);
+      }
+
+      .tool-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .tool-button {
+        appearance: none;
+        border: 1px solid #dcdcdc;
+        border-radius: 999px;
+        background: #fff;
+        color: #111;
+        font: inherit;
+        font-size: 0.92rem;
+        line-height: 1;
+        padding: 9px 14px;
+        transition:
+          border-color 0.16s ease,
+          background-color 0.16s ease,
+          color 0.16s ease;
+      }
+
+      .tool-button:hover {
+        border-color: #c9c9c9;
+        background: #f7f7f7;
+      }
+
+      .tool-button:focus-visible {
+        outline: 2px solid #111;
+        outline-offset: 2px;
+      }
+
+      .tool-button.is-active {
+        border-color: #111;
+        background: #111;
+        color: #fff;
+      }
+
+      .board-wrap {
+        border: 1.5px solid #e7e7e7;
+        border-radius: 14px;
+        background: #fbfbf8;
+        overflow: hidden;
+      }
+
+      .board {
+        display: block;
+        width: 100%;
+        height: 300px;
+        touch-action: none;
+        cursor: crosshair;
+      }
+
+      .hint {
+        margin: 12px 0 0;
+        color: #969696;
+        font-size: 0.8rem;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+          padding: 8px 0 24px;
+        }
+
+        .slider-shell {
+          padding: 20px 18px 16px;
+        }
+
+        .board {
+          height: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Fill In</h1>
+          <p>Fill the area yourself.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="wrap">
+          <div class="volume" id="volumeLabel">0%</div>
+
+          <div class="slider-shell">
+            <div class="display-slider" aria-hidden="true">
+              <div class="display-track">
+                <div class="display-fill" id="displayFill"></div>
+                <div class="display-thumb" id="displayThumb"></div>
+              </div>
+            </div>
+
+            <div class="tool-row" role="toolbar" aria-label="Drawing tools">
+              <button
+                class="tool-button is-active"
+                id="pencilButton"
+                type="button"
+                aria-pressed="true"
+              >
+                Pencil
+              </button>
+              <button
+                class="tool-button"
+                id="eraserButton"
+                type="button"
+                aria-pressed="false"
+              >
+                Eraser
+              </button>
+            </div>
+
+            <div class="board-wrap">
+              <canvas
+                class="board"
+                id="board"
+                aria-label="Drawing area"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const board = document.getElementById("board");
+      const boardCtx = board.getContext("2d");
+
+      const displayFill = document.getElementById("displayFill");
+      const displayThumb = document.getElementById("displayThumb");
+      const volumeLabel = document.getElementById("volumeLabel");
+
+      const pencilButton = document.getElementById("pencilButton");
+      const eraserButton = document.getElementById("eraserButton");
+
+      const maskCanvas = document.createElement("canvas");
+      const maskCtx = maskCanvas.getContext("2d", { willReadFrequently: true });
+
+      const state = {
+        tool: "pencil",
+        drawing: false,
+        pointerId: null,
+        lastX: 0,
+        lastY: 0,
+        cssWidth: 0,
+        cssHeight: 0,
+        dpr: Math.max(1, window.devicePixelRatio || 1),
+      };
+
+      const BRUSH_SIZE = 36;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function setTool(nextTool) {
+        state.tool = nextTool;
+
+        const isPencil = nextTool === "pencil";
+        pencilButton.classList.toggle("is-active", isPencil);
+        pencilButton.setAttribute("aria-pressed", String(isPencil));
+
+        eraserButton.classList.toggle("is-active", !isPencil);
+        eraserButton.setAttribute("aria-pressed", String(!isPencil));
+
+        board.style.cursor = isPencil ? "crosshair" : "cell";
+      }
+
+      function getPoint(event) {
+        const rect = board.getBoundingClientRect();
+        return {
+          x: clamp(event.clientX - rect.left, 0, rect.width),
+          y: clamp(event.clientY - rect.top, 0, rect.height),
+        };
+      }
+
+      function drawStroke(fromX, fromY, toX, toY) {
+        maskCtx.save();
+        maskCtx.lineCap = "round";
+        maskCtx.lineJoin = "round";
+        maskCtx.lineWidth = BRUSH_SIZE;
+
+        if (state.tool === "eraser") {
+          maskCtx.globalCompositeOperation = "destination-out";
+          maskCtx.strokeStyle = "rgba(0,0,0,1)";
+        } else {
+          maskCtx.globalCompositeOperation = "source-over";
+          maskCtx.strokeStyle = "#111";
+        }
+
+        maskCtx.beginPath();
+        maskCtx.moveTo(fromX, fromY);
+        maskCtx.lineTo(toX, toY);
+        maskCtx.stroke();
+
+        maskCtx.beginPath();
+        maskCtx.arc(toX, toY, BRUSH_SIZE / 2, 0, Math.PI * 2);
+        maskCtx.fillStyle = state.tool === "eraser" ? "rgba(0,0,0,1)" : "#111";
+        maskCtx.fill();
+
+        maskCtx.restore();
+      }
+
+      function renderBoard() {
+        boardCtx.setTransform(1, 0, 0, 1, 0, 0);
+        boardCtx.clearRect(0, 0, board.width, board.height);
+        boardCtx.scale(state.dpr, state.dpr);
+        boardCtx.fillStyle = "#fbfbf8";
+        boardCtx.fillRect(0, 0, state.cssWidth, state.cssHeight);
+        boardCtx.drawImage(maskCanvas, 0, 0, state.cssWidth, state.cssHeight);
+      }
+
+      function updateVolume() {
+        const width = maskCanvas.width;
+        const height = maskCanvas.height;
+
+        if (!width || !height) {
+          return;
+        }
+
+        const imageData = maskCtx.getImageData(0, 0, width, height).data;
+        let filledPixels = 0;
+
+        for (let i = 3; i < imageData.length; i += 4) {
+          if (imageData[i] > 0) {
+            filledPixels += 1;
+          }
+        }
+
+        const totalPixels = width * height;
+        const percent = Math.round((filledPixels / totalPixels) * 100);
+
+        volumeLabel.textContent = `${percent}%`;
+        displayFill.style.width = `${percent}%`;
+        displayThumb.style.left = `${percent}%`;
+      }
+
+      function renderAll() {
+        renderBoard();
+        updateVolume();
+      }
+
+      function resizeBoard() {
+        const previousMask = document.createElement("canvas");
+        previousMask.width = maskCanvas.width;
+        previousMask.height = maskCanvas.height;
+
+        if (maskCanvas.width > 0 && maskCanvas.height > 0) {
+          previousMask.getContext("2d").drawImage(maskCanvas, 0, 0);
+        }
+
+        const rect = board.getBoundingClientRect();
+        const cssWidth = Math.max(1, Math.round(rect.width));
+        const cssHeight = Math.max(1, Math.round(rect.height));
+
+        state.cssWidth = cssWidth;
+        state.cssHeight = cssHeight;
+        state.dpr = Math.max(1, window.devicePixelRatio || 1);
+
+        board.width = Math.round(cssWidth * state.dpr);
+        board.height = Math.round(cssHeight * state.dpr);
+
+        maskCanvas.width = cssWidth;
+        maskCanvas.height = cssHeight;
+
+        maskCtx.clearRect(0, 0, cssWidth, cssHeight);
+
+        if (previousMask.width > 0 && previousMask.height > 0) {
+          maskCtx.drawImage(
+            previousMask,
+            0,
+            0,
+            previousMask.width,
+            previousMask.height,
+            0,
+            0,
+            cssWidth,
+            cssHeight,
+          );
+        }
+
+        renderAll();
+      }
+
+      function startDrawing(event) {
+        event.preventDefault();
+
+        const point = getPoint(event);
+        state.drawing = true;
+        state.pointerId = event.pointerId;
+        state.lastX = point.x;
+        state.lastY = point.y;
+
+        drawStroke(point.x, point.y, point.x, point.y);
+        renderAll();
+
+        board.setPointerCapture(event.pointerId);
+      }
+
+      function moveDrawing(event) {
+        if (!state.drawing || event.pointerId !== state.pointerId) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const point = getPoint(event);
+        drawStroke(state.lastX, state.lastY, point.x, point.y);
+        state.lastX = point.x;
+        state.lastY = point.y;
+
+        renderAll();
+      }
+
+      function stopDrawing(event) {
+        if (!state.drawing || event.pointerId !== state.pointerId) {
+          return;
+        }
+
+        state.drawing = false;
+        state.pointerId = null;
+      }
+
+      pencilButton.addEventListener("click", () => setTool("pencil"));
+      eraserButton.addEventListener("click", () => setTool("eraser"));
+
+      board.addEventListener("pointerdown", startDrawing);
+      board.addEventListener("pointermove", moveDrawing);
+      board.addEventListener("pointerup", stopDrawing);
+      board.addEventListener("pointercancel", stopDrawing);
+      board.addEventListener("lostpointercapture", () => {
+        state.drawing = false;
+        state.pointerId = null;
+      });
+
+      window.addEventListener("resize", resizeBoard, { passive: true });
+
+      setTool("pencil");
+      resizeBoard();
+    </script>
+    <script src="../../assets/site.js"></script>
+  </body>
+</html>

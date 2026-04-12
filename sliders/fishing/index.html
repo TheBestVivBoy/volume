@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fishing | Volume</title>
+    <meta name="description" content="Cast once." />
+    <link rel="canonical" href="https://vivancodes.com/sliders/fishing/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fishing | Volume" />
+    <meta property="og:description" content="Cast once." />
+    <meta property="og:url" content="https://vivancodes.com/sliders/fishing/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Fishing | Volume" />
+    <meta name="twitter:description" content="Cast once." />
+    <meta
+      name="twitter:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      :root {
+        --page-max: 520px;
+        --bg: #f4f2ee;
+        --card: #ffffff;
+        --text: #181818;
+        --muted: #6f6b65;
+        --border: rgba(24, 24, 24, 0.11);
+        --border-med: rgba(24, 24, 24, 0.18);
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        --radius: 16px;
+        --pool-bg: #f7f5f2;
+      }
+
+      html,
+      body {
+        background: var(--bg);
+      }
+      .fishing-page {
+        width: 100%;
+      }
+
+      .fishing-intro {
+        width: min(100%, var(--page-max));
+        margin: 0 auto;
+        padding: 18px 20px 0;
+      }
+
+      .fishing-title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 34px);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .fishing-subtitle {
+        margin: 8px 0 0;
+        font-size: 14px;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .fishing-stage {
+        width: min(100%, var(--page-max));
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .fishing-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px 24px 20px;
+      }
+
+      /* ── Volume readout — all three parts the same large size ── */
+      .fishing-vol {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+        flex-wrap: wrap; /* safety on very narrow screens */
+      }
+
+      /* Label, value, and unit all at the same font-size */
+      .fishing-vol-label,
+      .fishing-vol-val,
+      .fishing-vol-unit {
+        font-size: clamp(52px, 10vw, 68px);
+        line-height: 0.9;
+        font-weight: 400;
+      }
+
+      .fishing-vol-label {
+        letter-spacing: -0.04em;
+        color: var(--muted);
+      }
+
+      .fishing-vol-val {
+        letter-spacing: -0.065em;
+      }
+
+      .fishing-vol-unit {
+        letter-spacing: -0.04em;
+        color: var(--muted);
+      }
+
+      /* ── Scene ── */
+      .fishing-scene {
+        position: relative;
+        height: 164px;
+        margin: 16px 0 14px;
+        user-select: none;
+      }
+
+      /*
+        Line anchor — zero-size positioned point.
+        ::after draws the tiny horizontal crossbar so the cast line
+        has a clean visual origin without any illustrated rod.
+        top: 0 on ::after means the crossbar's TOP aligns with the
+        anchor y, matching the cast-line's own top. They connect flush.
+      */
+      .line-anchor {
+        position: absolute;
+        top: 4px;
+        left: 66%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+      }
+
+      .line-anchor::after {
+        content: "";
+        position: absolute;
+        top: 0; /* flush with cast-line top — no gap */
+        left: -8px;
+        width: 16px;
+        height: 1.5px;
+        background: rgba(24, 24, 24, 0.18);
+        border-radius: 999px;
+      }
+
+      /*
+        Cast line.
+        JS sets left/top from lineAnchor's measured position,
+        offset by half the line width so it is centred under the crossbar.
+      */
+      .cast-line {
+        position: absolute;
+        width: 1.5px;
+        height: 0; /* set by JS */
+        background: rgba(24, 24, 24, 0.22);
+        border-radius: 0 0 999px 999px;
+        pointer-events: none;
+      }
+
+      /* Hook at the bottom of the line */
+      .cast-hook {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 10px;
+        border-right: 1.5px solid rgba(24, 24, 24, 0.26);
+        border-bottom: 1.5px solid rgba(24, 24, 24, 0.26);
+        border-bottom-right-radius: 10px;
+      }
+
+      /* Speaker icon shown on the hook when a catch is reeled in */
+      .hook-icon {
+        position: absolute;
+        bottom: 10px;
+        /* Centred on the 1.5px line: left = 50% of line width = 0.75px,
+           then translateX(-50%) pulls it back by half its own width.
+           Net: icon centre sits at the line's centre axis. */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 13px;
+        height: 13px;
+        color: rgba(24, 24, 24, 0.52);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .hook-icon svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ── Pool ── */
+      .fishing-pool {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 108px;
+        background: var(--pool-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      /* Fish = speaker SVG icons. Size varies per species. */
+      .fish {
+        position: absolute;
+        color: rgba(24, 24, 24, 0.28);
+        pointer-events: none;
+        will-change: left, top, transform, opacity;
+        transition: opacity 260ms ease;
+      }
+
+      .fish svg {
+        display: block;
+      }
+
+      /* ── Controls ── */
+      .fishing-actions {
+        display: flex;
+        align-items: center;
+      }
+
+      .fishing-btn {
+        appearance: none;
+        border: 1px solid var(--border-med);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 999px;
+        height: 40px;
+        padding: 0 18px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        cursor: pointer;
+        transition:
+          background 100ms ease,
+          border-color 100ms ease,
+          transform 100ms ease,
+          opacity 100ms ease;
+        white-space: nowrap;
+      }
+
+      .fishing-btn:hover:enabled {
+        background: #faf9f7;
+        border-color: rgba(24, 24, 24, 0.24);
+      }
+
+      .fishing-btn:active:enabled {
+        transform: translateY(1px);
+      }
+      .fishing-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .fishing-status {
+        margin: 12px 0 0;
+        min-height: 20px;
+        font-size: 14px;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 540px) {
+        .fishing-intro,
+        .fishing-stage {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+        .fishing-card {
+          padding: 20px 18px 18px;
+        }
+        .fishing-scene {
+          height: 148px;
+        }
+        .fishing-pool {
+          height: 94px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .fishing-btn,
+        .fish,
+        .hook-icon {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <main class="fishing-page">
+        <div class="page-bar fishing-intro">
+          <h1 class="fishing-title">Fishing</h1>
+          <p class="fishing-subtitle">Cast once. Accept what you get.</p>
+        </div>
+
+        <section class="fishing-stage">
+          <div class="fishing-card" aria-live="polite">
+            <p class="fishing-vol">
+              <span class="fishing-vol-label">Volume:</span>
+              <span id="volVal" class="fishing-vol-val">50</span>
+              <span class="fishing-vol-unit">%</span>
+            </p>
+
+            <div id="scene" class="fishing-scene" aria-hidden="true">
+              <!-- Zero-size anchor point. JS reads its position to place the cast line. -->
+              <div id="lineAnchor" class="line-anchor"></div>
+
+              <!-- Cast line + hook (entirely positioned by JS) -->
+              <div id="castLine" class="cast-line">
+                <div id="hookIcon" class="hook-icon">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                    <path
+                      d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div class="cast-hook"></div>
+              </div>
+
+              <!-- Pool: fish swim inside here -->
+              <div id="pool" class="fishing-pool">
+                <!-- Minnow: cone only, smallest -->
+                <div class="fish" data-idx="0">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                  </svg>
+                </div>
+
+                <!-- Bass: cone + near arc -->
+                <div class="fish" data-idx="1">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                    <path
+                      d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Trout: cone + far arc -->
+                <div class="fish" data-idx="2">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                    <path
+                      d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Tuna: cone + both arcs, largest -->
+                <div class="fish" data-idx="3">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+                    <path
+                      d="M15.54 8.46a5 5 0 0 1 0 7.07"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M18.36 5.64a9 9 0 0 1 0 12.73"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="fishing-actions">
+              <button id="castBtn" class="fishing-btn" type="button">
+                Cast
+              </button>
+            </div>
+
+            <p id="statusLine" class="fishing-status">No catch yet.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js"></script>
+    <script>
+      (function () {
+        var castBtn = document.getElementById("castBtn");
+        var volVal = document.getElementById("volVal");
+        var statusLine = document.getElementById("statusLine");
+        var scene = document.getElementById("scene");
+        var lineAnchor = document.getElementById("lineAnchor");
+        var castLine = document.getElementById("castLine");
+        var pool = document.getElementById("pool");
+        var hookIcon = document.getElementById("hookIcon");
+        var fishEls = Array.from(document.querySelectorAll(".fish"));
+
+        var LINE_W = 1.5; // px — must match CSS width
+
+        var fishData = [
+          {
+            name: "Minnow",
+            min: 8,
+            max: 24,
+            speed: 0.82,
+            depth: 0.34,
+            phase: 0.2,
+            baseX: 0.22,
+          },
+          {
+            name: "Bass",
+            min: 28,
+            max: 44,
+            speed: 0.96,
+            depth: 0.62,
+            phase: 1.7,
+            baseX: 0.42,
+          },
+          {
+            name: "Trout",
+            min: 50,
+            max: 70,
+            speed: 1.08,
+            depth: 0.46,
+            phase: 2.8,
+            baseX: 0.61,
+          },
+          {
+            name: "Tuna",
+            min: 76,
+            max: 100,
+            speed: 1.22,
+            depth: 0.68,
+            phase: 4.0,
+            baseX: 0.79,
+          },
+        ];
+
+        var state = {
+          phase: "idle",
+          volume: 50,
+          castStart: 0,
+          castDuration: 0,
+          retractStart: 0,
+          retractDuration: 1100,
+          caughtIdx: -1,
+          idleLen: 0,
+          catchLen: 0,
+          geo: null,
+          pos: [],
+          raf: 0,
+        };
+
+        function clamp(v, lo, hi) {
+          return Math.min(Math.max(v, lo), hi);
+        }
+        function lerp(a, b, t) {
+          return a + (b - a) * t;
+        }
+        function easeOut3(t) {
+          return 1 - Math.pow(1 - t, 3);
+        }
+        function randInt(lo, hi) {
+          return Math.floor(Math.random() * (hi - lo + 1)) + lo;
+        }
+
+        // ── Geometry ───────────────────────────────────────────────────────────
+
+        function measure() {
+          var sr = scene.getBoundingClientRect();
+          var ar = lineAnchor.getBoundingClientRect();
+          var pr = pool.getBoundingClientRect();
+
+          var ax = ar.left - sr.left; // anchor centre x (anchor has width 0)
+          var ay = ar.top - sr.top;
+          var pt = pr.top - sr.top;
+
+          /*
+          Centre the 1.5px cast-line under the 16px crossbar.
+          The crossbar is centred at ax; the line must also be centred at ax,
+          so its left edge goes at ax - LINE_W/2.
+        */
+          castLine.style.left = (ax - LINE_W / 2).toFixed(2) + "px";
+          castLine.style.top = ay.toFixed(1) + "px";
+
+          state.geo = { ay: ay, pt: pt, ph: pr.height };
+          state.idleLen = Math.max(14, pt - ay - 10);
+
+          if (state.phase === "idle") setLineLen(state.idleLen);
+        }
+
+        function catchTarget() {
+          if (!state.geo || state.caughtIdx < 0) return state.idleLen;
+          var g = state.geo;
+          var pos = state.pos[state.caughtIdx];
+          var y = pos ? pos.y : fishData[state.caughtIdx].depth;
+          return g.pt - g.ay + y * g.ph - 4;
+        }
+
+        // ── DOM helpers ────────────────────────────────────────────────────────
+
+        function setLineLen(len) {
+          castLine.style.height = Math.max(8, len).toFixed(1) + "px";
+        }
+
+        function setHook(show, opacity) {
+          hookIcon.style.opacity = show
+            ? String(opacity != null ? opacity : 0.82)
+            : "0";
+        }
+
+        function setVolume(v) {
+          state.volume = clamp(v, 1, 100);
+          volVal.textContent = String(state.volume);
+        }
+
+        // ── Fish animation ─────────────────────────────────────────────────────
+
+        function tickFish(now) {
+          fishEls.forEach(function (el, i) {
+            var d = fishData[i];
+            var t = now * 0.001 * d.speed + d.phase;
+            var x =
+              d.baseX + Math.sin(t * 1.55) * 0.072 + Math.sin(t * 0.65) * 0.018;
+            var y = d.depth + Math.sin(t * 1.28 + d.phase) * 0.046;
+            x = clamp(x, 0.13, 0.87);
+            y = clamp(y, 0.22, 0.8);
+
+            var dx =
+              Math.cos(t * 1.55) * 0.072 * 1.55 +
+              Math.cos(t * 0.65) * 0.018 * 0.65;
+            var facing = dx >= 0 ? 1 : -1;
+            var opacity = state.phase === "casting" ? 0.44 : 0.28;
+            if (state.phase === "retracting" && i === state.caughtIdx)
+              opacity = 0;
+
+            state.pos[i] = { x: x, y: y };
+
+            el.style.left = (x * 100).toFixed(2) + "%";
+            el.style.top = (y * 100).toFixed(2) + "%";
+            el.style.opacity = opacity.toFixed(3);
+            el.style.transform = "translate(-50%, -50%) scaleX(" + facing + ")";
+          });
+        }
+
+        // ── Line animation ─────────────────────────────────────────────────────
+
+        function tickLine(now) {
+          if (!state.geo) return;
+
+          if (state.phase === "casting") {
+            var elapsed = now - state.castStart;
+            var progress = clamp(elapsed / state.castDuration, 0, 1);
+            var descend = easeOut3(clamp(progress / 0.22, 0, 1));
+            var target = catchTarget();
+            var bob = progress > 0.22 ? Math.sin(elapsed / 170) * 1.1 : 0;
+
+            setLineLen(lerp(state.idleLen, target, descend) + bob);
+            setHook(false);
+
+            if (progress >= 1) {
+              var fd = fishData[state.caughtIdx];
+              var vol = randInt(fd.min, fd.max);
+              state.catchLen = catchTarget();
+              state.phase = "retracting";
+              state.retractStart = now;
+              setVolume(vol);
+              setHook(true, 0.82);
+              statusLine.textContent = fd.name + ". " + vol + "%.";
+              castBtn.textContent = "Reeling\u2026";
+              castBtn.disabled = true;
+            }
+            return;
+          }
+
+          if (state.phase === "retracting") {
+            var rel = clamp(
+              (now - state.retractStart) / state.retractDuration,
+              0,
+              1,
+            );
+            var eased = easeOut3(rel);
+            setLineLen(lerp(state.catchLen, state.idleLen, eased));
+            setHook(true, 0.82 - rel * 0.18);
+
+            if (rel >= 1) {
+              state.phase = "idle";
+              state.caughtIdx = -1;
+              setLineLen(state.idleLen);
+              setHook(false);
+              castBtn.textContent = "Cast again";
+              castBtn.disabled = false;
+            }
+            return;
+          }
+
+          setLineLen(state.idleLen);
+          setHook(false);
+        }
+
+        // ── Main loop ──────────────────────────────────────────────────────────
+
+        function tick(now) {
+          tickFish(now);
+          tickLine(now);
+          state.raf = requestAnimationFrame(tick);
+        }
+
+        // ── Cast ───────────────────────────────────────────────────────────────
+
+        function cast() {
+          if (state.phase !== "idle") return;
+          measure();
+          state.phase = "casting";
+          state.castStart = performance.now();
+          state.castDuration = randInt(2400, 4400);
+          state.caughtIdx = randInt(0, fishData.length - 1);
+          castBtn.textContent = "Waiting\u2026";
+          castBtn.disabled = true;
+          statusLine.textContent = "Line is in the water.";
+          setHook(false);
+        }
+
+        // ── Init ───────────────────────────────────────────────────────────────
+
+        castBtn.addEventListener("click", cast);
+        window.addEventListener("resize", measure);
+
+        setVolume(50);
+        measure();
+        state.raf = requestAnimationFrame(tick);
+      })();
+    </script>
+  </body>
+</html>
