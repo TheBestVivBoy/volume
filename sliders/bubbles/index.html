@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bubbles • Volume</title>
+    <meta
+      name="description"
+      content="A minimal volume slider where floating bubbles decide the result."
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+
+    <style>
+      :root {
+        --page-bg: #f2f1ec;
+        --card-bg: #ffffff;
+        --card-border: #e4e4e0;
+        --stage-bg: #fbfaf8;
+        --stage-border: #ebebe5;
+        --track: #e2e0d8;
+        --text: #171717;
+        --muted: #787670;
+        --shadow: 0 10px 28px rgba(17, 17, 17, 0.045);
+        --radius-xl: 22px;
+        --radius-lg: 16px;
+        --bubble-red-fill: #f7eeee;
+        --bubble-red-border: #dccccc;
+        --bubble-green-fill: #eef4ee;
+        --bubble-green-border: #cad9cb;
+      }
+
+      body {
+        background: var(--page-bg);
+        color: var(--text);
+      }
+
+      .bubbles-page {
+        width: min(100%, 540px);
+        display: grid;
+        gap: 18px;
+      }
+
+      .bubbles-wrap {
+        display: grid;
+        gap: 18px;
+      }
+
+      .volume-block {
+        text-align: center;
+        display: grid;
+        gap: 6px;
+      }
+
+      .volume-label {
+        margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.2;
+        color: var(--muted);
+        letter-spacing: -0.01em;
+      }
+
+      .volume-readout {
+        margin: 0;
+        font-size: clamp(4rem, 13vw, 5.85rem);
+        line-height: 0.92;
+        letter-spacing: -0.07em;
+        font-weight: 300;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .bubble-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .bubble-stage {
+        position: relative;
+        height: 360px;
+        border: 1px solid var(--stage-border);
+        border-radius: var(--radius-lg);
+        background: var(--stage-bg);
+        overflow: hidden;
+        touch-action: manipulation;
+        user-select: none;
+        isolation: isolate;
+      }
+
+      .bubble-stage::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 18px;
+        border-top: 1px solid var(--track);
+        pointer-events: none;
+        opacity: 0.8;
+      }
+
+      .bubble-stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(
+          to top,
+          rgba(23, 23, 23, 0.035) 1px,
+          transparent 1px
+        );
+        background-size: 100% 72px;
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      .bubble-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 2px 1px;
+      }
+
+      .bubble-status {
+        margin: 0;
+        min-height: 1.4em;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .bubble-reset {
+        appearance: none;
+        border: 1px solid var(--card-border);
+        background: #fff;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 14px;
+        font: inherit;
+        font-size: 0.92rem;
+        line-height: 1;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          background-color 120ms ease,
+          border-color 120ms ease,
+          box-shadow 120ms ease;
+      }
+
+      .bubble-reset:hover {
+        background: #faf9f7;
+        border-color: #ddd8cf;
+      }
+
+      .bubble-reset:active {
+        box-shadow: inset 0 1px 2px rgba(17, 17, 17, 0.08);
+      }
+
+      .bubble-reset:focus-visible {
+        outline: 2px solid rgba(17, 17, 17, 0.24);
+        outline-offset: 2px;
+      }
+
+      .bubble {
+        position: absolute;
+        bottom: calc(var(--bubble-size) * -1.15);
+        width: var(--bubble-size);
+        height: var(--bubble-size);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-size: 0.98rem;
+        font-weight: 500;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+        box-shadow:
+          0 7px 18px rgba(17, 17, 17, 0.055),
+          inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        cursor: pointer;
+        pointer-events: auto;
+        -webkit-tap-highlight-color: transparent;
+        animation-name: bubble-rise;
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+        z-index: 1;
+      }
+
+      .bubble.is-red {
+        background: var(--bubble-red-fill);
+        border-color: var(--bubble-red-border);
+      }
+
+      .bubble.is-green {
+        background: var(--bubble-green-fill);
+        border-color: var(--bubble-green-border);
+      }
+
+      .bubble:focus-visible {
+        outline: 2px solid rgba(17, 17, 17, 0.28);
+        outline-offset: 2px;
+      }
+
+      .bubble.is-popping {
+        animation: none;
+        transform: scale(0.9);
+        opacity: 0;
+        transition:
+          opacity 140ms ease,
+          transform 140ms ease;
+      }
+
+      @keyframes bubble-rise {
+        0% {
+          transform: translate3d(0, 0, 0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate3d(var(--drift-x), calc(var(--travel-y) * -1), 0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .bubbles-page {
+          width: min(100%, 520px);
+        }
+
+        .bubble-card {
+          padding: 12px;
+          border-radius: 20px;
+        }
+
+        .bubble-stage {
+          height: 320px;
+        }
+
+        .bubble-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .bubble-reset {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Bubbles</h1>
+          <p>Tap a bubble. It applies the number.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <div class="bubbles-page">
+          <section aria-label="Bubbles volume control">
+            <div class="bubbles-wrap">
+              <div class="volume-block">
+                <p class="volume-label">Volume</p>
+                <p
+                  class="volume-readout"
+                  id="volume-readout"
+                  aria-live="polite"
+                >
+                  50
+                </p>
+              </div>
+
+              <div class="bubble-card">
+                <div
+                  class="bubble-stage"
+                  id="bubble-stage"
+                  aria-label="Floating volume bubbles"
+                ></div>
+
+                <div class="bubble-controls">
+                  <p
+                    class="bubble-status"
+                    id="bubble-status"
+                    aria-live="polite"
+                  >
+                    Tap a bubble. Accept the result.
+                  </p>
+                  <button type="button" class="bubble-reset" id="bubble-reset">
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="../../assets/site.js"></script>
+    <script>
+      (() => {
+        const stage = document.getElementById("bubble-stage");
+        const readout = document.getElementById("volume-readout");
+        const status = document.getElementById("bubble-status");
+        const resetButton = document.getElementById("bubble-reset");
+
+        if (!stage || !readout || !status || !resetButton) return;
+
+        const state = {
+          volume: 50,
+          spawnTimeout: null,
+          statusTimeout: null,
+          activeBubbles: new Set(),
+          maxBubbles: 12,
+        };
+
+        const defaultStatus = "Tap a bubble. Accept the result.";
+
+        const weightedValues = [];
+        for (let value = -10; value <= 10; value += 1) {
+          const distance = Math.abs(value);
+          let weight = 1;
+
+          if (distance <= 2) weight = 12;
+          else if (distance <= 5) weight = 8;
+          else if (distance <= 7) weight = 4;
+          else if (distance <= 9) weight = 2;
+          else weight = 1;
+
+          for (let i = 0; i < weight; i += 1) {
+            weightedValues.push(value);
+          }
+        }
+
+        function clamp(value, min, max) {
+          return Math.min(max, Math.max(min, value));
+        }
+
+        function randomBetween(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        function randomInt(min, max) {
+          return Math.floor(randomBetween(min, max + 1));
+        }
+
+        function pickWeightedValue() {
+          return weightedValues[
+            Math.floor(Math.random() * weightedValues.length)
+          ];
+        }
+
+        function pickBubbleTone() {
+          return Math.random() < 0.65 ? "red" : "green";
+        }
+
+        function formatDelta(value) {
+          return value > 0 ? `+${value}` : `${value}`;
+        }
+
+        function setVolume(nextVolume) {
+          state.volume = clamp(nextVolume, 0, 100);
+          readout.textContent = String(state.volume);
+        }
+
+        function setStatus(message, resetDelay = 1800) {
+          status.textContent = message;
+          window.clearTimeout(state.statusTimeout);
+
+          if (resetDelay > 0) {
+            state.statusTimeout = window.setTimeout(() => {
+              status.textContent = defaultStatus;
+            }, resetDelay);
+          }
+        }
+
+        function removeBubble(bubble) {
+          if (!bubble || !state.activeBubbles.has(bubble)) return;
+          state.activeBubbles.delete(bubble);
+          bubble.remove();
+        }
+
+        function popBubble(bubble, delta) {
+          if (!bubble || bubble.dataset.used === "true") return;
+
+          bubble.dataset.used = "true";
+          bubble.classList.add("is-popping");
+
+          const before = state.volume;
+          const unclamped = before + delta;
+          const after = clamp(unclamped, 0, 100);
+
+          setVolume(after);
+
+          let message = `Applied ${formatDelta(delta)}.`;
+          if (after === 0 && unclamped < 0) {
+            message += " Floor.";
+          } else if (after === 100 && unclamped > 100) {
+            message += " Ceiling.";
+          }
+
+          setStatus(message);
+
+          window.setTimeout(() => {
+            removeBubble(bubble);
+          }, 140);
+        }
+
+        function createBubble() {
+          if (document.hidden) return;
+          if (state.activeBubbles.size >= state.maxBubbles) return;
+
+          const stageRect = stage.getBoundingClientRect();
+          if (stageRect.width < 80 || stageRect.height < 120) return;
+
+          const bubble = document.createElement("button");
+          const size = randomInt(54, 76);
+          const maxLeft = Math.max(
+            12,
+            Math.floor(stage.clientWidth - size - 12),
+          );
+          const left = randomInt(12, maxLeft);
+          const duration = randomBetween(4.8, 7.2);
+          const drift = randomInt(-20, 20);
+          const travel = stage.clientHeight + size + 30;
+          const amount = pickWeightedValue();
+          const tone = pickBubbleTone();
+
+          bubble.type = "button";
+          bubble.className = `bubble is-${tone}`;
+          bubble.textContent = formatDelta(amount);
+          bubble.setAttribute(
+            "aria-label",
+            `Apply ${formatDelta(amount)} to volume`,
+          );
+          bubble.style.setProperty("--bubble-size", `${size}px`);
+          bubble.style.setProperty("--drift-x", `${drift}px`);
+          bubble.style.setProperty("--travel-y", `${travel}px`);
+          bubble.style.left = `${left}px`;
+          bubble.style.animationDuration = `${duration}s`;
+          bubble.dataset.value = String(amount);
+          bubble.dataset.used = "false";
+
+          bubble.addEventListener("click", () => {
+            popBubble(bubble, amount);
+          });
+
+          bubble.addEventListener("animationend", () => {
+            removeBubble(bubble);
+          });
+
+          stage.appendChild(bubble);
+          state.activeBubbles.add(bubble);
+        }
+
+        function scheduleNextBubble() {
+          window.clearTimeout(state.spawnTimeout);
+          state.spawnTimeout = window.setTimeout(
+            () => {
+              createBubble();
+              scheduleNextBubble();
+            },
+            randomInt(520, 980),
+          );
+        }
+
+        function resetVolume() {
+          setVolume(50);
+          setStatus("Back to 50.");
+        }
+
+        function clearBubbles() {
+          Array.from(state.activeBubbles).forEach(removeBubble);
+        }
+
+        resetButton.addEventListener("click", () => {
+          resetVolume();
+        });
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) return;
+          scheduleNextBubble();
+        });
+
+        window.addEventListener("beforeunload", () => {
+          window.clearTimeout(state.spawnTimeout);
+          window.clearTimeout(state.statusTimeout);
+        });
+
+        setVolume(50);
+        clearBubbles();
+
+        createBubble();
+        window.setTimeout(createBubble, 260);
+        window.setTimeout(createBubble, 520);
+        scheduleNextBubble();
+      })();
+    </script>
+  </body>
+</html>

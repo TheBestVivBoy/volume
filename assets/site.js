@@ -27,6 +27,7 @@ let deferredAudioUnlockBound = false;
 const AUDIO_VOLUME_SELECTORS_BY_SLUG = {
   alphabetical: ["#volumeLabel"],
   battery: ["#volumeLabel"],
+  bubbles: ["#volume-readout"],
   cannon: ["#volLabel"],
   chess: ["#volumeLabel"],
   crank: ["#volumeLabel"],
