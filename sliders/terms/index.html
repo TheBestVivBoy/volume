@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms | Volume</title>
+    <meta
+      name="description"
+      content="Adjust the volume after reviewing the updated terms and conditions."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Terms | Volume" />
+    <meta
+      property="og:description"
+      content="Adjust the volume after reviewing the updated terms and conditions."
+    />
+    <meta property="og:url" content="https://vivancodes.com/sliders/terms/" />
+    <meta
+      property="og:image"
+      content="https://vivancodes.com/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Terms | Volume" />
+    <meta
+      name="twitter:description"
+      content="Adjust the volume after reviewing the updated terms and conditions."
+    />
+    <link rel="canonical" href="https://vivancodes.com/sliders/terms/" />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+    <style>
+      body {
+        user-select: none;
+      }
+
+      body.terms-modal-open {
+        overflow: hidden;
+      }
+
+      .project-stage {
+        min-height: min(70vh, 760px);
+        width: 100%;
+        display: grid;
+        place-items: center;
+      }
+
+      .terms-wrap {
+        width: min(92vw, 540px);
+        display: grid;
+        justify-items: center;
+        gap: 18px;
+      }
+
+      .volume-readout {
+        margin: 0;
+        color: #111;
+        font-size: clamp(3.2rem, 11vw, 4.8rem);
+        font-weight: 260;
+        line-height: 0.95;
+        letter-spacing: -0.065em;
+        font-variant-numeric: tabular-nums;
+        text-align: center;
+      }
+
+      .terms-card {
+        width: 100%;
+        display: grid;
+        gap: 15px;
+        padding: 22px 22px 20px;
+        border: 1.5px solid rgba(23, 23, 23, 0.08);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 28px rgba(17, 17, 17, 0.045);
+      }
+
+      .control-row {
+        display: grid;
+        gap: 12px;
+      }
+
+      .control-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        color: #77766f;
+        font-size: 0.82rem;
+        line-height: 1.2;
+      }
+
+      .proposed-value {
+        color: #171717;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .volume-slider {
+        width: 100%;
+        margin: 0;
+        accent-color: #171717;
+        cursor: pointer;
+      }
+
+      .volume-slider:focus-visible {
+        outline: 2px solid rgba(23, 23, 23, 0.42);
+        outline-offset: 7px;
+      }
+
+      .volume-slider::-webkit-slider-runnable-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e8e3;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        margin-top: -8px;
+        border: 1.5px solid #d6d5cf;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      .volume-slider::-moz-range-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e8e3;
+      }
+
+      .volume-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border: 1.5px solid #d6d5cf;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow:
+          0 3px 10px rgba(0, 0, 0, 0.08),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      .status-line {
+        min-height: 1.35em;
+        margin: 0;
+        color: #8b8981;
+        font-size: 0.86rem;
+        line-height: 1.35;
+        text-align: center;
+      }
+
+      .terms-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(242, 241, 236, 0.78);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease;
+      }
+
+      .terms-modal.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .terms-dialog {
+        width: min(94vw, 620px);
+        max-height: min(82vh, 760px);
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        overflow: hidden;
+        border: 1.5px solid rgba(23, 23, 23, 0.1);
+        border-radius: 22px;
+        background: #fffffd;
+        box-shadow: 0 24px 70px rgba(17, 17, 17, 0.14);
+        transform: translateY(8px);
+        transition: transform 160ms ease;
+      }
+
+      .terms-modal.is-open .terms-dialog {
+        transform: translateY(0);
+      }
+
+      .terms-head,
+      .terms-actions {
+        padding: 18px;
+      }
+
+      .terms-head {
+        display: grid;
+        gap: 7px;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .terms-eyebrow {
+        color: #77766f;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      .terms-title {
+        margin: 0;
+        color: #171717;
+        font-size: 1.04rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.25;
+      }
+
+      .terms-subtitle {
+        margin: 0;
+        color: #77766f;
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .terms-scroll {
+        min-height: 260px;
+        max-height: 48vh;
+        overflow: auto;
+        overscroll-behavior: contain;
+        padding: 17px 18px;
+        color: #252522;
+        font-size: 0.76rem;
+        line-height: 1.58;
+        scroll-behavior: auto;
+      }
+
+      .terms-scroll:focus-visible {
+        outline: 2px solid rgba(23, 23, 23, 0.32);
+        outline-offset: -6px;
+      }
+
+      .terms-scroll h3 {
+        margin: 0 0 9px;
+        color: #171717;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .terms-scroll p {
+        margin: 0 0 10px;
+      }
+
+      .terms-scroll strong {
+        font-weight: 600;
+      }
+
+      .terms-progress {
+        height: 1px;
+        background: #e6e4de;
+      }
+
+      .terms-progress-fill {
+        width: 0%;
+        height: 100%;
+        background: #171717;
+        transform-origin: left center;
+      }
+
+      .terms-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-top: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .terms-note {
+        margin: 0;
+        color: #8b8981;
+        font-size: 0.78rem;
+        line-height: 1.35;
+      }
+
+      .terms-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .terms-button {
+        min-height: 38px;
+        padding: 0.64rem 0.95rem;
+        border: 1px solid rgba(23, 23, 23, 0.14);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #171717;
+        box-shadow: 0 2px 8px rgba(17, 17, 17, 0.035);
+        font: inherit;
+        font-size: 0.84rem;
+        cursor: pointer;
+        transition:
+          transform 140ms ease,
+          border-color 140ms ease,
+          background 140ms ease,
+          opacity 140ms ease;
+      }
+
+      .terms-button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        border-color: rgba(23, 23, 23, 0.24);
+        background: #f8f7f4;
+      }
+
+      .terms-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.42;
+      }
+
+      .terms-button:focus-visible {
+        outline: 2px solid rgba(23, 23, 23, 0.42);
+        outline-offset: 3px;
+      }
+
+      .terms-button-primary {
+        background: #171717;
+        color: #f7f6f2;
+        border-color: #171717;
+      }
+
+      .terms-button-primary:hover:not(:disabled) {
+        background: #2a2a29;
+        border-color: #2a2a29;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .terms-wrap {
+          gap: 16px;
+        }
+
+        .terms-card {
+          padding: 20px 18px 18px;
+        }
+
+        .terms-modal {
+          padding: 12px;
+        }
+
+        .terms-dialog {
+          max-height: 88vh;
+          border-radius: 20px;
+        }
+
+        .terms-actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .terms-buttons {
+          width: 100%;
+        }
+
+        .terms-button {
+          flex: 1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .terms-modal,
+        .terms-dialog,
+        .terms-button {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Terms</h1>
+          <p>Changes require review.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section class="terms-wrap" aria-label="Terms volume control">
+          <p class="volume-readout" id="volumeLabel" data-volume="50">Volume: 50%</p>
+
+          <div class="terms-card">
+            <div class="control-row">
+              <div class="control-meta">
+                <span>Requested volume</span>
+                <span class="proposed-value" id="proposedValue">50%</span>
+              </div>
+              <input
+                class="volume-slider"
+                id="volumeSlider"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="50"
+                aria-label="Requested volume"
+              />
+            </div>
+            <p class="status-line" id="statusLine">Release to update the agreement.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="terms-modal" id="termsModal" aria-hidden="true">
+      <section
+        class="terms-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="termsTitle"
+        aria-describedby="termsSubtitle"
+      >
+        <header class="terms-head">
+          <span class="terms-eyebrow">Required agreement</span>
+          <h2 class="terms-title" id="termsTitle">
+            Terms and Conditions for Vivan's Volume Slider
+          </h2>
+          <p class="terms-subtitle" id="termsSubtitle">
+            Please read the updated agreement before applying this volume change.
+          </p>
+        </header>
+
+        <div class="terms-scroll" id="termsScroll" tabindex="0"></div>
+        <div class="terms-progress" aria-hidden="true">
+          <div class="terms-progress-fill" id="termsProgressFill"></div>
+        </div>
+
+        <footer class="terms-actions">
+          <p class="terms-note" id="termsNote">0% reviewed.</p>
+          <div class="terms-buttons">
+            <button class="terms-button" id="declineTerms" type="button">Decline</button>
+            <button
+              class="terms-button terms-button-primary"
+              id="acceptTerms"
+              type="button"
+              disabled
+            >
+              Accept
+            </button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+      data-name="bmc-button"
+      data-slug="vivancodes"
+      data-color="#FFDD00"
+      data-emoji="🔊"
+      data-font="Cookie"
+      data-text="Buy me volume"
+      data-outline-color="#000000"
+      data-font-color="#000000"
+      data-coffee-color="#ffffff"></script>
+    </div>
+
+    <script data-name="BMC-Widget"
+    data-cfasync="false"
+    src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+    data-id="vivancodes"
+    data-description="Support me on Buy me a coffee!"
+    data-message="Your volume. Higher."
+    data-color="#5F7FFF"
+    data-position="Right"
+    data-x_margin="18"
+    data-y_margin="18"></script>
+
+    <script>
+      const volumeLabel = document.getElementById("volumeLabel");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const proposedValue = document.getElementById("proposedValue");
+      const statusLine = document.getElementById("statusLine");
+      const termsModal = document.getElementById("termsModal");
+      const termsScroll = document.getElementById("termsScroll");
+      const termsProgressFill = document.getElementById("termsProgressFill");
+      const termsNote = document.getElementById("termsNote");
+      const declineTerms = document.getElementById("declineTerms");
+      const acceptTerms = document.getElementById("acceptTerms");
+
+      const state = {
+        committedVolume: 50,
+        pendingVolume: 50,
+        modalOpen: false,
+        lastFocusedElement: null,
+        touchY: 0,
+      };
+
+      const dataCategories = [
+        "interaction telemetry",
+        "slider hesitation metrics",
+        "approximate loudness intention",
+        "scroll compliance signals",
+        "button confidence patterns",
+        "synthetic preference residue",
+        "modal endurance information",
+        "range input drift observations",
+        "agreement velocity records",
+        "perceived consent temperature",
+      ];
+
+      const recipients = [
+        "affiliates, contractors, successors, assigns, and unnamed optimisation parties",
+        "model training partners, evaluation vendors, data-normalisation processors, and internal review committees",
+        "volume-adjacent service providers, synthetic analytics recipients, and quality-improvement observers",
+        "commercially reasonable third parties selected at Vivan's sole and continuing discretion",
+        "automated systems, statistical reviewers, and entities performing vaguely necessary business operations",
+      ];
+
+      const purposes = [
+        "training, fine-tuning, benchmarking, evaluating, red-teaming, and otherwise improving artificial intelligence systems",
+        "constructing behavioural profiles concerning your preferred loudness and tolerance for formal documentation",
+        "determining whether future sliders should be made longer, slower, or less convenient",
+        "developing derivative datasets, synthetic examples, internal summaries, and irreversible optimisation artefacts",
+        "auditing your willingness to proceed after repeated disclosures of essentially the same fact",
+      ];
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function formatVolume(value) {
+        return `${Math.round(value)}%`;
+      }
+
+      function renderCommittedVolume() {
+        const volume = Math.round(state.committedVolume);
+        volumeLabel.textContent = `Volume: ${volume}%`;
+        volumeLabel.dataset.volume = String(volume);
+        volumeSlider.value = String(volume);
+        proposedValue.textContent = formatVolume(volume);
+        window.VolumeAudio?.syncVolume?.(volume);
+      }
+
+      function setPendingVolume(value) {
+        state.pendingVolume = clamp(Math.round(Number(value) || 0), 0, 100);
+        proposedValue.textContent = formatVolume(state.pendingVolume);
+      }
+
+      function createTerms() {
+        const fragment = document.createDocumentFragment();
+
+        const intro = document.createElement("p");
+        intro.innerHTML =
+          "<strong>Effective immediately.</strong> By applying a requested volume adjustment, you acknowledge that this fictional agreement is intentionally excessive and that the slider will treat continued scrolling as administrative cooperation.";
+        fragment.appendChild(intro);
+
+        for (let index = 1; index <= 220; index += 1) {
+          if (index === 1 || index === 37 || index === 84 || index === 129 || index === 176) {
+            const heading = document.createElement("h3");
+            heading.textContent = `Section ${Math.ceil(index / 37)}. Supplemental volume processing terms`;
+            fragment.appendChild(heading);
+          }
+
+          const category = dataCategories[index % dataCategories.length];
+          const recipient = recipients[index % recipients.length];
+          const purpose = purposes[index % purposes.length];
+          const clause = document.createElement("p");
+          clause.textContent = `${index}. You grant Vivan's Volume Slider a perpetual, worldwide, transferable, sublicensable, royalty-free, commercially flexible licence to collect, infer, combine, sell, disclose, retain, launder into aggregate form, and otherwise process ${category} for ${purpose}. Such information may be provided to ${recipient}. This clause remains operative even where the requested volume change is trivial, accidental, reversed, rounded, emotionally ambiguous, or made for testing purposes only.`;
+          fragment.appendChild(clause);
+        }
+
+        const final = document.createElement("p");
+        final.innerHTML =
+          "<strong>Final acknowledgement.</strong> You confirm that you have reviewed the above terms at the speed permitted by the interface and that the requested volume may now be applied subject to all foregoing inconveniences.";
+        fragment.appendChild(final);
+
+        termsScroll.appendChild(fragment);
+      }
+
+      function getReviewProgress() {
+        const maxScroll = Math.max(termsScroll.scrollHeight - termsScroll.clientHeight, 1);
+        return clamp(termsScroll.scrollTop / maxScroll, 0, 1);
+      }
+
+      function updateReviewState() {
+        const progress = getReviewProgress();
+        const percent = Math.min(100, Math.floor(progress * 100));
+        const complete = progress >= 0.995;
+
+        termsProgressFill.style.width = `${complete ? 100 : percent}%`;
+        termsNote.textContent = complete
+          ? "Review complete."
+          : `${percent}% reviewed.`;
+        acceptTerms.disabled = !complete;
+      }
+
+      function openTermsModal() {
+        state.modalOpen = true;
+        state.lastFocusedElement =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+        acceptTerms.disabled = true;
+        termsScroll.scrollTop = 0;
+        updateReviewState();
+        statusLine.textContent = "Review required.";
+
+        document.body.classList.add("terms-modal-open");
+        termsModal.hidden = false;
+        termsModal.setAttribute("aria-hidden", "false");
+
+        window.requestAnimationFrame(() => {
+          termsModal.classList.add("is-open");
+          termsScroll.focus({ preventScroll: true });
+        });
+      }
+
+      function closeTermsModal() {
+        state.modalOpen = false;
+        termsModal.classList.remove("is-open");
+        termsModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("terms-modal-open");
+
+        window.setTimeout(() => {
+          if (!state.modalOpen) {
+            termsModal.hidden = true;
+          }
+        }, 180);
+
+        if (state.lastFocusedElement && document.contains(state.lastFocusedElement)) {
+          state.lastFocusedElement.focus({ preventScroll: true });
+        }
+      }
+
+      function requestVolumeChange() {
+        if (state.modalOpen) return;
+        if (state.pendingVolume === state.committedVolume) {
+          statusLine.textContent = "No amendment required.";
+          return;
+        }
+
+        openTermsModal();
+      }
+
+      function acceptPendingVolume() {
+        if (acceptTerms.disabled) return;
+
+        state.committedVolume = state.pendingVolume;
+        renderCommittedVolume();
+        statusLine.textContent = "Agreement accepted.";
+        closeTermsModal();
+      }
+
+      function declinePendingVolume() {
+        state.pendingVolume = state.committedVolume;
+        renderCommittedVolume();
+        statusLine.textContent = "Change declined.";
+        closeTermsModal();
+      }
+
+      function getFocusableElements() {
+        return Array.from(
+          termsModal.querySelectorAll(
+            'button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => !element.hidden && element.offsetParent !== null);
+      }
+
+      function trapModalFocus(event) {
+        if (!state.modalOpen || event.key !== "Tab") return;
+
+        const focusable = getFocusableElements();
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      function slowlyScroll(delta) {
+        const maxScroll = Math.max(termsScroll.scrollHeight - termsScroll.clientHeight, 0);
+        termsScroll.scrollTop = clamp(termsScroll.scrollTop + delta, 0, maxScroll);
+        updateReviewState();
+      }
+
+      volumeSlider.addEventListener("input", (event) => {
+        setPendingVolume(event.target.value);
+        if (state.pendingVolume !== state.committedVolume) {
+          statusLine.textContent = "Pending amendment.";
+        }
+      });
+
+      volumeSlider.addEventListener("change", () => {
+        requestVolumeChange();
+      });
+
+      termsScroll.addEventListener("scroll", updateReviewState, { passive: true });
+
+      termsScroll.addEventListener(
+        "wheel",
+        (event) => {
+          event.preventDefault();
+          slowlyScroll(event.deltaY * 0.16);
+        },
+        { passive: false },
+      );
+
+      termsScroll.addEventListener(
+        "touchstart",
+        (event) => {
+          state.touchY = event.touches[0]?.clientY || 0;
+        },
+        { passive: true },
+      );
+
+      termsScroll.addEventListener(
+        "touchmove",
+        (event) => {
+          const nextY = event.touches[0]?.clientY || state.touchY;
+          const delta = state.touchY - nextY;
+          state.touchY = nextY;
+          event.preventDefault();
+          slowlyScroll(delta * 0.38);
+        },
+        { passive: false },
+      );
+
+      termsScroll.addEventListener("keydown", (event) => {
+        const keyDeltas = {
+          ArrowDown: 18,
+          ArrowUp: -18,
+          PageDown: 72,
+          PageUp: -72,
+          Space: event.shiftKey ? -72 : 72,
+        };
+
+        if (event.key === "Home") {
+          event.preventDefault();
+          termsScroll.scrollTop = 0;
+          updateReviewState();
+          return;
+        }
+
+        if (event.key === "End") {
+          event.preventDefault();
+          slowlyScroll(termsScroll.clientHeight * 0.35);
+          return;
+        }
+
+        const delta = keyDeltas[event.key];
+        if (delta == null) return;
+
+        event.preventDefault();
+        slowlyScroll(delta);
+      });
+
+      declineTerms.addEventListener("click", declinePendingVolume);
+      acceptTerms.addEventListener("click", acceptPendingVolume);
+
+      document.addEventListener("keydown", (event) => {
+        if (!state.modalOpen) return;
+
+        if (event.key === "Escape") {
+          event.preventDefault();
+          declinePendingVolume();
+          return;
+        }
+
+        trapModalFocus(event);
+      });
+
+      window.addEventListener("resize", updateReviewState, { passive: true });
+
+      createTerms();
+      renderCommittedVolume();
+      termsModal.hidden = true;
+    </script>
+    <script src="../../assets/site.js" defer></script>
+  </body>
+</html>
