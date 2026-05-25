@@ -293,6 +293,13 @@ const sliders = [
     preview: false,
   },
   {
+    title: "Terms",
+    description: "Read before changing.",
+    slug: "terms",
+    path: "sliders/terms/",
+    preview: false,
+  },
+  {
     title: "Tic-Tac-Toe",
     description: "Slow and steady wins the.. volume?",
     slug: "tictactoe",
@@ -606,7 +613,9 @@ function renderSiteHeader() {
 }
 
 function getPageSlug() {
-  const match = window.location.pathname.match(/\/sliders\/([^/]+?)(?:\/|\.html)?$/);
+  const match = window.location.pathname.match(
+    /\/sliders\/([^/]+?)(?:\/|\.html)?$/,
+  );
   return match ? match[1] : "";
 }
 

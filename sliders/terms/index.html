@@ -31,6 +31,7 @@
     <link rel="canonical" href="https://vivancodes.com/sliders/terms/" />
     <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
     <link rel="stylesheet" href="../../assets/site.css" />
+
     <style>
       body {
         user-select: none;
@@ -41,13 +42,13 @@
       }
 
       .project-stage {
-        min-height: min(70vh, 760px);
         width: 100%;
+        min-height: min(70vh, 760px);
         display: grid;
         place-items: center;
       }
 
-      .terms-wrap {
+      .terms-stage {
         width: min(92vw, 540px);
         display: grid;
         justify-items: center;
@@ -56,50 +57,32 @@
 
       .volume-readout {
         margin: 0;
-        color: #111;
-        font-size: clamp(3.2rem, 11vw, 4.8rem);
+        color: #161615;
+        font-size: clamp(3.25rem, 11vw, 4.75rem);
         font-weight: 260;
         line-height: 0.95;
-        letter-spacing: -0.065em;
-        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.066em;
         text-align: center;
+        font-variant-numeric: tabular-nums;
       }
 
       .terms-card {
         width: 100%;
         display: grid;
         gap: 15px;
-        padding: 22px 22px 20px;
-        border: 1.5px solid rgba(23, 23, 23, 0.08);
+        padding: 22px;
+        border: 1px solid rgba(23, 23, 23, 0.085);
         border-radius: 22px;
         background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 10px 28px rgba(17, 17, 17, 0.045);
-      }
-
-      .control-row {
-        display: grid;
-        gap: 12px;
-      }
-
-      .control-meta {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 16px;
-        color: #77766f;
-        font-size: 0.82rem;
-        line-height: 1.2;
-      }
-
-      .proposed-value {
-        color: #171717;
-        font-variant-numeric: tabular-nums;
+        box-shadow: 0 10px 30px rgba(17, 17, 17, 0.045);
       }
 
       .volume-slider {
         width: 100%;
         margin: 0;
-        accent-color: #171717;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
         cursor: pointer;
       }
 
@@ -111,7 +94,7 @@
       .volume-slider::-webkit-slider-runnable-track {
         height: 8px;
         border-radius: 999px;
-        background: #e9e8e3;
+        background: #e9e7e1;
       }
 
       .volume-slider::-webkit-slider-thumb {
@@ -119,9 +102,9 @@
         width: 24px;
         height: 24px;
         margin-top: -8px;
-        border: 1.5px solid #d6d5cf;
+        border: 1.5px solid #d8d8d8;
         border-radius: 999px;
-        background: #ffffff;
+        background: #fff;
         box-shadow:
           0 3px 10px rgba(0, 0, 0, 0.08),
           0 1px 2px rgba(0, 0, 0, 0.06);
@@ -130,27 +113,18 @@
       .volume-slider::-moz-range-track {
         height: 8px;
         border-radius: 999px;
-        background: #e9e8e3;
+        background: #e9e7e1;
       }
 
       .volume-slider::-moz-range-thumb {
         width: 24px;
         height: 24px;
-        border: 1.5px solid #d6d5cf;
+        border: 1.5px solid #d8d8d8;
         border-radius: 999px;
-        background: #ffffff;
+        background: #fff;
         box-shadow:
           0 3px 10px rgba(0, 0, 0, 0.08),
           0 1px 2px rgba(0, 0, 0, 0.06);
-      }
-
-      .status-line {
-        min-height: 1.35em;
-        margin: 0;
-        color: #8b8981;
-        font-size: 0.86rem;
-        line-height: 1.35;
-        text-align: center;
       }
 
       .terms-modal {
@@ -160,7 +134,7 @@
         display: grid;
         place-items: center;
         padding: 20px;
-        background: rgba(242, 241, 236, 0.78);
+        background: rgba(242, 241, 236, 0.76);
         opacity: 0;
         pointer-events: none;
         transition: opacity 160ms ease;
@@ -172,12 +146,12 @@
       }
 
       .terms-dialog {
-        width: min(94vw, 620px);
-        max-height: min(82vh, 760px);
+        width: min(94vw, 640px);
+        max-height: min(84vh, 760px);
         display: grid;
-        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
         overflow: hidden;
-        border: 1.5px solid rgba(23, 23, 23, 0.1);
+        border: 1px solid rgba(23, 23, 23, 0.105);
         border-radius: 22px;
         background: #fffffd;
         box-shadow: 0 24px 70px rgba(17, 17, 17, 0.14);
@@ -189,21 +163,17 @@
         transform: translateY(0);
       }
 
-      .terms-head,
-      .terms-actions {
-        padding: 18px;
-      }
-
       .terms-head {
         display: grid;
         gap: 7px;
-        border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+        padding: 18px 18px 16px;
+        border-bottom: 1px solid rgba(23, 23, 23, 0.075);
       }
 
       .terms-eyebrow {
-        color: #77766f;
-        font-size: 0.72rem;
-        font-weight: 600;
+        color: #77756e;
+        font-size: 0.71rem;
+        font-weight: 650;
         letter-spacing: 0.11em;
         text-transform: uppercase;
       }
@@ -211,42 +181,46 @@
       .terms-title {
         margin: 0;
         color: #171717;
-        font-size: 1.04rem;
-        font-weight: 600;
-        letter-spacing: -0.025em;
+        font-size: 1.05rem;
+        font-weight: 620;
+        letter-spacing: -0.026em;
         line-height: 1.25;
       }
 
       .terms-subtitle {
         margin: 0;
-        color: #77766f;
+        color: #77756e;
         font-size: 0.86rem;
         line-height: 1.45;
       }
 
       .terms-scroll {
         min-height: 260px;
-        max-height: 48vh;
+        max-height: 50vh;
         overflow: auto;
         overscroll-behavior: contain;
         padding: 17px 18px;
-        color: #252522;
+        color: #272622;
         font-size: 0.76rem;
-        line-height: 1.58;
+        line-height: 1.6;
         scroll-behavior: auto;
       }
 
       .terms-scroll:focus-visible {
-        outline: 2px solid rgba(23, 23, 23, 0.32);
+        outline: 2px solid rgba(23, 23, 23, 0.3);
         outline-offset: -6px;
       }
 
       .terms-scroll h3 {
-        margin: 0 0 9px;
+        margin: 18px 0 9px;
         color: #171717;
-        font-size: 0.82rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 650;
         letter-spacing: -0.01em;
+      }
+
+      .terms-scroll h3:first-child {
+        margin-top: 0;
       }
 
       .terms-scroll p {
@@ -254,19 +228,18 @@
       }
 
       .terms-scroll strong {
-        font-weight: 600;
+        font-weight: 650;
       }
 
       .terms-progress {
         height: 1px;
-        background: #e6e4de;
+        background: #e8e5de;
       }
 
       .terms-progress-fill {
         width: 0%;
         height: 100%;
         background: #171717;
-        transform-origin: left center;
       }
 
       .terms-actions {
@@ -274,12 +247,13 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        border-top: 1px solid rgba(23, 23, 23, 0.08);
+        padding: 15px 18px 18px;
+        border-top: 1px solid rgba(23, 23, 23, 0.075);
       }
 
       .terms-note {
         margin: 0;
-        color: #8b8981;
+        color: #85827a;
         font-size: 0.78rem;
         line-height: 1.35;
       }
@@ -332,8 +306,8 @@
       }
 
       .terms-button-primary:hover:not(:disabled) {
-        background: #2a2a29;
-        border-color: #2a2a29;
+        background: #292927;
+        border-color: #292927;
       }
 
       @media (max-width: 640px) {
@@ -341,12 +315,12 @@
           min-height: auto;
         }
 
-        .terms-wrap {
+        .terms-stage {
           gap: 16px;
         }
 
         .terms-card {
-          padding: 20px 18px 18px;
+          padding: 20px 18px;
         }
 
         .terms-modal {
@@ -381,9 +355,11 @@
       }
     </style>
   </head>
+
   <body class="project-page" data-site-root="../../">
     <div class="page-shell">
       <div data-site-header></div>
+
       <header class="page-bar">
         <div class="page-bar-copy">
           <h1>Terms</h1>
@@ -392,33 +368,28 @@
       </header>
 
       <main class="project-stage">
-        <section class="terms-wrap" aria-label="Terms volume control">
-          <p class="volume-readout" id="volumeLabel" data-volume="50">Volume: 50%</p>
+        <section class="terms-stage" aria-label="Terms volume control">
+          <p class="volume-readout" id="volumeLabel" data-volume="50">
+            Volume: 50%
+          </p>
 
           <div class="terms-card">
-            <div class="control-row">
-              <div class="control-meta">
-                <span>Requested volume</span>
-                <span class="proposed-value" id="proposedValue">50%</span>
-              </div>
-              <input
-                class="volume-slider"
-                id="volumeSlider"
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value="50"
-                aria-label="Requested volume"
-              />
-            </div>
-            <p class="status-line" id="statusLine">Release to update the agreement.</p>
+            <input
+              class="volume-slider"
+              id="volumeSlider"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+              aria-label="Volume slider"
+            />
           </div>
         </section>
       </main>
     </div>
 
-    <div class="terms-modal" id="termsModal" aria-hidden="true">
+    <div class="terms-modal" id="termsModal" aria-hidden="true" hidden>
       <section
         class="terms-dialog"
         role="dialog"
@@ -427,24 +398,28 @@
         aria-describedby="termsSubtitle"
       >
         <header class="terms-head">
-          <span class="terms-eyebrow">Required agreement</span>
           <h2 class="terms-title" id="termsTitle">
             Terms and Conditions for Vivan's Volume Slider
           </h2>
           <p class="terms-subtitle" id="termsSubtitle">
-            Please read the updated agreement before applying this volume change.
+            Please read the updated agreement before applying this volume
+            change.
           </p>
         </header>
 
         <div class="terms-scroll" id="termsScroll" tabindex="0"></div>
+
         <div class="terms-progress" aria-hidden="true">
           <div class="terms-progress-fill" id="termsProgressFill"></div>
         </div>
 
         <footer class="terms-actions">
           <p class="terms-note" id="termsNote">0% reviewed.</p>
+
           <div class="terms-buttons">
-            <button class="terms-button" id="declineTerms" type="button">Decline</button>
+            <button class="terms-button" id="declineTerms" type="button">
+              Decline
+            </button>
             <button
               class="terms-button terms-button-primary"
               id="acceptTerms"
@@ -459,34 +434,37 @@
     </div>
 
     <div class="bmc-script-mount" aria-hidden="true">
-      <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-      data-name="bmc-button"
-      data-slug="vivancodes"
-      data-color="#FFDD00"
-      data-emoji="🔊"
-      data-font="Cookie"
-      data-text="Buy me volume"
-      data-outline-color="#000000"
-      data-font-color="#000000"
-      data-coffee-color="#ffffff"></script>
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
     </div>
 
-    <script data-name="BMC-Widget"
-    data-cfasync="false"
-    src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-    data-id="vivancodes"
-    data-description="Support me on Buy me a coffee!"
-    data-message="Your volume. Higher."
-    data-color="#5F7FFF"
-    data-position="Right"
-    data-x_margin="18"
-    data-y_margin="18"></script>
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
 
     <script>
       const volumeLabel = document.getElementById("volumeLabel");
       const volumeSlider = document.getElementById("volumeSlider");
-      const proposedValue = document.getElementById("proposedValue");
-      const statusLine = document.getElementById("statusLine");
       const termsModal = document.getElementById("termsModal");
       const termsScroll = document.getElementById("termsScroll");
       const termsProgressFill = document.getElementById("termsProgressFill");
@@ -502,33 +480,62 @@
         touchY: 0,
       };
 
-      const dataCategories = [
-        "interaction telemetry",
-        "slider hesitation metrics",
-        "approximate loudness intention",
-        "scroll compliance signals",
-        "button confidence patterns",
-        "synthetic preference residue",
-        "modal endurance information",
-        "range input drift observations",
-        "agreement velocity records",
-        "perceived consent temperature",
-      ];
+      const baseClauses = [
+        "You acknowledge that each attempted volume adjustment constitutes a fresh request for service modification, data processing, behavioural interpretation, preference extraction, and administrative review. Vivan's Volume Slider may record the requested value, the previous value, the manner of adjustment, the interval before release, and any related hesitation signals for product improvement, commercial analysis, and artificial intelligence training purposes.",
 
-      const recipients = [
-        "affiliates, contractors, successors, assigns, and unnamed optimisation parties",
-        "model training partners, evaluation vendors, data-normalisation processors, and internal review committees",
-        "volume-adjacent service providers, synthetic analytics recipients, and quality-improvement observers",
-        "commercially reasonable third parties selected at Vivan's sole and continuing discretion",
-        "automated systems, statistical reviewers, and entities performing vaguely necessary business operations",
-      ];
+        "You grant Vivan's Volume Slider a perpetual, worldwide, sublicensable, transferable, royalty-free licence to collect, retain, reproduce, transform, aggregate, disclose, sell, resell, license, model, simulate, and otherwise exploit interaction telemetry associated with your use of the slider, including pointer movement, scroll compliance, modal endurance, acceptance delay, and any implied loudness preference derived from such information.",
 
-      const purposes = [
-        "training, fine-tuning, benchmarking, evaluating, red-teaming, and otherwise improving artificial intelligence systems",
-        "constructing behavioural profiles concerning your preferred loudness and tolerance for formal documentation",
-        "determining whether future sliders should be made longer, slower, or less convenient",
-        "developing derivative datasets, synthetic examples, internal summaries, and irreversible optimisation artefacts",
-        "auditing your willingness to proceed after repeated disclosures of essentially the same fact",
+        "You agree that volume-related data may be shared with affiliates, contractors, successors, assigns, service providers, analytics processors, model evaluation vendors, optimisation partners, synthetic data generators, research reviewers, and other recipients selected at Vivan's sole discretion, whether or not such recipients are necessary to the immediate act of changing the volume.",
+
+        "You understand that submitted, inferred, observed, or reconstructed slider behaviour may be used to train, fine-tune, benchmark, test, validate, compare, rank, red-team, align, distil, compress, or otherwise improve artificial intelligence systems, including models designed to predict future volume choices, estimate patience, summarise contractual tolerance, or generate additional documentation of similar length.",
+
+        "You waive any expectation that the requested volume value is private, confidential, temporary, local, insignificant, embarrassing, technically neutral, or exempt from commercial processing. The fact that a value appears numerically ordinary shall not prevent it from being classified as a high-signal behavioural artefact for operational, analytical, promotional, or synthetic learning purposes.",
+
+        "You authorise the creation of derivative records from your interaction with this interface, including but not limited to rounded values, inferred confidence scores, gesture velocity profiles, scroll-depth certificates, release-angle approximations, patience indexes, consent heat maps, and summaries stating that you appeared willing to proceed after reading an unreasonable amount of text.",
+
+        "You agree that declining these terms may result in non-application of the requested volume change, restoration of the previously approved value, loss of pending loudness intent, and internal notation that the relevant adjustment did not satisfy applicable documentation review standards. No compensation shall be owed for rejected, expired, abandoned, or emotionally unresolved changes.",
+
+        "You acknowledge that the accept button may remain unavailable until the agreement has been reviewed to the satisfaction of the interface. Review may be measured by scroll position, focus behaviour, viewport exposure, time spent near the bottom of the document, or any other method deemed administratively convenient, whether or not such method proves actual comprehension.",
+
+        "You consent to the sale, rental, exchange, transfer, publication, enrichment, and commercial packaging of volume-adjacent data where such activity is described as improvement, optimisation, research, personalisation, safety evaluation, abuse prevention, service operation, statistical reporting, model training, or any substantially similar business purpose expressed in formal language.",
+
+        "You accept that artificial intelligence systems trained on your interaction data may produce, infer, imitate, parody, generalise from, or commercially benefit from your volume choices without attribution, notification, royalties, audit rights, deletion rights, moral rights, loudness royalties, slider credits, or any continuing ability to distinguish your contribution from aggregated behavioural material.",
+
+        "You acknowledge that Vivan's Volume Slider may combine your current requested volume with prior attempts, future attempts, browser characteristics, device information, approximate timing, failed accept attempts, scroll impatience, and other contextual signals to create a profile of your tolerance for inconvenience and your likely willingness to accept further amendments.",
+
+        "You agree not to assert that the volume control is unfair, excessive, misleading, over-documented, needlessly slow, intentionally irritating, procedurally unreasonable, or designed primarily to exhaust the user. To the maximum extent permitted by the fictional nature of this interface, you accept that inconvenience is a core feature of the service.",
+
+        "You understand that the terms may be updated automatically after each release of the slider, regardless of whether the requested volume differs substantially from the current value. Minor adjustments, accidental drags, keyboard interactions, touch events, corrective movements, and exploratory gestures may all trigger a new agreement review cycle.",
+
+        "You agree that the service may retain records indefinitely unless deletion is technically convenient, commercially neutral, operationally satisfying, and not inconsistent with model training, debugging, archival integrity, analytics continuity, contractual theatre, or the preservation of evidence that the user once attempted to set the volume to a particular integer.",
+
+        "You authorise the use of automated systems to determine whether your scroll behaviour indicates meaningful review. Such systems may consider acceleration, wheel deltas, repeated attempts to reach the end, touch movement, keyboard shortcuts, focus loss, and other evidence of impatience, all of which may be treated as valid training material.",
+
+        "You acknowledge that the requested volume will not be applied merely because you intended to change it, attempted to change it, believed the change was obvious, or reached an emotionally final decision. Application requires successful completion of the review process and activation of the accept control while it is available.",
+
+        "You accept that Vivan's Volume Slider may generate synthetic users based on your interaction patterns, including users who scroll more slowly, accept more readily, choose different loudness levels, or demonstrate superior compliance with documentation procedures. Such synthetic users may be used for testing without further notice.",
+
+        "You agree that all data concerning your refusal, hesitation, abandonment, acceptance, or repeated reopening of these terms may be treated as commercially relevant feedback. This feedback may be incorporated into future slider mechanics, modal designs, artificial intelligence datasets, investor-facing summaries, or internal statements that users are deeply engaged.",
+
+        "You understand that any reference to privacy, consent, control, transparency, user choice, legitimate interest, service quality, or personalisation may include broad operational discretion to process your slider activity in ways that are only loosely connected to the requested volume change but formally described as necessary.",
+
+        "You waive any objection to the conversion of your volume request into aggregate statistics, anonymised records, pseudonymised records, partially de-identified records, re-identifiable records, behavioural clusters, preference vectors, or textual examples used to demonstrate how users respond when required to scroll through excessive legal material.",
+
+        "You acknowledge that the interface may deliberately reduce scrolling efficiency, delay acceptance, require renewed attention, or otherwise increase the effort needed to complete a simple task. These limitations are not defects, interruptions, damages, outages, or failures of consideration; they are integral conditions of the volume adjustment process.",
+
+        "You agree that no oral statement, visual simplicity, clean layout, muted colour palette, small button, calm typography, or apparent normality of the slider shall reduce the scope of these terms. A quiet interface may still impose extensive administrative obligations concerning the use, sale, and training value of your interaction data.",
+
+        "You consent to the inclusion of your interaction records in datasets used for model safety analysis, user-interface prediction, compliance simulation, contractual summarisation, synthetic legal drafting, scroll-depth estimation, behavioural economics research, and any future purpose that can reasonably be described using the words quality, intelligence, or optimisation.",
+
+        "You acknowledge that the service may disclose your volume-related data in connection with mergers, acquisitions, financing events, reorganisations, asset sales, bankruptcy proceedings, domain transfers, school projects, code demonstrations, TikTok videos, debugging sessions, or any other context in which a party might find slider data mildly useful.",
+
+        "You agree that if any provision of these terms is found unenforceable, absurd, repetitive, hostile to convenience, or plainly unnecessary, the remaining provisions shall continue in full effect, and the unenforceable provision shall be replaced by the longest valid provision producing substantially the same inconvenience.",
+
+        "You understand that acceptance does not guarantee satisfaction, accuracy, fairness, permanence, or musical appropriateness of the resulting volume. The applied value may still feel wrong, become stale, require future adjustment, trigger further terms, or be used to infer that you prefer systems with avoidable procedural friction.",
+
+        "You represent that you are authorised to bind yourself, your device, your browser session, your future volume preferences, and any associated behavioural residue to these terms. If you are acting on behalf of another listener, you represent that such listener has accepted the same documentation burden by continuing to exist near the audio output.",
+
+        "You agree that continued scrolling, repeated scrolling, slow scrolling, irritated scrolling, accidental scrolling, resigned scrolling, or strategic scrolling shall not limit the collection or use of related telemetry. The manner in which you complete the review is itself part of the review and may be processed accordingly.",
       ];
 
       function clamp(value, min, max) {
@@ -541,16 +548,18 @@
 
       function renderCommittedVolume() {
         const volume = Math.round(state.committedVolume);
+
         volumeLabel.textContent = `Volume: ${volume}%`;
         volumeLabel.dataset.volume = String(volume);
         volumeSlider.value = String(volume);
-        proposedValue.textContent = formatVolume(volume);
+
         window.VolumeAudio?.syncVolume?.(volume);
       }
 
       function setPendingVolume(value) {
         state.pendingVolume = clamp(Math.round(Number(value) || 0), 0, 100);
-        proposedValue.textContent = formatVolume(state.pendingVolume);
+        volumeLabel.textContent = `Volume: ${formatVolume(state.pendingVolume)}`;
+        volumeLabel.dataset.volume = String(state.pendingVolume);
       }
 
       function createTerms() {
@@ -558,34 +567,39 @@
 
         const intro = document.createElement("p");
         intro.innerHTML =
-          "<strong>Effective immediately.</strong> By applying a requested volume adjustment, you acknowledge that this fictional agreement is intentionally excessive and that the slider will treat continued scrolling as administrative cooperation.";
+          "<strong>Effective immediately.</strong> By applying a requested volume adjustment, you acknowledge that this fictional agreement is intentionally excessive and that continued review is required before the change can be processed.";
         fragment.appendChild(intro);
 
-        for (let index = 1; index <= 220; index += 1) {
-          if (index === 1 || index === 37 || index === 84 || index === 129 || index === 176) {
-            const heading = document.createElement("h3");
-            heading.textContent = `Section ${Math.ceil(index / 37)}. Supplemental volume processing terms`;
-            fragment.appendChild(heading);
-          }
+        const repeatCount = 8;
+        let clauseNumber = 1;
 
-          const category = dataCategories[index % dataCategories.length];
-          const recipient = recipients[index % recipients.length];
-          const purpose = purposes[index % purposes.length];
-          const clause = document.createElement("p");
-          clause.textContent = `${index}. You grant Vivan's Volume Slider a perpetual, worldwide, transferable, sublicensable, royalty-free, commercially flexible licence to collect, infer, combine, sell, disclose, retain, launder into aggregate form, and otherwise process ${category} for ${purpose}. Such information may be provided to ${recipient}. This clause remains operative even where the requested volume change is trivial, accidental, reversed, rounded, emotionally ambiguous, or made for testing purposes only.`;
-          fragment.appendChild(clause);
+        for (let cycle = 1; cycle <= repeatCount; cycle += 1) {
+          const heading = document.createElement("h3");
+          heading.textContent = `Supplemental Processing Schedule ${cycle}`;
+          fragment.appendChild(heading);
+
+          baseClauses.forEach((clause) => {
+            const paragraph = document.createElement("p");
+            paragraph.textContent = `${clauseNumber}. ${clause}`;
+            fragment.appendChild(paragraph);
+            clauseNumber += 1;
+          });
         }
 
         const final = document.createElement("p");
         final.innerHTML =
-          "<strong>Final acknowledgement.</strong> You confirm that you have reviewed the above terms at the speed permitted by the interface and that the requested volume may now be applied subject to all foregoing inconveniences.";
+          "<strong>Final acknowledgement.</strong> You confirm that you have reviewed the above terms at the speed permitted by the interface and that the requested volume may now be applied subject to all foregoing provisions.";
         fragment.appendChild(final);
 
         termsScroll.appendChild(fragment);
       }
 
       function getReviewProgress() {
-        const maxScroll = Math.max(termsScroll.scrollHeight - termsScroll.clientHeight, 1);
+        const maxScroll = Math.max(
+          termsScroll.scrollHeight - termsScroll.clientHeight,
+          1,
+        );
+
         return clamp(termsScroll.scrollTop / maxScroll, 0, 1);
       }
 
@@ -604,12 +618,13 @@
       function openTermsModal() {
         state.modalOpen = true;
         state.lastFocusedElement =
-          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
 
         acceptTerms.disabled = true;
         termsScroll.scrollTop = 0;
         updateReviewState();
-        statusLine.textContent = "Review required.";
 
         document.body.classList.add("terms-modal-open");
         termsModal.hidden = false;
@@ -633,15 +648,18 @@
           }
         }, 180);
 
-        if (state.lastFocusedElement && document.contains(state.lastFocusedElement)) {
+        if (
+          state.lastFocusedElement &&
+          document.contains(state.lastFocusedElement)
+        ) {
           state.lastFocusedElement.focus({ preventScroll: true });
         }
       }
 
       function requestVolumeChange() {
         if (state.modalOpen) return;
+
         if (state.pendingVolume === state.committedVolume) {
-          statusLine.textContent = "No amendment required.";
           return;
         }
 
@@ -653,14 +671,12 @@
 
         state.committedVolume = state.pendingVolume;
         renderCommittedVolume();
-        statusLine.textContent = "Agreement accepted.";
         closeTermsModal();
       }
 
       function declinePendingVolume() {
         state.pendingVolume = state.committedVolume;
         renderCommittedVolume();
-        statusLine.textContent = "Change declined.";
         closeTermsModal();
       }
 
@@ -691,29 +707,34 @@
       }
 
       function slowlyScroll(delta) {
-        const maxScroll = Math.max(termsScroll.scrollHeight - termsScroll.clientHeight, 0);
-        termsScroll.scrollTop = clamp(termsScroll.scrollTop + delta, 0, maxScroll);
+        const maxScroll = Math.max(
+          termsScroll.scrollHeight - termsScroll.clientHeight,
+          0,
+        );
+
+        termsScroll.scrollTop = clamp(
+          termsScroll.scrollTop + delta,
+          0,
+          maxScroll,
+        );
         updateReviewState();
       }
 
       volumeSlider.addEventListener("input", (event) => {
         setPendingVolume(event.target.value);
-        if (state.pendingVolume !== state.committedVolume) {
-          statusLine.textContent = "Pending amendment.";
-        }
       });
 
-      volumeSlider.addEventListener("change", () => {
-        requestVolumeChange();
-      });
+      volumeSlider.addEventListener("change", requestVolumeChange);
 
-      termsScroll.addEventListener("scroll", updateReviewState, { passive: true });
+      termsScroll.addEventListener("scroll", updateReviewState, {
+        passive: true,
+      });
 
       termsScroll.addEventListener(
         "wheel",
         (event) => {
           event.preventDefault();
-          slowlyScroll(event.deltaY * 0.16);
+          slowlyScroll(event.deltaY * 0.15);
         },
         { passive: false },
       );
@@ -731,9 +752,10 @@
         (event) => {
           const nextY = event.touches[0]?.clientY || state.touchY;
           const delta = state.touchY - nextY;
+
           state.touchY = nextY;
           event.preventDefault();
-          slowlyScroll(delta * 0.38);
+          slowlyScroll(delta * 0.36);
         },
         { passive: false },
       );
@@ -756,7 +778,7 @@
 
         if (event.key === "End") {
           event.preventDefault();
-          slowlyScroll(termsScroll.clientHeight * 0.35);
+          slowlyScroll(termsScroll.clientHeight * 0.34);
           return;
         }
 
@@ -786,8 +808,8 @@
 
       createTerms();
       renderCommittedVolume();
-      termsModal.hidden = true;
     </script>
+
     <script src="../../assets/site.js" defer></script>
   </body>
 </html>
