@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calibration | Volume</title>
+    <meta
+      name="description"
+      content="Adjust the volume after completing a short calibration routine."
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f2f1ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Volume" />
+    <meta property="og:title" content="Calibration | Volume" />
+    <meta
+      property="og:description"
+      content="Adjust the volume after completing a short calibration routine."
+    />
+    <meta
+      property="og:url"
+      content="https://volume.vivan.site/sliders/calibration/"
+    />
+    <meta
+      property="og:image"
+      content="https://volume.vivan.site/assets/vivancodes_logo.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Calibration | Volume" />
+    <meta
+      name="twitter:description"
+      content="Adjust the volume after completing a short calibration routine."
+    />
+    <link
+      rel="canonical"
+      href="https://volume.vivan.site/sliders/calibration/"
+    />
+    <link rel="icon" type="image/png" href="../../assets/vivancodes_logo.png" />
+    <link rel="stylesheet" href="../../assets/site.css" />
+
+    <style>
+      body {
+        user-select: none;
+      }
+
+      body.calibration-modal-open {
+        overflow: hidden;
+      }
+
+      .project-stage {
+        width: 100%;
+        min-height: min(70vh, 760px);
+        display: grid;
+        place-items: center;
+      }
+
+      .calibration-stage {
+        width: min(92vw, 540px);
+        display: grid;
+        justify-items: center;
+        gap: 18px;
+      }
+
+      .volume-readout {
+        margin: 0;
+        color: #161615;
+        font-size: clamp(3.25rem, 11vw, 4.75rem);
+        font-weight: 260;
+        line-height: 0.95;
+        letter-spacing: -0.066em;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .calibration-card {
+        width: 100%;
+        display: grid;
+        gap: 15px;
+        padding: 22px;
+        border: 1px solid rgba(23, 23, 23, 0.085);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 30px rgba(17, 17, 17, 0.045);
+      }
+
+      .slider-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        color: #77756e;
+        font-size: 0.82rem;
+        line-height: 1.2;
+      }
+
+      .pending-value {
+        color: #171717;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .volume-slider,
+      .calibration-slider {
+        width: 100%;
+        margin: 0;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .volume-slider:focus-visible,
+      .calibration-slider:focus-visible,
+      .corner-puck:focus-visible,
+      .align-thumb:focus-visible,
+      .modal-button:focus-visible {
+        outline: 2px solid rgba(23, 23, 23, 0.42);
+        outline-offset: 4px;
+      }
+
+      .volume-slider::-webkit-slider-runnable-track,
+      .calibration-slider::-webkit-slider-runnable-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e7e1;
+      }
+
+      .volume-slider::-webkit-slider-thumb,
+      .calibration-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        margin-top: -8px;
+        border: 1.5px solid #d7d5ce;
+        border-radius: 999px;
+        background: #fffffd;
+        box-shadow:
+          0 4px 12px rgba(17, 17, 17, 0.08),
+          0 1px 2px rgba(17, 17, 17, 0.05);
+      }
+
+      .volume-slider::-moz-range-track,
+      .calibration-slider::-moz-range-track {
+        height: 8px;
+        border: 0;
+        border-radius: 999px;
+        background: #e9e7e1;
+      }
+
+      .volume-slider::-moz-range-thumb,
+      .calibration-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border: 1.5px solid #d7d5ce;
+        border-radius: 999px;
+        background: #fffffd;
+        box-shadow:
+          0 4px 12px rgba(17, 17, 17, 0.08),
+          0 1px 2px rgba(17, 17, 17, 0.05);
+      }
+
+      .status-line {
+        min-height: 1.35em;
+        margin: 0;
+        color: #85827a;
+        font-size: 0.86rem;
+        line-height: 1.35;
+        text-align: center;
+      }
+
+      .calibration-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(242, 241, 236, 0.74);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 140ms ease;
+      }
+
+      .calibration-modal.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .calibration-dialog {
+        width: min(92vw, 430px);
+        display: grid;
+        gap: 16px;
+        padding: 18px;
+        border: 1px solid rgba(23, 23, 23, 0.1);
+        border-radius: 18px;
+        background: #fffffd;
+        box-shadow: 0 18px 50px rgba(17, 17, 17, 0.12);
+        transform: translateY(6px);
+        transition: transform 140ms ease;
+      }
+
+      .calibration-modal.is-open .calibration-dialog {
+        transform: translateY(0);
+      }
+
+      .modal-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .modal-title {
+        margin: 0;
+        color: #171717;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+
+      .step-label {
+        color: #85827a;
+        font-size: 0.78rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .task-panel {
+        display: grid;
+        gap: 14px;
+      }
+
+      .task-copy {
+        min-height: 1.35em;
+        margin: 0;
+        color: #77756e;
+        font-size: 0.88rem;
+        line-height: 1.35;
+        text-align: center;
+      }
+
+      .fade-sample {
+        min-height: 86px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(23, 23, 23, 0.08);
+        border-radius: 14px;
+        background: #faf9f6;
+        color: #171717;
+        font-size: 0.92rem;
+        letter-spacing: -0.015em;
+      }
+
+      .corner-pad {
+        position: relative;
+        width: min(100%, 260px);
+        aspect-ratio: 1 / 1;
+        justify-self: center;
+        border: 1px solid rgba(23, 23, 23, 0.09);
+        border-radius: 15px;
+        background: #faf9f6;
+        touch-action: none;
+      }
+
+      .corner-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border: 1px solid rgba(23, 23, 23, 0.16);
+        border-radius: 999px;
+        background: #fffffd;
+        transform: translate(-50%, -50%);
+      }
+
+      .corner-dot.is-active {
+        background: #171717;
+        border-color: #171717;
+      }
+
+      .corner-dot.is-done {
+        opacity: 0.28;
+      }
+
+      .corner-puck {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 1.5px solid #d7d5ce;
+        border-radius: 999px;
+        background: #fffffd;
+        box-shadow:
+          0 4px 12px rgba(17, 17, 17, 0.08),
+          0 1px 2px rgba(17, 17, 17, 0.05);
+        cursor: grab;
+        touch-action: none;
+        transform: translate(-50%, -50%);
+      }
+
+      .corner-puck.is-dragging {
+        cursor: grabbing;
+      }
+
+      .align-track {
+        position: relative;
+        height: 44px;
+        display: flex;
+        align-items: center;
+      }
+
+      .align-rail {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 8px;
+        border-radius: 999px;
+        background: #e9e7e1;
+      }
+
+      .align-target,
+      .align-thumb {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .align-target {
+        width: 2px;
+        height: 24px;
+        border-radius: 999px;
+        background: #171717;
+      }
+
+      .align-thumb {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 1.5px solid #d7d5ce;
+        border-radius: 999px;
+        background: #fffffd;
+        box-shadow:
+          0 4px 12px rgba(17, 17, 17, 0.08),
+          0 1px 2px rgba(17, 17, 17, 0.05);
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .align-thumb.is-dragging {
+        cursor: grabbing;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .modal-button {
+        min-height: 38px;
+        padding: 0 15px;
+        border: 1px solid rgba(23, 23, 23, 0.14);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #171717;
+        font: inherit;
+        font-size: 0.84rem;
+        cursor: pointer;
+      }
+
+      .modal-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.42;
+      }
+
+      .modal-button-primary {
+        border-color: #171717;
+        background: #171717;
+        color: #f7f6f2;
+      }
+
+      @media (max-width: 640px) {
+        .project-stage {
+          min-height: auto;
+        }
+
+        .calibration-card,
+        .calibration-dialog {
+          border-radius: 18px;
+        }
+
+        .calibration-card {
+          padding: 20px 18px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .calibration-modal,
+        .calibration-dialog {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="project-page" data-site-root="../../">
+    <div class="page-shell">
+      <div data-site-header></div>
+
+      <header class="page-bar">
+        <div class="page-bar-copy">
+          <h1>Calibration</h1>
+          <p>Make the experience feel more natural.</p>
+        </div>
+      </header>
+
+      <main class="project-stage">
+        <section
+          class="calibration-stage"
+          aria-label="Calibration volume control"
+        >
+          <p class="volume-readout" id="volumeLabel" data-volume="50">
+            Volume: 50%
+          </p>
+
+          <div class="calibration-card">
+            <div class="slider-meta">
+              <span>Requested volume</span>
+              <span class="pending-value" id="pendingValue">50%</span>
+            </div>
+
+            <input
+              class="volume-slider"
+              id="volumeSlider"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+              aria-label="Requested volume"
+            />
+
+            <p class="status-line" id="statusLine">Release to calibrate.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      class="calibration-modal"
+      id="calibrationModal"
+      aria-hidden="true"
+      hidden
+    >
+      <section
+        class="calibration-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <header class="modal-head">
+          <h2 class="modal-title" id="modalTitle">Calibration</h2>
+          <span class="step-label" id="stepLabel">1 / 3</span>
+        </header>
+
+        <div class="task-panel" id="taskPanel"></div>
+        <p class="task-copy" id="taskStatus">Set the mark.</p>
+
+        <footer class="modal-actions">
+          <button class="modal-button" id="cancelButton" type="button">
+            Cancel
+          </button>
+          <button
+            class="modal-button modal-button-primary"
+            id="confirmButton"
+            type="button"
+          >
+            Confirm
+          </button>
+        </footer>
+      </section>
+    </div>
+
+    <div class="bmc-script-mount" aria-hidden="true">
+      <script
+        type="text/javascript"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+        data-name="bmc-button"
+        data-slug="vivancodes"
+        data-color="#FFDD00"
+        data-emoji="🔊"
+        data-font="Cookie"
+        data-text="Buy me volume"
+        data-outline-color="#000000"
+        data-font-color="#000000"
+        data-coffee-color="#ffffff"
+      ></script>
+    </div>
+
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="vivancodes"
+      data-description="Support me on Buy me a coffee!"
+      data-message="Your volume. Higher."
+      data-color="#5F7FFF"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+
+    <script>
+      const volumeLabel = document.getElementById("volumeLabel");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const pendingValue = document.getElementById("pendingValue");
+      const statusLine = document.getElementById("statusLine");
+
+      const calibrationModal = document.getElementById("calibrationModal");
+      const taskPanel = document.getElementById("taskPanel");
+      const taskStatus = document.getElementById("taskStatus");
+      const stepLabel = document.getElementById("stepLabel");
+      const cancelButton = document.getElementById("cancelButton");
+      const confirmButton = document.getElementById("confirmButton");
+
+      const state = {
+        committedVolume: 50,
+        pendingVolume: 50,
+        calibratedVolume: 50,
+        modalOpen: false,
+        stepIndex: 0,
+        lastFocusedElement: null,
+        fadeValue: 50,
+        cornerSequence: ["tl", "tr", "br", "bl"],
+        cornerIndex: 0,
+        cornerDone: [],
+        puckX: 0.5,
+        puckY: 0.5,
+        cornerPointerId: null,
+        alignTarget: 0.66,
+        alignX: 0.34,
+        alignPointerId: null,
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function volumeText(value) {
+        return `${Math.round(value)}%`;
+      }
+
+      function setPendingVolume(value) {
+        state.pendingVolume = clamp(Math.round(Number(value) || 0), 0, 100);
+        pendingValue.textContent = volumeText(state.pendingVolume);
+      }
+
+      function renderCommittedVolume() {
+        const volume = Math.round(state.committedVolume);
+        volumeLabel.textContent = `Volume: ${volume}%`;
+        volumeLabel.dataset.volume = String(volume);
+        volumeSlider.value = String(volume);
+        pendingValue.textContent = volumeText(volume);
+        window.VolumeAudio?.syncVolume?.(volume);
+      }
+
+      function resetCalibration() {
+        state.stepIndex = 0;
+        state.fadeValue = state.pendingVolume;
+        state.calibratedVolume = state.pendingVolume;
+        state.cornerIndex = 0;
+        state.cornerDone = [];
+        state.puckX = 0.5;
+        state.puckY = 0.5;
+        state.cornerPointerId = null;
+        state.alignTarget = 0.38 + Math.random() * 0.34;
+        state.alignX = state.alignTarget < 0.5 ? 0.78 : 0.22;
+        state.alignPointerId = null;
+      }
+
+      function openCalibration() {
+        if (state.modalOpen) return;
+
+        state.modalOpen = true;
+        state.lastFocusedElement =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
+
+        resetCalibration();
+        renderStep();
+
+        document.body.classList.add("calibration-modal-open");
+        calibrationModal.hidden = false;
+        calibrationModal.setAttribute("aria-hidden", "false");
+
+        requestAnimationFrame(() => {
+          calibrationModal.classList.add("is-open");
+          confirmButton.focus({ preventScroll: true });
+        });
+      }
+
+      function closeCalibration() {
+        state.modalOpen = false;
+        calibrationModal.classList.remove("is-open");
+        calibrationModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("calibration-modal-open");
+
+        window.setTimeout(() => {
+          if (!state.modalOpen) calibrationModal.hidden = true;
+        }, 160);
+
+        if (
+          state.lastFocusedElement &&
+          document.contains(state.lastFocusedElement)
+        ) {
+          state.lastFocusedElement.focus({ preventScroll: true });
+        }
+      }
+
+      function requestVolumeChange() {
+        if (state.pendingVolume === state.committedVolume) {
+          statusLine.textContent = "No calibration required.";
+          return;
+        }
+
+        statusLine.textContent = "Calibration required.";
+        openCalibration();
+      }
+
+      function cancelCalibration() {
+        state.pendingVolume = state.committedVolume;
+        renderCommittedVolume();
+        statusLine.textContent = "Change cancelled.";
+        closeCalibration();
+      }
+
+      function applyCalibration() {
+        state.committedVolume = clamp(
+          Math.round(state.calibratedVolume),
+          0,
+          100,
+        );
+        state.pendingVolume = state.committedVolume;
+        renderCommittedVolume();
+        statusLine.textContent = "Calibrated.";
+        closeCalibration();
+      }
+
+      function renderStep() {
+        stepLabel.textContent = `${state.stepIndex + 1} / 3`;
+        confirmButton.textContent = state.stepIndex === 2 ? "Apply" : "Confirm";
+        confirmButton.disabled = false;
+
+        if (state.stepIndex === 0) {
+          renderFadeStep();
+          return;
+        }
+
+        if (state.stepIndex === 1) {
+          renderCornerStep();
+          return;
+        }
+
+        renderAlignStep();
+      }
+
+      function renderFadeStep() {
+        taskPanel.innerHTML = `
+          <div class="fade-sample">
+            <span id="fadeText">Stop when this disappears.</span>
+          </div>
+          <input
+            class="calibration-slider"
+            id="fadeSlider"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="${state.fadeValue}"
+            aria-label="Visibility calibration"
+          />
+        `;
+
+        const fadeSlider = document.getElementById("fadeSlider");
+        const fadeText = document.getElementById("fadeText");
+
+        function syncFade() {
+          const value = clamp(Number(fadeSlider.value) || 0, 0, 100);
+          state.fadeValue = value;
+          state.calibratedVolume = Math.round(value);
+
+          const opacity = clamp(1 - value / 72, 0, 1);
+          fadeText.style.opacity = String(opacity);
+          taskStatus.textContent = `Calibrated volume: ${volumeText(value)}.`;
+        }
+
+        fadeSlider.addEventListener("input", syncFade);
+        confirmButton.onclick = () => {
+          state.calibratedVolume = Math.round(state.fadeValue);
+          state.stepIndex = 1;
+          renderStep();
+        };
+
+        syncFade();
+        fadeSlider.focus({ preventScroll: true });
+      }
+
+      function getCornerPoint(corner, pad) {
+        const inset = 20;
+        const width = Math.max(pad.clientWidth, 1);
+        const height = Math.max(pad.clientHeight, 1);
+
+        return {
+          tl: { x: inset, y: inset },
+          tr: { x: width - inset, y: inset },
+          br: { x: width - inset, y: height - inset },
+          bl: { x: inset, y: height - inset },
+        }[corner];
+      }
+
+      function renderCornerStep() {
+        taskPanel.innerHTML = `
+          <p class="task-copy">Drag the dot to each corner.</p>
+          <div class="corner-pad" id="cornerPad" aria-label="Corner calibration area">
+            <span class="corner-dot" data-corner="tl"></span>
+            <span class="corner-dot" data-corner="tr"></span>
+            <span class="corner-dot" data-corner="br"></span>
+            <span class="corner-dot" data-corner="bl"></span>
+            <button class="corner-puck" id="cornerPuck" type="button" aria-label="Calibration dot"></button>
+          </div>
+        `;
+
+        const pad = document.getElementById("cornerPad");
+        const puck = document.getElementById("cornerPuck");
+        const dots = Array.from(pad.querySelectorAll(".corner-dot"));
+
+        function layout() {
+          const active = state.cornerSequence[state.cornerIndex];
+
+          dots.forEach((dot) => {
+            const corner = dot.dataset.corner;
+            const point = getCornerPoint(corner, pad);
+            const done = state.cornerDone.includes(corner);
+            dot.style.left = `${point.x}px`;
+            dot.style.top = `${point.y}px`;
+            dot.classList.toggle("is-done", done);
+            dot.classList.toggle("is-active", corner === active && !done);
+          });
+
+          puck.style.left = `${state.puckX * pad.clientWidth}px`;
+          puck.style.top = `${state.puckY * pad.clientHeight}px`;
+          confirmButton.disabled =
+            state.cornerDone.length < state.cornerSequence.length;
+          taskStatus.textContent = `${state.cornerDone.length} / 4 corners.`;
+        }
+
+        function resetPuck() {
+          state.puckX = 0.5;
+          state.puckY = 0.5;
+        }
+
+        function setPuckFromPointer(event) {
+          const rect = pad.getBoundingClientRect();
+          const x = clamp(event.clientX - rect.left, 12, rect.width - 12);
+          const y = clamp(event.clientY - rect.top, 12, rect.height - 12);
+          state.puckX = rect.width ? x / rect.width : 0.5;
+          state.puckY = rect.height ? y / rect.height : 0.5;
+          puck.style.left = `${x}px`;
+          puck.style.top = `${y}px`;
+          checkHit(x, y);
+        }
+
+        function checkHit(x, y) {
+          if (state.cornerDone.length >= state.cornerSequence.length) return;
+
+          const active = state.cornerSequence[state.cornerIndex];
+          const point = getCornerPoint(active, pad);
+          const distance = Math.hypot(x - point.x, y - point.y);
+
+          if (distance > 24) return;
+
+          state.cornerDone.push(active);
+          state.cornerIndex += 1;
+          state.cornerPointerId = null;
+          puck.classList.remove("is-dragging");
+          resetPuck();
+          layout();
+        }
+
+        function startDrag(event) {
+          event.preventDefault();
+          state.cornerPointerId = event.pointerId;
+          puck.classList.add("is-dragging");
+          puck.setPointerCapture(event.pointerId);
+          setPuckFromPointer(event);
+        }
+
+        function moveDrag(event) {
+          if (event.pointerId !== state.cornerPointerId) return;
+          event.preventDefault();
+          setPuckFromPointer(event);
+        }
+
+        function endDrag(event) {
+          if (event.pointerId !== state.cornerPointerId) return;
+          state.cornerPointerId = null;
+          puck.classList.remove("is-dragging");
+
+          if (state.cornerDone.length < state.cornerSequence.length) {
+            resetPuck();
+            layout();
+          }
+        }
+
+        puck.addEventListener("pointerdown", startDrag);
+        puck.addEventListener("pointermove", moveDrag);
+        puck.addEventListener("pointerup", endDrag);
+        puck.addEventListener("pointercancel", endDrag);
+
+        confirmButton.onclick = () => {
+          if (state.cornerDone.length < state.cornerSequence.length) return;
+          state.stepIndex = 2;
+          renderStep();
+        };
+
+        layout();
+        requestAnimationFrame(layout);
+        puck.focus({ preventScroll: true });
+      }
+
+      function renderAlignStep() {
+        taskPanel.innerHTML = `
+          <p class="task-copy">Align the marks.</p>
+          <div class="align-track" id="alignTrack" aria-label="Alignment calibration area">
+            <div class="align-rail"></div>
+            <div class="align-target" id="alignTarget" aria-hidden="true"></div>
+            <button class="align-thumb" id="alignThumb" type="button" aria-label="Alignment marker"></button>
+          </div>
+        `;
+
+        const track = document.getElementById("alignTrack");
+        const target = document.getElementById("alignTarget");
+        const thumb = document.getElementById("alignThumb");
+
+        function layout() {
+          const width = Math.max(track.clientWidth, 1);
+          target.style.left = `${state.alignTarget * width}px`;
+          thumb.style.left = `${state.alignX * width}px`;
+          const ready = Math.abs(state.alignX - state.alignTarget) <= 0.025;
+          confirmButton.disabled = !ready;
+          taskStatus.textContent = ready ? "Close enough." : "Not aligned.";
+        }
+
+        function setFromPointer(event) {
+          const rect = track.getBoundingClientRect();
+          const x = clamp(event.clientX - rect.left, 0, rect.width);
+          state.alignX = rect.width ? x / rect.width : 0;
+          layout();
+        }
+
+        function startDrag(event) {
+          event.preventDefault();
+          state.alignPointerId = event.pointerId;
+          thumb.classList.add("is-dragging");
+          thumb.setPointerCapture(event.pointerId);
+          setFromPointer(event);
+        }
+
+        function moveDrag(event) {
+          if (event.pointerId !== state.alignPointerId) return;
+          event.preventDefault();
+          setFromPointer(event);
+        }
+
+        function endDrag(event) {
+          if (event.pointerId !== state.alignPointerId) return;
+          state.alignPointerId = null;
+          thumb.classList.remove("is-dragging");
+        }
+
+        thumb.addEventListener("pointerdown", startDrag);
+        thumb.addEventListener("pointermove", moveDrag);
+        thumb.addEventListener("pointerup", endDrag);
+        thumb.addEventListener("pointercancel", endDrag);
+
+        confirmButton.onclick = () => {
+          if (Math.abs(state.alignX - state.alignTarget) > 0.025) return;
+          applyCalibration();
+        };
+
+        layout();
+        requestAnimationFrame(layout);
+        thumb.focus({ preventScroll: true });
+      }
+
+      function getFocusableElements() {
+        return Array.from(
+          calibrationModal.querySelectorAll(
+            'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => !element.hidden && element.offsetParent !== null);
+      }
+
+      function trapFocus(event) {
+        if (!state.modalOpen || event.key !== "Tab") return;
+
+        const focusable = getFocusableElements();
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      volumeSlider.addEventListener("input", (event) => {
+        setPendingVolume(event.target.value);
+        statusLine.textContent =
+          state.pendingVolume === state.committedVolume
+            ? "No calibration required."
+            : "Pending calibration.";
+      });
+
+      volumeSlider.addEventListener("change", requestVolumeChange);
+      cancelButton.addEventListener("click", cancelCalibration);
+
+      document.addEventListener("keydown", (event) => {
+        if (!state.modalOpen) return;
+
+        if (event.key === "Escape") {
+          event.preventDefault();
+          cancelCalibration();
+          return;
+        }
+
+        trapFocus(event);
+      });
+
+      window.addEventListener(
+        "resize",
+        () => {
+          if (state.modalOpen) renderStep();
+        },
+        { passive: true },
+      );
+
+      renderCommittedVolume();
+    </script>
+
+    <script src="../../assets/site.js" defer></script>
+  </body>
+</html>

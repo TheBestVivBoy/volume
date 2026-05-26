@@ -96,6 +96,13 @@ const sliders = [
     preview: false,
   },
   {
+    title: "Calibration",
+    description: "Finish the setup before touching volume.",
+    slug: "calibration",
+    path: "sliders/calibration/",
+    preview: false,
+  },
+  {
     title: "Dino",
     description: "The classic no-internet game!",
     slug: "dino",
